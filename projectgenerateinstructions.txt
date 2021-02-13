@@ -1,0 +1,3 @@
+Instructions to replicate:
+
+npx create-react-app appName --template redux
