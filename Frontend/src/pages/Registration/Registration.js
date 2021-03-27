@@ -4,114 +4,231 @@ import { makeStyles} from "@material-ui/core/styles";
 import TextField from "@material-ui/core/TextField";
 import "./registration.css";
 import Button from "@material-ui/core/Button";
+import AppBar from '@material-ui/core/AppBar';
+import Tab from '@material-ui/core/Tab';
+import TabContext from '@material-ui/lab/TabContext';
+import TabList from '@material-ui/lab/TabList';
+import TabPanel from '@material-ui/lab/TabPanel';
+import Radio from '@material-ui/core/Radio';
+import RadioGroup from '@material-ui/core/RadioGroup';
+import FormControlLabel from '@material-ui/core/FormControlLabel';
+import FormControl from '@material-ui/core/FormControl';
+import FormLabel from '@material-ui/core/FormLabel';
+
 
 
 const useStyles = makeStyles((theme) => ({
   root: {
-    '& > *': {
-      margin: theme.spacing(1),
-      width: '25ch',
-      padding: '0 30px',
-    },
+    backgroundColor: theme.palette.background.paper,
+    
+  },
+  textField: {
+    marginLeft: theme.spacing(2),
+    marginRight: theme.spacing(2),
+    width: '21ch',
+    fontSize: 20,
   },
 }));
 
 function Registration() {
   const classes = useStyles();
-  return (
-    <div className="registration_pg">
-      <div className="registration_pg-header1">
-      </div>
 
-    <div className="registration_pg-main">
-    <br/>
-      <div className="registration_pg-title">
+  const [v, setV] = React.useState('1');
+  const [value, setValue] = React.useState('Maintainer');
+
+  const labelChange = (event,value) => {
+    setValue(event.target.value);
+  };
+  const handleChange = (event, newValue) => {
+    setV(newValue);
+  };
+
+  
+
+  
+
+  return (
+    <div className="registration">
+      <div  className="registration-title">
         Registration
       </div>
-      <br/>
-      <Grid container direction={"column"} spacing={5}>
-      <Grid item>
-      <TextField 
-        required
-        id="Normal"
-        label="First Name"
-        variant="filled"
-        />
-      </Grid>
+      <div className={classes.root}>
+        <TabContext value={v}>
+          <AppBar position="static">
+            <TabList onChange={handleChange}>
+              <Tab label="Employee Registration" value="1" />
+              <Tab label="Customer Registration" value="2" />
+            </TabList>
+          </AppBar>
 
-      <Grid item>
-        <TextField 
-        required
+          <TabPanel value="2">
+            <div className="registration-e">
+              <Grid container spacing={2}>
+              <Grid item>
+              <TextField
+                label="First Name"
+                id="filled-margin-none"
+                className={classes.textField}
+                margin="normal"
+                variant="filled"
+              />
+              <TextField
+                label="Last Name"
+                id="filled-margin-dense"
+                className={classes.textField}
+                margin="normal"
+                variant="filled"
+              />
+              <FormControl component="fieldset">
+              <FormLabel component="legend">Employee Type</FormLabel>
+                <RadioGroup aria-label="Employee Type" name="employee" value={value} onChange={labelChange}>
+                  <FormControlLabel value="Maintainer" control={<Radio />} label="Maintainer" />
+                  <FormControlLabel value="Attendant" control={<Radio />} label="Attendant" />
+                </RadioGroup>
+              </FormControl>
+              </Grid>
+              <div item className="password2">
+              <Grid>
+              <TextField 
+                id="filled-full-width"
+                label="Email"
+                fullWidth
+                margin="normal"
+                InputLabelProps={{
+                  shrink: true,
+                }}
+                variant="filled"
+                />
+              <TextField
+                id="filled-full-width"
+                label="Password"
+                fullWidth
+                margin="normal"
+                InputLabelProps={{
+                  shrink: true,
+                }}
+                variant="filled"
+              />
+              <TextField
+                id="filled-full-width"
+                label="Confirm Password"
+                fullWidth
+                margin="normal"
+                InputLabelProps={{
+                  shrink: true,
+                }}
+                variant="filled"
+              />
+              </Grid>
+              </div>
+              </Grid>
+              <br/>
+              <Grid>
+              <Button 
+                variant="outlined" 
+                type="submit">
+                Submit
+              </Button>
+              </Grid>
+            </div>
+          </TabPanel>
 
-        id="filled-required"
-        label="Last Name"
-        variant="filled" />
-      </Grid>
-
-      <Grid item>
-      <TextField 
-        required
-        id="outlined-number"
-        label ="Height"
-        type="number"
-        helperText="Feet"
-        InputLabelProps={{
-          shrink: true,
-        }}
-        variant="outlined"
-        style={{ margin: 10 }}/>
-      <br/>
-      <TextField 
-        required
-        id="outlined-number"
-        label =""
-        type="number"
-        helperText="Inches"
-        variant="outlined"/>
-      </Grid>
-
-      <Grid item>    
-      <TextField 
-        required
-        id="outlined-number"
-        label="Age"
-        type="number"
-        InputLabelProps={{
-          shrink: true,
-        }}
-        variant="outlined"
-        style={{ margin: 10 }}/>
-      </Grid>
-
-      <Grid item>
-      <TextField 
-        required
-        id="filled-required"
-        label="Email"
-        variant="filled" 
-        />
-      </Grid>
-      
-      <Grid item>
-      <TextField 
-        required
-        id="filled-required"
-        label="Password"
-        variant="filled"/>
-      </Grid>
-      </Grid>
-      <br/>
-      <Button 
-      variant="outlined" >
-      
-        Submit
-      </Button>
-    
-    </div>
-
+          <TabPanel value="1">
+            <div className="registration-c">
+              <Grid container spacing={2}>
+              <Grid item>
+              <TextField
+                label="First Name"
+                id="filled-margin-none"
+                className={classes.textField}
+                margin="normal"
+                variant="filled"
+              />
+              <TextField
+                label="Last Name"
+                id="filled-margin-dense"
+                className={classes.textField}
+                margin="normal"
+                variant="filled"
+              />
+              <TextField
+                id="filled-margin-normal"
+                label="Age"
+                className={classes.textField}
+                margin="normal"
+                type="number"
+                InputLabelProps={{
+                  shrink: true,
+                }}
+                variant="outlined"/>
+              <TextField 
+                required
+                id="outlined-number"
+                margin="normal"
+                label ="Height"
+                type="number"
+                className={classes.textField}
+                helperText="Feet"
+                InputLabelProps={{
+                  shrink: true,
+                }}
+                variant="outlined"/> 
+              <TextField 
+                required
+                className={classes.textField}
+                id="outlined-number"
+                label ="Height"
+                type="number"
+                helperText="Inches"
+                margin="normal"
+                InputLabelProps={{
+                  shrink: true,
+                }}
+                variant="outlined"/>
+              <TextField 
+                required
+                className={classes.textField}
+                id="filled-required"
+                label="Email"
+                variant="filled" 
+                margin="normal"
+                />
+              <div item className="password">
+              
+              <TextField
+                id="filled-full-width"
+                label="Password"
+                fullWidth
+                margin="normal"
+                InputLabelProps={{
+                  shrink: true,
+                }}
+                variant="filled"
+              />
+              <TextField
+                id="filled-full-width"
+                label="Confirm Password"
+                fullWidth
+                margin="normal"
+                InputLabelProps={{
+                  shrink: true,
+                }}
+                variant="filled"
+              />
+              </div>
+              </Grid>
+              </Grid>
+              <Button 
+                variant="outlined" 
+                type="submit">
+                Submit
+              </Button>
+            </div>
+          </TabPanel>
+        </TabContext>
+      </div>
     </div>
   );
 }
 
 export default Registration;
-

@@ -1,59 +1,43 @@
-.registration_pg {
+.registration{
   text-align: center;
+  display:grid;
   background-color: #c2bebe;
   width:100%;
 }
 
-.registration_pg-header1 {
-  text-align: center;
-}
-.registration_pg-header {
-  font-family: Georgia, 'Times New Roman', Times, serif;
-  background-color: #282c34;
-  min-height: 15vh;
-  display: flex;
-  width:100%;
-  flex-direction: column;
-  text-align: center;
-  align-items: center;
+.registration-title {
+  font-size: 40px;
   justify-content: center;
-  font-size: calc(10px + 2vmin);
-  color: white;
-  
-}
-
-.registration_pg-title {
-  font-size: 30px;
-
+  text-align:center;
+  min-height:80px;
   font-family: Georgia, 'Times New Roman', Times, serif;
 
   
 }
 
-.registration_pg-main {
+.registration-c {
   font-family: Georgia, 'Times New Roman', Times, serif;
+  width: 60%;
   margin:auto;
-  width: 50%;
-	height: 50%;
-	display:block;
-  background-color: #ffffff;
-  border-radius: 10px;
-
+  max-height: 60%;
+  border-radius: 5px;
   
 }
 
-.registration_pg-footer {
+.registration-e {
   font-family: Georgia, 'Times New Roman', Times, serif;
-  background-color: #ffffff;
-  min-height: 10vh;
-  display: flex;
-  flex-direction: row;
-  align-items: right;
-  font-size: 15px;
-  color: rgb(0, 0, 0);
-  
-}
-.registration_pg-link {
-
+  width: 60%;
+  margin:auto;
+  max-height: 60%;
+  border-radius: 5px;
 }
 
+.password{
+  width: 94%;
+  margin:auto;
+}
+
+.password2{
+  width: 96%;
+  margin:auto;
+}
