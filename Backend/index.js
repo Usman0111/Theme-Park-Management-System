@@ -10,6 +10,8 @@ app.use(cors());
 app.use("/auth", require("./routes/jwtAuth"));
 
 app.use("/attraction", require("./routes/attraction"));
+app.use("/ride", require("./routes/ride"));
+app.use("/manager", require("./routes/manager"));
 
 app.get("", async (req, res) => {
   try {
