@@ -65,5 +65,14 @@ router.post("/retreive-rides", authorize, async (req, res) => {
   }
 });
 
+router.post("/test", authorize, async (req, res) => {
+  try {
+
+    res.json(req.user.type);
+  } catch (err) {
+    console.log(err);
+  }
+});
+
 
 module.exports = router;
