@@ -1,20 +1,23 @@
-import React from 'react';
+import React from "react";
 import Grid from "@material-ui/core/Grid";
 import { makeStyles} from "@material-ui/core/styles";
 import TextField from "@material-ui/core/TextField";
 import "./registration.css";
 import Button from "@material-ui/core/Button";
-import AppBar from '@material-ui/core/AppBar';
-import Tab from '@material-ui/core/Tab';
-import TabContext from '@material-ui/lab/TabContext';
-import TabList from '@material-ui/lab/TabList';
-import TabPanel from '@material-ui/lab/TabPanel';
-import Radio from '@material-ui/core/Radio';
-import RadioGroup from '@material-ui/core/RadioGroup';
-import FormControlLabel from '@material-ui/core/FormControlLabel';
-import FormControl from '@material-ui/core/FormControl';
-import FormLabel from '@material-ui/core/FormLabel';
-
+import AppBar from "@material-ui/core/AppBar";
+import Tab from "@material-ui/core/Tab";
+import TabContext from "@material-ui/lab/TabContext";
+import TabList from "@material-ui/lab/TabList";
+import TabPanel from "@material-ui/lab/TabPanel";
+import Radio from "@material-ui/core/Radio";
+import RadioGroup from "@material-ui/core/RadioGroup";
+import FormControlLabel from "@material-ui/core/FormControlLabel";
+import FormControl from "@material-ui/core/FormControl";
+import FormLabel from "@material-ui/core/FormLabel";
+import Paper from "@material-ui/core/Paper";
+import axios from "axios";
+import {useState} from "react";
+import { useHistory } from "react-router-dom";
 
 
 const useStyles = makeStyles((theme) => ({
@@ -30,34 +33,87 @@ const useStyles = makeStyles((theme) => ({
   },
 }));
 
+
 function Registration() {
   const classes = useStyles();
+  const paperStyle={ padding: 20,height: '70vh',width: 900, margin: '50px auto'};
+  const [v, setV] = useState('1');
+  const [value, setValue] = useState('maintainer');
 
-  const [v, setV] = React.useState('1');
-  const [value, setValue] = React.useState('Maintainer');
+
+ 
+
+  const [customerD, setCustomerD] = useState({
+    first_name:"",
+    last_name:"",
+    email:"",
+    password:"",
+    age:"",
+    height_inch: "",
+    height_feet:"",
+    user_type:"customer"
+  })
+
+  const [employeeD, setEmployeeD] = useState({
+    first_name:"",
+    last_name:"",
+    email:"",
+    password:"",
+    user_type:"attendant"
+  })
+
+  let history = useHistory();
+
+  const customer = () => {
+    const height = Number(customerD.height_feet)*12 + Number(customerD.height_inch)
+    const custData = {
+    first_name: customerD.first_name,
+    last_name:customerD.last_name,
+    email:customerD.email,
+    password:customerD.password,
+    age:Number(customerD.age),
+    height,
+    user_type:"customer"}
+    console.log(custData);
+    axios.post("http://100.26.17.215:5000/auth/register",custData).then((res)=>{
+      history.push("/login");
+    console.log(res)})
+    .catch((err) => {
+      console.log(err);
+    });
+  };
+
+  const employee = () => {
+    axios.post("http://100.26.17.215:5000/auth/register", employeeD).then((res)=>{
+    history.push("/login");  
+    console.log(res)})
+    .catch((err) => {
+      console.log(err);
+    });
+  };
+
 
   const labelChange = (event,value) => {
-    setValue(event.target.value);
+    setValue(event.target.value); 
   };
   const handleChange = (event, newValue) => {
     setV(newValue);
   };
 
-  
-
-  
 
   return (
-    <div className="registration">
-      <div  className="registration-title">
+    <div className="registration-page">
+      <Grid>
+          <Paper elevation={10} style={paperStyle}>
+          <div  className="registration-title">
         Registration
       </div>
       <div className={classes.root}>
         <TabContext value={v}>
           <AppBar position="static">
             <TabList onChange={handleChange}>
-              <Tab label="Employee Registration" value="1" />
-              <Tab label="Customer Registration" value="2" />
+              <Tab label="Customer Registration" value="1" />
+              <Tab label="Employee Registration" value="2" />
             </TabList>
           </AppBar>
 
@@ -66,67 +122,80 @@ function Registration() {
               <Grid container spacing={2}>
               <Grid item>
               <TextField
+                required
                 label="First Name"
-                id="filled-margin-none"
+                id="employee-fname"
                 className={classes.textField}
                 margin="normal"
                 variant="filled"
+                onChange ={(event) => {
+                  setEmployeeD({...employeeD, first_name:event.target.value})
+                }}
               />
               <TextField
+                required
                 label="Last Name"
-                id="filled-margin-dense"
+                id="employee-lname"
                 className={classes.textField}
                 margin="normal"
                 variant="filled"
+                onChange ={(event) => {
+                  setEmployeeD({...employeeD, last_name:event.target.value})
+                }}
               />
-              <FormControl component="fieldset">
-              <FormLabel component="legend">Employee Type</FormLabel>
+              <FormControl onChange ={(event) => {
+                  setEmployeeD({...employeeD, user_type:event.target.value})
+                }}
+                component="fieldset">
+              <FormLabel required component="legend">
+                Employee Type
+              </FormLabel>
                 <RadioGroup aria-label="Employee Type" name="employee" value={value} onChange={labelChange}>
-                  <FormControlLabel value="Maintainer" control={<Radio />} label="Maintainer" />
-                  <FormControlLabel value="Attendant" control={<Radio />} label="Attendant" />
+                  <FormControlLabel value="maintainer" control={<Radio />} label="Maintainer" />
+                  <FormControlLabel value="attendant" control={<Radio />} label="Attendant" />
+                  
                 </RadioGroup>
               </FormControl>
-              </Grid>
-              <div item className="password2">
-              <Grid>
+
               <TextField 
-                id="filled-full-width"
+                required
+                id="employee-email"
                 label="Email"
                 fullWidth
                 margin="normal"
-                InputLabelProps={{
-                  shrink: true,
-                }}
                 variant="filled"
+                onChange ={(event) => {
+                  setEmployeeD({...employeeD, email:event.target.value})
+                }}
                 />
               <TextField
-                id="filled-full-width"
+                required
+                id="employee-password"
                 label="Password"
                 fullWidth
                 margin="normal"
-                InputLabelProps={{
-                  shrink: true,
-                }}
                 variant="filled"
+                onChange ={(event) => {
+                  setEmployeeD({...employeeD, password:event.target.value})
+                }}
               />
               <TextField
-                id="filled-full-width"
+                required
+                id="employee-cpassword"
                 label="Confirm Password"
                 fullWidth
                 margin="normal"
-                InputLabelProps={{
-                  shrink: true,
-                }}
                 variant="filled"
               />
               </Grid>
-              </div>
               </Grid>
               <br/>
               <Grid>
               <Button 
                 variant="outlined" 
-                type="submit">
+                type="submit"
+                onClick = {employee}
+                >
                 Submit
               </Button>
               </Grid>
@@ -138,21 +207,30 @@ function Registration() {
               <Grid container spacing={2}>
               <Grid item>
               <TextField
+                required
                 label="First Name"
-                id="filled-margin-none"
+                id="customer-fname"
                 className={classes.textField}
                 margin="normal"
                 variant="filled"
+                onChange ={(event) => {
+                  setCustomerD({...customerD, first_name:event.target.value})
+                }}
               />
               <TextField
+                required
                 label="Last Name"
-                id="filled-margin-dense"
+                id="customer-lname"
                 className={classes.textField}
                 margin="normal"
                 variant="filled"
+                onChange ={(event) => {
+                  setCustomerD({...customerD, last_name:event.target.value})
+                }}
               />
               <TextField
-                id="filled-margin-normal"
+                required
+                id="customer-age"
                 label="Age"
                 className={classes.textField}
                 margin="normal"
@@ -160,10 +238,14 @@ function Registration() {
                 InputLabelProps={{
                   shrink: true,
                 }}
-                variant="outlined"/>
+                variant="outlined"
+                onChange ={(event) => {
+                  setCustomerD({...customerD, age:event.target.value})
+                }}
+                />
               <TextField 
                 required
-                id="outlined-number"
+                id="customer-hfeet"
                 margin="normal"
                 label ="Height"
                 type="number"
@@ -172,11 +254,15 @@ function Registration() {
                 InputLabelProps={{
                   shrink: true,
                 }}
-                variant="outlined"/> 
+                variant="outlined"
+                
+                onChange ={(event) => {
+                  setCustomerD({...customerD, height_feet:event.target.value})
+                }}/> 
               <TextField 
                 required
                 className={classes.textField}
-                id="outlined-number"
+                id="customer-hinches"
                 label ="Height"
                 type="number"
                 helperText="Inches"
@@ -184,49 +270,61 @@ function Registration() {
                 InputLabelProps={{
                   shrink: true,
                 }}
-                variant="outlined"/>
+                variant="outlined"
+                onChange ={(event) => {
+                  setCustomerD({...customerD, height_inch:event.target.value})
+                }}
+                />
               <TextField 
                 required
                 className={classes.textField}
-                id="filled-required"
+                id="customer-email"
                 label="Email"
                 variant="filled" 
                 margin="normal"
+                onChange ={(event) => {
+                  setCustomerD({...customerD, email:event.target.value})
+                }}
                 />
               <div item className="password">
               
               <TextField
+                required
                 id="filled-full-width"
                 label="Password"
                 fullWidth
                 margin="normal"
-                InputLabelProps={{
-                  shrink: true,
-                }}
                 variant="filled"
+                onChange ={(event) => {
+                  setCustomerD({...customerD, password:event.target.value})
+                }}
               />
               <TextField
+                required
                 id="filled-full-width"
                 label="Confirm Password"
                 fullWidth
                 margin="normal"
-                InputLabelProps={{
-                  shrink: true,
-                }}
                 variant="filled"
               />
               </div>
               </Grid>
               </Grid>
+              <br/>
               <Button 
                 variant="outlined" 
-                type="submit">
+                type="submit"
+                onClick = {customer}
+                >
                 Submit
               </Button>
             </div>
           </TabPanel>
         </TabContext>
       </div>
+          </Paper>
+        </Grid>
+      
     </div>
   );
 }
