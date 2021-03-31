@@ -1,6 +1,7 @@
 .registration-title {
   font-size: 35px;
   justify-content: center;
-  text-align:center;
-  font-family: Georgia, 'Times New Roman', Times, serif;
+  text-align: center;
+  font-family: Georgia, "Times New Roman", Times, serif;
+  margin-bottom: 10px;
 }

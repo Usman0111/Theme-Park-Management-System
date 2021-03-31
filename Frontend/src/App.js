@@ -4,24 +4,16 @@ import Home from "./pages/Home/Home";
 import Login from "./pages/Login/Login";
 import Registration from "./pages/Registration/Registration";
 import Dashboard from "./pages/Dashboard/Dashboard";
+import car from "./assets/background.jpg";
 
 const App = () => {
   return (
-    <div className="grid-container">
-      <header>
-        <a href="/">Theme Park</a>
-      </header>
-
-      <div>
-        <Router>
-          <Route path="/" exact component={Home} />
-          <Route path="/login" component={Login} />
-          <Route path="/register" component={Registration} />
-          <Route path="/dashboard" component={Dashboard} />
-        </Router>
-      </div>
-
-      <footer>Copyright</footer>
+    <div>
+      <Router>
+        <Route path="/" component={Login} exact />
+        <Route path="/register" component={Registration} />
+        <Route path="/dashboard" component={Dashboard} />
+      </Router>
     </div>
   );
 };
