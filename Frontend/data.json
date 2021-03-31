@@ -1,0 +1,21 @@
+{
+    "attractions":[
+        {"_id":"attraction1", 
+            "title":"Attraction 1", 
+            "image": "/images/attraction1.jpg",
+            "description": "about attraction 1"
+        },
+        {
+            "id":"attraction2",
+            "title":"Attraction 2",
+            "image": "/images/attraction2.jpg",
+            "description": "about attraction 2"
+        },
+        {
+            "id":"attraction3",
+            "title":"Attraction 3",
+            "image": "/images/attraction3.jpg",
+            "description": "about attraction 3"
+        }
+    ]
+}
