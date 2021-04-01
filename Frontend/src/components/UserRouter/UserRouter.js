@@ -1,33 +1,30 @@
 import React, { useState, useEffect } from "react";
+import CustomerDashboard from "../../pages/CustomerDashboard/CustomerDashboard";
+import ManagerDashboard from "../../pages/ManagerDashboard/ManagerDashboard";
 
 const UserRouter = () => {
   const [userType, setUserType] = useState("");
 
   useEffect(() => {
-    setType(localStorage.getItem("user_type"));
+    setUserType(localStorage.getItem("user_type"));
   }, []);
 
   const routes = () => {
     switch (userType) {
       case "customer":
-        // code block
-        break;
+        return <CustomerDashboard />;
       case "manager":
-        // code block
-        break;
+        return <ManagerDashboard />;
       case "attendant":
-        // code block
-        break;
+        return <div>Nothing Here</div>;
       case "maintainer":
-        // code block
-        break;
-
+        return <div>Nothing Here</div>;
       default:
-      // code block
+        return <div>Nothing Here</div>;
     }
   };
 
-  return <div></div>;
+  return <div>{routes()}</div>;
 };
 
 export default UserRouter;

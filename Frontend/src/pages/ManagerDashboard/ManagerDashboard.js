@@ -14,7 +14,7 @@ import ListItemText from "@material-ui/core/ListItemText";
 import ExitToAppIcon from "@material-ui/icons/ExitToApp";
 import StoreIcon from "@material-ui/icons/Store";
 import TrainIcon from "@material-ui/icons/Train";
-import ConfirmationNumberIcon from "@material-ui/icons/ConfirmationNumber";
+import AssessmentIcon from "@material-ui/icons/Assessment";
 
 const drawerWidth = 240;
 
@@ -41,7 +41,7 @@ const useStyles = makeStyles((theme) => ({
   },
 }));
 
-export default function CustomerDashboard() {
+export default function ManagerDashboard() {
   const classes = useStyles();
 
   return (
@@ -66,9 +66,9 @@ export default function CustomerDashboard() {
           <List>
             <ListItem button>
               <ListItemIcon>
-                <ConfirmationNumberIcon />
+                <AssessmentIcon />
               </ListItemIcon>
-              <ListItemText primary={"Entry Pass"} />
+              <ListItemText primary={"Reports"} />
             </ListItem>
             <ListItem button>
               <ListItemIcon>
