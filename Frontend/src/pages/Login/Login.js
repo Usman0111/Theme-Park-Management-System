@@ -1,4 +1,4 @@
-import React, { useState, useContext } from "react";
+import React, { useState, useContext, useEffect } from "react";
 import {
   Avatar,
   Grid,
@@ -72,8 +72,10 @@ const Login = () => {
     axios
       .post("http://100.26.17.215:5000/auth/login", loginData)
       .then((res) => {
-        console.log(res);
-        history.push("/dashbaord");
+        console.log(res.data);
+        localStorage.setItem("user_id", res.data.user_id);
+        localStorage.setItem("user_type", res.data.user_type);
+        history.push("/dashboard");
       })
       .catch((err) => {
         setErr(err.response.data);
@@ -81,6 +83,12 @@ const Login = () => {
         setOpenErr(true);
       });
   };
+
+  useEffect(() => {
+    if (localStorage.getItem("user_id") && localStorage.getItem("user_type")) {
+      history.push("/dashboard");
+    }
+  }, [history]);
 
   return (
     <Paper style={root} square>

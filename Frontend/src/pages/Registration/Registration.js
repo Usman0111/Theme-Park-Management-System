@@ -1,4 +1,4 @@
-import React, { useContext } from "react";
+import React, { useContext, useEffect } from "react";
 import Grid from "@material-ui/core/Grid";
 import { makeStyles } from "@material-ui/core/styles";
 import TextField from "@material-ui/core/TextField";
@@ -147,6 +147,12 @@ function Registration() {
   const handleChange = (event, newValue) => {
     setV(newValue);
   };
+
+  useEffect(() => {
+    if (localStorage.getItem("user_id") && localStorage.getItem("user_type")) {
+      history.push("/dashboard");
+    }
+  }, [history]);
 
   return (
     <Paper style={root} square>
