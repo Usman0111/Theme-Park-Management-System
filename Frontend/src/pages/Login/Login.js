@@ -1,4 +1,4 @@
-import React, { useState } from "react";
+import React, { useState, useContext } from "react";
 import {
   Avatar,
   Grid,
@@ -13,6 +13,13 @@ import { useHistory } from "react-router-dom";
 import axios from "axios";
 import { CssBaseline } from "@material-ui/core";
 import bg from "../../assets/background.jpg";
+import Snackbar from "@material-ui/core/Snackbar";
+import MuiAlert from "@material-ui/lab/Alert";
+import { DataContext } from "../../contexts/dataContext";
+
+function Alert(props) {
+  return <MuiAlert elevation={6} variant="filled" {...props} />;
+}
 
 const Login = () => {
   const paperStyle = {
@@ -29,6 +36,28 @@ const Login = () => {
     backgroundRepeat: "no-repeat",
     backgroundSize: "cover",
   };
+  //for register success
+  const { data, dispatch } = useContext(DataContext);
+
+  const handleCloseReg = (event, reason) => {
+    if (reason === "clickaway") {
+      return;
+    }
+
+    dispatch({ type: "SET_REGISTERED", payload: false });
+  };
+
+  //for error
+  const [openErr, setOpenErr] = useState(false);
+  const [err, setErr] = useState("");
+
+  const handleCloseErr = (event, reason) => {
+    if (reason === "clickaway") {
+      return;
+    }
+
+    setOpenErr(false);
+  };
 
   const [loginData, setLoginData] = useState({
     email: "",
@@ -37,8 +66,8 @@ const Login = () => {
 
   let history = useHistory();
 
-  const login = () => {
-    console.log(loginData);
+  const login = (e) => {
+    e.preventDefault();
 
     axios
       .post("http://100.26.17.215:5000/auth/login", loginData)
@@ -47,7 +76,9 @@ const Login = () => {
         history.push("/dashbaord");
       })
       .catch((err) => {
-        console.log(err);
+        setErr(err.response.data);
+        console.log(err.response.data);
+        setOpenErr(true);
       });
   };
 
@@ -69,42 +100,61 @@ const Login = () => {
             </Avatar>
             <h2>Sign in</h2>
           </Grid>
-          <TextField
-            label="Enter Email"
-            variant="filled"
-            placeholder={"Email"}
-            fullWidth
-            style={boxStyle}
-            required
-            onChange={(event) => {
-              setLoginData({ ...loginData, email: event.target.value });
-            }}
-          />
-          <TextField
-            type="password"
-            label="Enter Password"
-            variant="filled"
-            placeholder={"Password"}
-            fullWidth
-            required
-            style={boxStyle}
-            onChange={(event) => {
-              setLoginData({ ...loginData, password: event.target.value });
-            }}
-          />
-          <Button
-            type="submit"
-            variant="contained"
-            color="primary"
-            fullWidth
-            style={btnStyle}
-            onClick={login}
-          >
-            Sign In
-          </Button>
+          <form onSubmit={(e) => login(e)}>
+            <TextField
+              label="Enter Email"
+              variant="filled"
+              placeholder={"Email"}
+              fullWidth
+              style={boxStyle}
+              required
+              onChange={(event) => {
+                setLoginData({ ...loginData, email: event.target.value });
+              }}
+            />
+            <TextField
+              type="password"
+              label="Enter Password"
+              variant="filled"
+              placeholder={"Password"}
+              fullWidth
+              required
+              style={boxStyle}
+              onChange={(event) => {
+                setLoginData({ ...loginData, password: event.target.value });
+              }}
+            />
+            <Button
+              type="submit"
+              variant="contained"
+              color="primary"
+              fullWidth
+              style={btnStyle}
+            >
+              Sign In
+            </Button>
+          </form>
           <Typography>Dont have an account?</Typography>
-          <Link>Register Here</Link>
+          <Link href="/register">Register Here</Link>
         </Paper>
+        <Snackbar
+          open={openErr}
+          autoHideDuration={4000}
+          onClose={handleCloseErr}
+        >
+          <Alert severity="error" style={{ marginTop: "10px" }}>
+            {err}
+          </Alert>
+        </Snackbar>
+        <Snackbar
+          open={data.registered}
+          autoHideDuration={4000}
+          onClose={handleCloseReg}
+        >
+          <Alert severity="success" style={{ marginTop: "10px" }}>
+            Your account was successfully created!
+          </Alert>
+        </Snackbar>
       </Grid>
     </Paper>
   );
