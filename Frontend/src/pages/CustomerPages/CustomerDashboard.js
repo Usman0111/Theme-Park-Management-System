@@ -1,5 +1,6 @@
 import React from "react";
-import { Route, Switch } from "react-router-dom";
+import { Route, Switch, useRouteMatch, Link } from "react-router-dom";
+import { useHistory } from "react-router-dom";
 import { makeStyles } from "@material-ui/core/styles";
 import Drawer from "@material-ui/core/Drawer";
 import AppBar from "@material-ui/core/AppBar";
@@ -15,6 +16,9 @@ import ExitToAppIcon from "@material-ui/icons/ExitToApp";
 import StoreIcon from "@material-ui/icons/Store";
 import TrainIcon from "@material-ui/icons/Train";
 import ConfirmationNumberIcon from "@material-ui/icons/ConfirmationNumber";
+import CustomerPass from "./CustomerPass";
+import CustomerRides from "./CustomerRides";
+import CustomerAttractions from "./CustomerAttractions";
 
 const drawerWidth = 240;
 
@@ -39,10 +43,28 @@ const useStyles = makeStyles((theme) => ({
     flexGrow: 1,
     padding: theme.spacing(3),
   },
+  link: {
+    textDecoration: "none",
+    color: "black",
+  },
 }));
 
 export default function CustomerDashboard() {
   const classes = useStyles();
+  let history = useHistory();
+  let { url, path } = useRouteMatch();
+
+  const logout = () => {
+    localStorage.clear();
+    setTimeout(1000, history.push("/"));
+  };
+  console.log(path);
+
+  const options = [
+    { text: "Entry Pass", url: `${url}`, icon: <ConfirmationNumberIcon /> },
+    { text: "Rides", url: `${url}/rides`, icon: <TrainIcon /> },
+    { text: "Attractions", url: `${url}/attractions`, icon: <StoreIcon /> },
+  ];
 
   return (
     <div className={classes.root}>
@@ -64,28 +86,18 @@ export default function CustomerDashboard() {
         <Toolbar />
         <div className={classes.drawerContainer}>
           <List>
-            <ListItem button>
-              <ListItemIcon>
-                <ConfirmationNumberIcon />
-              </ListItemIcon>
-              <ListItemText primary={"Entry Pass"} />
-            </ListItem>
-            <ListItem button>
-              <ListItemIcon>
-                <TrainIcon />
-              </ListItemIcon>
-              <ListItemText primary={"Rides"} />
-            </ListItem>
-            <ListItem button>
-              <ListItemIcon>
-                <StoreIcon />
-              </ListItemIcon>
-              <ListItemText primary={"Attractions"} />
-            </ListItem>
+            {options.map((item, index) => (
+              <Link to={item.url} key={item.index} className={classes.link}>
+                <ListItem>
+                  <ListItemIcon>{item.icon}</ListItemIcon>
+                  <ListItemText primary={item.text} />
+                </ListItem>
+              </Link>
+            ))}
           </List>
           <Divider />
           <List>
-            <ListItem button>
+            <ListItem onClick={logout}>
               <ListItemIcon>
                 <ExitToAppIcon />
               </ListItemIcon>
@@ -95,8 +107,11 @@ export default function CustomerDashboard() {
         </div>
       </Drawer>
       <main className={classes.content}>
+        <Toolbar />
         <Switch>
-          <Route />
+          <Route path={`${path}`} component={CustomerPass} exact />
+          <Route path={`${path}/rides`} component={CustomerRides} />
+          <Route path={`${path}/attractions`} component={CustomerAttractions} />
         </Switch>
       </main>
     </div>

@@ -1,6 +1,6 @@
 import React, { useState, useEffect } from "react";
-import CustomerDashboard from "../../pages/CustomerDashboard/CustomerDashboard";
-import ManagerDashboard from "../../pages/ManagerDashboard/ManagerDashboard";
+import CustomerDashboard from "../../pages/CustomerPages/CustomerDashboard";
+import ManagerDashboard from "../../pages/ManagerPages/ManagerDashboard";
 
 const UserRouter = () => {
   const [userType, setUserType] = useState("");
