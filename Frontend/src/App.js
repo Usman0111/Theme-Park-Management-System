@@ -1,27 +1,22 @@
 import React from "react";
-import { BrowserRouter as Router, Route } from "react-router-dom";
-import Home from "./pages/Home/Home";
+import { BrowserRouter as Router, Route, Switch } from "react-router-dom";
 import Login from "./pages/Login/Login";
 import Registration from "./pages/Registration/Registration";
-import Dashboard from "./pages/Dashboard/Dashboard";
+import ProtectedRoute from "./components/ProtectedRoute/ProtectedRoute";
+import NotFound from "./pages/NotFound/NotFound";
+import UserRouter from "./components/UserRouter/UserRouter";
 
 const App = () => {
   return (
-    <div className="grid-container">
-      <header>
-        <a href="/">Theme Park</a>
-      </header>
-
-      <div>
-        <Router>
-          <Route path="/" exact component={Home} />
-          <Route path="/login" component={Login} />
+    <div>
+      <Router>
+        <Switch>
+          <Route path="/" component={Login} exact />
           <Route path="/register" component={Registration} />
-          <Route path="/dashboard" component={Dashboard} />
-        </Router>
-      </div>
-
-      <footer>Copyright</footer>
+          <ProtectedRoute path="/dashboard" component={UserRouter} />
+          <Route path="*" component={NotFound} />
+        </Switch>
+      </Router>
     </div>
   );
 };
