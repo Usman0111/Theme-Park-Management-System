@@ -106,7 +106,7 @@ router.post("/attraction-create", authorize, async (req, res) => {
     }
 });
 
-router.put("/ride-modify", authorize, async (req, res) => {
+router.put("/ride-edit", authorize, async (req, res) => {
     try {
         const { ride_id, name, description, location, broken, rainedout,
             age_restriction, height_restriction, picture } = req.body;
@@ -131,7 +131,7 @@ router.put("/ride-modify", authorize, async (req, res) => {
     }
 });
 
-router.put("/attraction-modify", authorize, async (req, res) => {
+router.put("/attraction-edit", authorize, async (req, res) => {
     try {
         const { attraction_id, name, description, location, rainedout,
             age_restriction, picture } = req.body;
