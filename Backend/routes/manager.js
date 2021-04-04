@@ -2,6 +2,12 @@ const router = require("express").Router();
 const pool = require("../db");
 const authorize = require("../middleware/authorize");
 
+pool.on('notification', function(msg) {
+    //get the added / updated / deleted record
+    //sync it with the search database
+  });
+
+  var query = pool.query('LISTEN new_attendant_notification');
 //get all rides
 router.get("/ride-all", async (req, res) => {
     try {
@@ -12,6 +18,7 @@ router.get("/ride-all", async (req, res) => {
         console.log(err);
     }
 });
+
 
 //get single ride
 router.get("/ride-single", async (req, res) => {
@@ -50,12 +57,16 @@ router.get("/attraction-single", async (req, res) => {
     }
 });
 
-router.post("/ride-create", authorize, async (req, res) => {
+router.post("/ride-create", async (req, res) => {
+    
     try {
-        const role = req.user.type;
-        if (role == "manager") {
+
             const { name, description, location, //broken, rainedout, new ride defatult false
                 age_restriction, height_restriction, picture } = req.body;
+                
+
+            //const querry = await pool.query('listen db_notification');
+            
             const newRide = await pool.query(
                 `INSERT INTO ride (name, 
                                     description, 
@@ -65,14 +76,12 @@ router.post("/ride-create", authorize, async (req, res) => {
                                     age_restriction, 
                                     height_restriction, 
                                     picture) 
-                VALUES ($1, $2, $3, $4, $5, $6, $7, $8) RETURNING *`,
-                [name, description, location, false, false,
+                VALUES ($1, $2, $3, $4, $5, $6, $7, pg_read_binary_file($8)) RETURNING *`,
+                [name, description, location, true, false,
                     age_restriction, height_restriction, picture]
             );
             res.json(newRide.rows[0]);
-        } else {
-            res.sendStatus(401);
-        }
+
 
     } catch (err) {
         console.log(err);
