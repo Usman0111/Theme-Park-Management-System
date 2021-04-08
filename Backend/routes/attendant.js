@@ -19,12 +19,18 @@ router.get("/get-assignment", async (req, res) => {
 //request maintainence;
 router.put("/request-maintainence", async (req, res) => {
   try {
-    const { ride_id } = req.body;
+    const { ride_id, maintainer_id, breakdown_date, breakdown_description } = req.body;
     const udpateAttraction = await pool.query(
         `UPDATE ride SET broken = true
               WHERE ride_id = $1`,
               [ride_id]);
-    res.json("success");
+    const brokendown = await pool.query(
+        `INSERT INTO RideBreakdowns 
+              (ride_id, maintainer_id, breakdown_date, breakdown_description) 
+              VALUES($1, $2, $3, $4) RETURNING *`,
+              [ride_id, maintainer_id, breakdown_date, breakdown_description]);
+            
+    res.json(brokendown.rows[0]);
 
 } catch (err) {
     res.json("error");
