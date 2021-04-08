@@ -50,19 +50,4 @@ router.post("/ride", async (req, res) => {
   }
 });
 
-router.post("/retreive-rides", async (req, res) => {
-  try {
-    const { customer_id } = req.body;
-
-    const ride_rides = await pool.query(
-      "SELECT * from rideusage where customer_id = $1",
-      [customer_id]
-    );
-
-    res.json(ride_rides.rows);
-  } catch (err) {
-    console.log(err);
-  }
-});
-
 module.exports = router;
