@@ -29,7 +29,7 @@ CREATE TABLE Ride
 	rainedout boolean NOT NULL,
 	age_restriction int,
 	height_restriction int,
-	picture bytea,
+	picture varchar(300),
     PRIMARY KEY (ride_id)
 );
 
@@ -41,7 +41,7 @@ CREATE TABLE Attraction
 	location varchar(50) NOT NULL,
 	rainedout boolean NOT NULL,
 	age_restriction int,
-	picture bytea,
+	picture varchar(300),
     PRIMARY KEY (attraction_id)
 );
 

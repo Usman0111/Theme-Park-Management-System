@@ -7,7 +7,9 @@ const authorize = require("../middleware/authorize");
 //get all attractions
 router.get("/all", async (req, res) => {
   try {
-    const attractions = await pool.query("SELECT * FROM attraction");
+    const attractions = await pool.query(
+      "SELECT attraction_id, name, description, location, rainedout, age_restriction, ENCODE(picture,'base64') as base64 FROM attraction"
+    );
 
     res.json(attractions.rows);
   } catch (err) {
