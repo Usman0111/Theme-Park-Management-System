@@ -6,6 +6,7 @@ const path = require("path");
 app.use(express.json());
 app.use(cors());
 app.use(express.static(path.resolve(__dirname, "../Frontend/build")));
+app.use(express.static("images"));
 
 app.use("/auth", require("./routes/jwtAuth"));
 app.use("/attraction", require("./routes/attraction"));

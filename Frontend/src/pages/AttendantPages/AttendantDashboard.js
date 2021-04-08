@@ -13,12 +13,7 @@ import ListItem from "@material-ui/core/ListItem";
 import ListItemIcon from "@material-ui/core/ListItemIcon";
 import ListItemText from "@material-ui/core/ListItemText";
 import ExitToAppIcon from "@material-ui/icons/ExitToApp";
-import StoreIcon from "@material-ui/icons/Store";
-import TrainIcon from "@material-ui/icons/Train";
 import ConfirmationNumberIcon from "@material-ui/icons/ConfirmationNumber";
-import CustomerPass from "./CustomerPass";
-import CustomerRides from "./CustomerRides";
-import CustomerAttractions from "./CustomerAttractions";
 
 const drawerWidth = 240;
 
@@ -49,7 +44,7 @@ const useStyles = makeStyles((theme) => ({
   },
 }));
 
-export default function CustomerDashboard() {
+export default function AttendantDashboard() {
   const classes = useStyles();
   let history = useHistory();
   let { url, path } = useRouteMatch();
@@ -58,11 +53,10 @@ export default function CustomerDashboard() {
     localStorage.clear();
     setTimeout(1000, history.push("/"));
   };
+  console.log(path);
 
   const options = [
-    { text: "Entry Pass", url: `${url}`, icon: <ConfirmationNumberIcon /> },
-    { text: "Rides", url: `${url}/rides`, icon: <TrainIcon /> },
-    { text: "Attractions", url: `${url}/attractions`, icon: <StoreIcon /> },
+    { text: "My Assignment", url: `${url}`, icon: <ConfirmationNumberIcon /> },
   ];
 
   return (
@@ -86,7 +80,7 @@ export default function CustomerDashboard() {
         <div className={classes.drawerContainer}>
           <List>
             {options.map((item, index) => (
-              <Link to={item.url} key={index} className={classes.link}>
+              <Link to={item.url} key={item.index} className={classes.link}>
                 <ListItem>
                   <ListItemIcon>{item.icon}</ListItemIcon>
                   <ListItemText primary={item.text} />
@@ -108,9 +102,7 @@ export default function CustomerDashboard() {
       <main className={classes.content}>
         <Toolbar />
         <Switch>
-          <Route path={`${path}`} component={CustomerPass} exact />
-          <Route path={`${path}/rides`} component={CustomerRides} />
-          <Route path={`${path}/attractions`} component={CustomerAttractions} />
+          <Route path={`${path}`} component={<h1>test</h1>} exact />
         </Switch>
       </main>
     </div>
