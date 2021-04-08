@@ -62,7 +62,6 @@ CREATE TABLE EntryPass
     entrypass_id serial NOT NULL,
     customer_id int NOT NULL,
     time_purchased timestamp NOT NULL DEFAULT CURRENT_TIMESTAMP,
-	expired boolean NOT NULL DEFAULT false,
     PRIMARY KEY (entrypass_id),
 	FOREIGN KEY (customer_id) REFERENCES UserAccount(account_id)
 );

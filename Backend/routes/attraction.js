@@ -18,7 +18,7 @@ router.get("/all", async (req, res) => {
 //attraction visit routes
 
 //visit
-router.post("/visit", authorize, async (req, res) => {
+router.post("/visit", async (req, res) => {
   try {
     const { attraction_id, customer_id } = req.body;
 
@@ -50,7 +50,7 @@ router.post("/visit", authorize, async (req, res) => {
   }
 });
 
-router.post("/retreive-visits", authorize, async (req, res) => {
+router.post("/retreive-visits", async (req, res) => {
   try {
     const { customer_id } = req.body;
 

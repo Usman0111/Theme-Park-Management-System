@@ -18,7 +18,7 @@ router.get("/all", async (req, res) => {
 //ride ride routes
 
 //visit
-router.post("/ride", authorize, async (req, res) => {
+router.post("/ride", async (req, res) => {
   try {
     const { ride_id, customer_id } = req.body;
 
@@ -50,7 +50,7 @@ router.post("/ride", authorize, async (req, res) => {
   }
 });
 
-router.post("/retreive-rides", authorize, async (req, res) => {
+router.post("/retreive-rides", async (req, res) => {
   try {
     const { customer_id } = req.body;
 
@@ -64,15 +64,5 @@ router.post("/retreive-rides", authorize, async (req, res) => {
     console.log(err);
   }
 });
-
-router.post("/test", authorize, async (req, res) => {
-  try {
-
-    res.json(req.user.type);
-  } catch (err) {
-    console.log(err);
-  }
-});
-
 
 module.exports = router;
