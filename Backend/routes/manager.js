@@ -357,5 +357,4 @@ router.delete("/remove-assignment", async (req, res) => {
 });
 
 //Manager Reports
-
 module.exports = router;
