@@ -74,6 +74,7 @@ CREATE TABLE RideBreakdowns
     maintainer_id int ,
     breakdown_date date NOT NULL DEFAULT CURRENT_DATE,
     breakdown_description varchar(1000),
+	attendant_id int,
     PRIMARY KEY (breakdown_id),
 	FOREIGN KEY (ride_id) REFERENCES Ride(ride_id),
 	FOREIGN KEY (maintainer_id) REFERENCES UserAccount(account_id)
@@ -108,6 +109,7 @@ CREATE TABLE RideRainout
     rainout_id serial NOT NULL,
 	ride_id int NOT NULL,
 	date_rainedout date NOT NULL DEFAULT CURRENT_DATE,
+	attendant_id int,
     PRIMARY KEY (rainout_id),
 	FOREIGN KEY (ride_id) REFERENCES Ride(ride_id)
 );
@@ -117,6 +119,7 @@ CREATE TABLE AttractionRainout
     rainout_id serial NOT NULL,
 	attraction_id int NOT NULL,
 	date_rainedout date NOT NULL DEFAULT CURRENT_DATE,
+	attendant_id int,
     PRIMARY KEY (rainout_id),
 	FOREIGN KEY (attraction_id) REFERENCES Attraction(attraction_id)
 );
