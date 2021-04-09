@@ -19,6 +19,7 @@ app.use("/ride", require("./routes/ride"));
 app.use("/customer", require("./routes/customer"));
 app.use("/manager", require("./routes/manager"));
 app.use("/attendant", require("./routes/attendant"));
+app.use("/maintainer", require("./routes/maintainer"));
 
 app.get("*", (req, res) => {
   res.sendFile(path.resolve(__dirname, "../Frontend/build", "index.html"));

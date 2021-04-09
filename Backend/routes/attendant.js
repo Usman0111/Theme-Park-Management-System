@@ -17,20 +17,29 @@ router.get("/get-assignment", async (req, res) => {
 });
 
 //request maintainence;
-router.put("/request-maintainence", async (req, res) => {
+router.post("/request-maintainence", async (req, res) => {
   try {
-    const { ride_id, maintainer_id, breakdown_date, breakdown_description } = req.body;
+    const { ride_id, breakdown_date, breakdown_description } = req.body;
     const udpateAttraction = await pool.query(
         `UPDATE ride SET broken = true
               WHERE ride_id = $1`,
               [ride_id]);
-    const brokendown = await pool.query(
-        `INSERT INTO RideBreakdowns 
-              (ride_id, maintainer_id, breakdown_date, breakdown_description) 
-              VALUES($1, $2, $3, $4) RETURNING *`,
-              [ride_id, maintainer_id, breakdown_date, breakdown_description]);
+    const unresolved = await pool.query(
+        `SELECT * FROM RideBreakdowns WHERE ride_id = $1 AND maintainer_id IS NULL`, [ride_id]);
+      if (unresolved.rowCount == 0) {
+        const brokendown = await pool.query(
+          `INSERT INTO RideBreakdowns 
+                (ride_id, breakdown_date, breakdown_description) 
+                VALUES($1, $2, $3) RETURNING *`,
+                [ride_id, breakdown_date, breakdown_description]);
+        res.json("reported");
+      }
+      else
+      {
+        return res.status(401).send("Already reported!");
+      }
             
-    res.json(brokendown.rows[0]);
+    
 
 } catch (err) {
     res.json("error");

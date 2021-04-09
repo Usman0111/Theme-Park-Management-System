@@ -173,7 +173,8 @@ router.post("/assign-attendant-attraction", authorize, async (req, res) => {
 
     } catch (err) {
         console.log(err);
+    }
 
-
+});
 
 module.exports = router;
