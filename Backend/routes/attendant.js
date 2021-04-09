@@ -1,17 +1,41 @@
 const router = require("express").Router();
 const pool = require("../db");
-const authorize = require("../middleware/authorize");
 
-//get all assignment based on attendant_id;
 router.get("/get-assignment", async (req, res) => {
   try {
     const { attendant_id } = req.body;
     const assignment = await pool.query(
-      `SELECT * FROM AttendantAssignment WHERE attendant_id = $1`,
+      `SELECT * FROM attendantassignment WHERE attendant_id = $1`,
       [attendant_id]
     );
 
-    res.json(assignment.rows);
+    if (assignment.rows.length === 0) {
+      return res.json("No assignment");
+    }
+
+    if (assignment.rows[0].assignment_type == "ride") {
+      const ride = await pool.query(
+        "SELECT * from ride WHERE attendant_id = $1"
+      );
+      return res.json({
+        type: "ride",
+        assignment: ride.rows[0],
+      });
+    }
+
+    if (assignment.rows[0].assignment_type == "attraction") {
+      const attraction = await pool.query(
+        "SELECT * from attraction WHERE attendant_id = $1"
+      );
+      return res.json({
+        type: "attraction",
+        assignment: attraction.rows[0],
+      });
+    }
+
+    // if other assignment routes are properly implemented
+    // it should never get to this point
+    res.json("no ride or attraction found");
   } catch (err) {
     console.log(err);
   }

@@ -30,6 +30,8 @@ CREATE TABLE Ride
 	age_restriction int,
 	height_restriction int,
 	picture varchar(300),
+	archived NOT NULL DEFAULT FALSE,
+	attendant_id int,
     PRIMARY KEY (ride_id)
 );
 
@@ -42,6 +44,8 @@ CREATE TABLE Attraction
 	rainedout boolean NOT NULL,
 	age_restriction int,
 	picture varchar(300),
+	archived NOT NULL DEFAULT FALSE,
+	attendant_id int,
     PRIMARY KEY (attraction_id)
 );
 
@@ -49,13 +53,10 @@ CREATE TABLE AttendantAssignment
 (
     assignment_id serial NOT NULL,
 	attendant_id int NOT NULL,
-	ride_id int,
-	attraction_id int,
+	assignment_type varchar(50) NOT NULL,
     PRIMARY KEY (assignment_id),
-	FOREIGN KEY (attendant_id) REFERENCES UserAccount(account_id),
-	FOREIGN KEY (ride_id) REFERENCES Ride(ride_id),
-	FOREIGN KEY (attraction_id) REFERENCES Attraction(attraction_id)
-);
+	FOREIGN KEY (attendant_id) REFERENCES UserAccount(account_id)
+);	
 
 CREATE TABLE EntryPass
 (
