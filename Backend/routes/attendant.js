@@ -46,8 +46,7 @@ router.post("/get-assignment", async (req, res) => {
 //request maintainence;
 router.put("/request-maintainence", async (req, res) => {
   try {
-    const { ride_id, breakdown_description } = req.body;
-    console.log(ride_id, breakdown_description);
+    const { ride_id, breakdown_description, attendant_id } = req.body;
     const udpateAttraction = await pool.query(
       `UPDATE ride SET broken = true
               WHERE ride_id = $1 RETURNING *`,
@@ -55,9 +54,9 @@ router.put("/request-maintainence", async (req, res) => {
     );
     const brokendown = await pool.query(
       `INSERT INTO RideBreakdowns 
-              (ride_id, maintainer_id, breakdown_description, breakdown_date) 
-              VALUES($1, $2, $3, CURRENT_DATE) RETURNING *`,
-      [ride_id, null, breakdown_description]
+              (ride_id, maintainer_id, breakdown_description, attendant_id, breakdown_date) 
+              VALUES($1, $2, $3,$4, CURRENT_DATE) RETURNING *`,
+      [ride_id, null, breakdown_description, attendant_id]
     );
 
     res.json({ ride: udpateAttraction.rows[0], breakdown: brokendown.rows[0] });
@@ -72,7 +71,7 @@ const validRainoutTypes = ["ride", "attraction"];
 
 router.put("/declare-rainout", async (req, res) => {
   try {
-    const { rainout_type } = req.body;
+    const { rainout_type, attendant_id } = req.body;
     if (!validRainoutTypes.includes(rainout_type)) {
       return res.status(400).send("Invalid rainout type");
     }
@@ -81,8 +80,8 @@ router.put("/declare-rainout", async (req, res) => {
       const { ride_id } = req.body;
 
       const rainout = await pool.query(
-        `INSERT INTO riderainout (ride_id) VALUES($1) RETURNING *`,
-        [ride_id]
+        `INSERT INTO riderainout (ride_id,attendant_id) VALUES($1,$1) RETURNING *`,
+        [ride_id, attendant_id]
       );
 
       const update = await pool.query(
@@ -96,8 +95,8 @@ router.put("/declare-rainout", async (req, res) => {
       const { attraction_id } = req.body;
 
       const rainout = await pool.query(
-        `INSERT INTO attractionrainout (attraction_id) VALUES($1) RETURNING *`,
-        [attraction_id]
+        `INSERT INTO attractionrainout (attraction_id,attendant_id) VALUES($1,$2) RETURNING *`,
+        [attraction_id, attendant_id]
       );
 
       const update = await pool.query(
