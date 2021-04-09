@@ -44,9 +44,10 @@ router.post("/get-assignment", async (req, res) => {
 });
 
 //request maintainence;
-router.put("/request-maintainence", async (req, res) => {
+router.post("/request-maintainence", async (req, res) => {
   try {
     const { ride_id, breakdown_description, attendant_id } = req.body;
+
     const udpateAttraction = await pool.query(
       `UPDATE ride SET broken = true
               WHERE ride_id = $1 RETURNING *`,
