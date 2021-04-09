@@ -1,16 +1,43 @@
 const router = require("express").Router();
 const pool = require("../db");
-const authorize = require("../middleware/authorize");
 
-//get all assignment based on attendant_id;
-router.get("/get-assignment", async (req, res) => {
+router.post("/get-assignment", async (req, res) => {
   try {
     const { attendant_id } = req.body;
-    const assignment = await pool.query(`SELECT * FROM AttendantAssignment
-                                        WHERE attendant_id = $1`,
-                                        [attendant_id]);
+    const assignment = await pool.query(
+      `SELECT * FROM attendantassignment WHERE attendant_id = $1`,
+      [attendant_id]
+    );
 
-    res.json(assignment.rows);
+    if (assignment.rows.length === 0) {
+      return res.json("No assignment");
+    }
+
+    if (assignment.rows[0].assignment_type == "ride") {
+      const ride = await pool.query(
+        "SELECT * from ride WHERE attendant_id = $1",
+        [attendant_id]
+      );
+      return res.json({
+        type: "ride",
+        assignment: ride.rows[0],
+      });
+    }
+
+    if (assignment.rows[0].assignment_type == "attraction") {
+      const attraction = await pool.query(
+        "SELECT * from attraction WHERE attendant_id = $1",
+        [attendant_id]
+      );
+      return res.json({
+        type: "attraction",
+        assignment: attraction.rows[0],
+      });
+    }
+
+    // if other assignment routes are properly implemented
+    // it should never get to this point
+    res.json("no ride or attraction found");
   } catch (err) {
     console.log(err);
   }
@@ -19,62 +46,103 @@ router.get("/get-assignment", async (req, res) => {
 //request maintainence;
 router.post("/request-maintainence", async (req, res) => {
   try {
-    const { ride_id, breakdown_date, breakdown_description } = req.body;
-    const udpateAttraction = await pool.query(
-        `UPDATE ride SET broken = true
-              WHERE ride_id = $1`,
-              [ride_id]);
-    const unresolved = await pool.query(
-        `SELECT * FROM RideBreakdowns WHERE ride_id = $1 AND maintainer_id IS NULL`, [ride_id]);
-      if (unresolved.rowCount == 0) {
-        const brokendown = await pool.query(
-          `INSERT INTO RideBreakdowns 
-                (ride_id, breakdown_date, breakdown_description) 
-                VALUES($1, $2, $3) RETURNING *`,
-                [ride_id, breakdown_date, breakdown_description]);
-        res.json("reported");
-      }
-      else
-      {
-        return res.status(401).send("Already reported!");
-      }
-            
-    
 
-} catch (err) {
+    const { ride_id, breakdown_description } = req.body;
+    console.log(ride_id, breakdown_description);
+    const udpateAttraction = await pool.query(
+      `UPDATE ride SET broken = true
+              WHERE ride_id = $1 RETURNING *`,
+      [ride_id]
+    );
+    const brokendown = await pool.query(
+      `INSERT INTO RideBreakdowns 
+              (ride_id, maintainer_id, breakdown_description, breakdown_date) 
+              VALUES($1, $2, $3, CURRENT_DATE) RETURNING *`,
+      [ride_id, null, breakdown_description]
+    );
+
+    res.json({ ride: udpateAttraction.rows[0], breakdown: brokendown.rows[0] });
+  } catch (err) {
     res.json("error");
     console.log(err);
-}
+  }
 });
 
 //declare rainout;
-router.post("/declare-rainout", async (req, res) => {
-  try {
-    const { ride_id } = req.body;
-    const rainout = await pool.query(
-        `INSERT INTO riderainout (ride_id) VALUES($1) RETURNING *`,[ride_id]);
-    const update = await pool.query(
-        `UPDATE ride SET rainedout = true WHERE ride_id = $1`,[ride_id]);
-    res.json(rainout.rows[0]);
+const validRainoutTypes = ["ride", "attraction"];
 
-} catch (err) {
+router.put("/declare-rainout", async (req, res) => {
+  try {
+    const { rainout_type } = req.body;
+    if (!validRainoutTypes.includes(rainout_type)) {
+      return res.status(400).send("Invalid rainout type");
+    }
+
+    if (rainout_type === "ride") {
+      const { ride_id } = req.body;
+
+      const rainout = await pool.query(
+        `INSERT INTO riderainout (ride_id) VALUES($1) RETURNING *`,
+        [ride_id]
+      );
+
+      const update = await pool.query(
+        `UPDATE ride SET rainedout = true WHERE ride_id = $1 RETURNING *`,
+        [ride_id]
+      );
+      return res.json(update.rows[0]);
+    }
+
+    if (rainout_type === "attraction") {
+      const { attraction_id } = req.body;
+
+      const rainout = await pool.query(
+        `INSERT INTO attractionrainout (attraction_id) VALUES($1) RETURNING *`,
+        [attraction_id]
+      );
+
+      const update = await pool.query(
+        `UPDATE attraction SET rainedout = true WHERE attraction_id = $1 RETURNING *`,
+        [attraction_id]
+      );
+      return res.json(update.rows[0]);
+    }
+  } catch (err) {
     res.json("error");
     console.log(err);
-}
+  }
 });
 
 //end rainout;
 router.put("/end-rainout", async (req, res) => {
   try {
-    const { ride_id } = req.body;
-    const rainout = await pool.query(
-        `UPDATE ride SET rainedout = false WHERE ride_id = $1 RETURNING *`,[ride_id]);
-    res.json(rainout.rows[0]);
+    const { rainout_type } = req.body;
+    if (!validRainoutTypes.includes(rainout_type)) {
+      return res.status(400).send("Invalid rainout type");
+    }
 
-} catch (err) {
+    if (rainout_type === "ride") {
+      const { ride_id } = req.body;
+
+      const update = await pool.query(
+        `UPDATE ride SET rainedout = false WHERE ride_id = $1 RETURNING *`,
+        [ride_id]
+      );
+      return res.json(update.rows[0]);
+    }
+    if (rainout_type === "attraction") {
+      const { attraction_id } = req.body;
+
+      const update = await pool.query(
+        `UPDATE attraction SET rainedout = false WHERE attraction_id = $1 RETURNING *`,
+        [attraction_id]
+      );
+      return res.json(update.rows[0]);
+    }
+  } catch (err) {
     res.json("error");
     console.log(err);
-}
+  }
 });
 
 module.exports = router;

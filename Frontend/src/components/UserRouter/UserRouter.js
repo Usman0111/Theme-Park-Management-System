@@ -1,6 +1,7 @@
 import React, { useState, useEffect } from "react";
 import CustomerDashboard from "../../pages/CustomerPages/CustomerDashboard";
 import ManagerDashboard from "../../pages/ManagerPages/ManagerDashboard";
+import MaintainerDashboard from "../../pages/MaintainerPages/MaintainerDashboard";
 
 const UserRouter = () => {
   const [userType, setUserType] = useState("");
@@ -18,7 +19,7 @@ const UserRouter = () => {
       case "attendant":
         return <div>Nothing Here</div>;
       case "maintainer":
-        return <div>Nothing Here</div>;
+        return <MaintainerDashboard />;
       default:
         return <div>Nothing Here</div>;
     }

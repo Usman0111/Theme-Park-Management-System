@@ -7,7 +7,7 @@ const authorize = require("../middleware/authorize");
 //get all attractions
 router.get("/all", async (req, res) => {
   try {
-    const attractions = await pool.query("SELECT * FROM attraction");
+    const attractions = await pool.query("SELECT * from attraction");
 
     res.json(attractions.rows);
   } catch (err) {
@@ -24,8 +24,8 @@ router.post("/visit", async (req, res) => {
 
     let attraction_visit;
     const alreadyVisited = await pool.query(
-      "SELECT * FROM attractionvisit WHERE customer_id=$1 AND date_visited = CURRENT_DATE",
-      [customer_id]
+      "SELECT * FROM attractionvisit WHERE attraction_id=$1 AND customer_id=$2 AND date_visited = CURRENT_DATE",
+      [attraction_id, customer_id]
     );
 
     if (alreadyVisited.rows.length !== 0) {
@@ -45,21 +45,6 @@ router.post("/visit", async (req, res) => {
     }
 
     res.json(attraction_visit.rows[0]);
-  } catch (err) {
-    console.log(err);
-  }
-});
-
-router.post("/retreive-visits", async (req, res) => {
-  try {
-    const { customer_id } = req.body;
-
-    const attraction_visits = await pool.query(
-      "SELECT * from attractionvisit where customer_id = $1",
-      [customer_id]
-    );
-
-    res.json(attraction_visits.rows);
   } catch (err) {
     console.log(err);
   }
