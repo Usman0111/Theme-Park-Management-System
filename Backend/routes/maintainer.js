@@ -6,8 +6,8 @@ const authorize = require("../middleware/authorize");
 router.get("/all-maintainence-requests", async (req, res) => {
   try {
     const breakdowns = await pool.query(
-      `SELECT * FROM RideBreakdowns
-                      WHERE maintainer_id IS NULL`
+      `SELECT * FROM ridebreakdowns, ride
+                      WHERE maintainer_id IS NULL AND ridebreakdowns.ride_id = ride.ride_id`
     );
 
     res.json(breakdowns.rows);
@@ -38,11 +38,11 @@ router.put("/resolve-request", async (req, res) => {
 });
 
 //get all maintainence based on maintainer_id;
-router.get("/resolved-requests", async (req, res) => {
+router.post("/resolved-requests", async (req, res) => {
   try {
     const { maintainer_id } = req.body;
     const breakdowns = await pool.query(
-      `SELECT * FROM ridebreakdowns WHERE maintainer_id = $1`,
+      `SELECT * FROM ridebreakdowns, ride WHERE maintainer_id = $1 AND ridebreakdowns.ride_id = ride.ride_id`,
       [maintainer_id]
     );
 

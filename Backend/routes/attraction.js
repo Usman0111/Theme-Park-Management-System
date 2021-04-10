@@ -1,6 +1,6 @@
 const router = require("express").Router();
 const pool = require("../db");
-const authorize = require("../middleware/authorize");
+const validpass = require("../middleware/validpass");
 
 //attraction routes
 
@@ -15,7 +15,18 @@ router.get("/all", async (req, res) => {
   }
 });
 
-//attraction visit routes
+//customer attraction
+router.post("/all-customer", validpass, async (req, res) => {
+  try {
+    const attractions = await pool.query(
+      "SELECT * from attraction WHERE archived=False"
+    );
+
+    res.json({ attractions: attractions.rows, time_left: req.time_left });
+  } catch (err) {
+    console.log(err);
+  }
+});
 
 //visit
 router.post("/visit", async (req, res) => {
