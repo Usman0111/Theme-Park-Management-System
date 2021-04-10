@@ -71,7 +71,7 @@ CREATE TABLE RideBreakdowns
 (
     breakdown_id serial NOT NULL,
 	ride_id int NOT NULL,
-    maintainer_id int ,
+    maintainer_id int,
     breakdown_date date NOT NULL DEFAULT CURRENT_DATE,
     breakdown_description varchar(1000),
 	attendant_id int,
