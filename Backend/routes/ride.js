@@ -1,6 +1,6 @@
 const router = require("express").Router();
 const pool = require("../db");
-const authorize = require("../middleware/authorize");
+const validpass = require("../middleware/validpass");
 
 //ride routes
 
@@ -15,7 +15,16 @@ router.get("/all", async (req, res) => {
   }
 });
 
-//ride ride routes
+// customer rides
+router.post("/all-customer", validpass, async (req, res) => {
+  try {
+    const rides = await pool.query("SELECT * FROM ride WHERE archived=False");
+
+    res.json({ rides: rides.rows, time_left: req.time_left });
+  } catch (err) {
+    console.log(err);
+  }
+});
 
 //visit
 router.post("/ride", async (req, res) => {
