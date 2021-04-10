@@ -44,7 +44,7 @@ router.post("/get-assignment", async (req, res) => {
 });
 
 //request maintainence;
-router.post("/request-maintainence", async (req, res) => {
+router.put("/request-maintainence", async (req, res) => {
   try {
     const { ride_id, breakdown_description, attendant_id } = req.body;
 
