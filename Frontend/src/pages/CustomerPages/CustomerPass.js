@@ -9,7 +9,7 @@ import CardContent from "@material-ui/core/CardContent";
 import CardMedia from "@material-ui/core/CardMedia";
 import Box from "@material-ui/core/Box";
 import Snackbar from "@material-ui/core/Snackbar";
-import Alert from "@material-ui/lab/Alert";
+import MuiAlert from "@material-ui/lab/Alert";
 import Grid from "@material-ui/core/Grid";
 import grey from "@material-ui/core/colors/grey";
 
@@ -32,6 +32,10 @@ const useStyles = makeStyles((theme) => ({
     width: 200,
   },
 }));
+
+function Alert(props) {
+  return <MuiAlert elevation={6} variant="filled" {...props} />;
+}
 
 const createPass = (pass) => {
   const indexT = pass.time_purchased.indexOf("T");
@@ -71,15 +75,17 @@ function CustomerPass(props) {
         user_id: localStorage.getItem("user_id"),
       })
       .then((res) => {
-        console.log(createPass(res.data));
-        console.log(
-          "You have successfully purchased a ticket! To view current and previous tickets please click on 'View All Tickets'"
-        );
+        if (res.data === "you already have a valid pass") {
+          setErr(res.data);
+          setOpen(true);
+        } else {
+          const newpass = createPass(res.data);
+          const fixpass = { ...newpass, expired: false };
+          setTickets([...tickets, fixpass]);
+        }
       })
       .catch((err) => {
-        setErr(err.res.data);
-        console.log(err.res.data);
-        setOpen(true);
+        console.log(err);
       });
   };
 
@@ -104,7 +110,7 @@ function CustomerPass(props) {
       <form onSubmit={(e) => buy_ticket(e)}>
         <div>
           <Button variant="contained" color="primary" type="submit">
-            Purchase Ticket
+            Purchase Entry Pass
           </Button>
         </div>
       </form>
@@ -136,7 +142,7 @@ function CustomerPass(props) {
                     )}
                   </Typography>
                   <Typography className={classes.id}>
-                    <span style={{ color: grey[400] }}>Ticket ID:</span>{" "}
+                    <span style={{ color: grey[400] }}>Pass ID:</span>{" "}
                     {ticket.ticketId}
                   </Typography>
                 </Box>
@@ -150,8 +156,8 @@ function CustomerPass(props) {
         ))}
       </Grid>
 
-      <Snackbar open={open} autoHideDuration={4000} onClose={handleClose}>
-        <Alert severity="error" style={{ marginTop: "10px" }}>
+      <Snackbar open={open} autoHideDuration={2000} onClose={handleClose}>
+        <Alert onClose={handleClose} severity="error">
           {err}
         </Alert>
       </Snackbar>

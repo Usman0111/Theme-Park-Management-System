@@ -13,6 +13,9 @@ import Container from "@material-ui/core/Container";
 import axios from "axios";
 import Snackbar from "@material-ui/core/Snackbar";
 import MuiAlert from "@material-ui/lab/Alert";
+import PassNeeded from "./PassNeeded";
+import BrokenImageIcon from "@material-ui/icons/BrokenImage";
+import OpacityIcon from "@material-ui/icons/Opacity";
 
 function Alert(props) {
   return <MuiAlert elevation={6} variant="filled" {...props} />;
@@ -47,12 +50,19 @@ const useStyles = makeStyles((theme) => ({
 export default function CustomerRides() {
   const classes = useStyles();
   const [rides, setRides] = useState([]);
+  const [validpass, setValidpass] = useState(true);
 
   useEffect(() => {
     axios
-      .get("ride/all")
+      .post("ride/all-customer", {
+        customer_id: localStorage.getItem("user_id"),
+      })
       .then((res) => {
-        setRides(res.data);
+        if (res.data !== "You have an unexpired entry pass") {
+          setRides(res.data.rides);
+        } else {
+          setValidpass(false);
+        }
       })
       .catch((err) => console.log(err));
   }, []);
@@ -86,63 +96,91 @@ export default function CustomerRides() {
         console.log(err);
       });
   };
+
   console.log(rides);
 
   return (
     <Container className={classes.cardGrid}>
       <CssBaseline />
       <Grid container spacing={4}>
-        {rides.map((ride) => (
-          <Grid item key={ride.ride_id} md={3}>
-            <Card className={classes.card}>
-              <CardMedia
-                className={classes.cardMedia}
-                image={ride.picture}
-                title="Image title"
-              />
-              <CardContent className={classes.cardContent}>
-                <Typography variant="h5">{ride.name}</Typography>
-              </CardContent>
-              <CardActions className={classes.buttons}>
-                <Button
-                  color="primary"
-                  variant="contained"
-                  onClick={() => visit(ride.ride_id)}
-                >
-                  Ride!
-                </Button>
-                <Tooltip
-                  title={
-                    <React.Fragment>
-                      <Typography color="inherit" variant="subtitle1">
-                        Description
-                      </Typography>
-                      <div className={classes.paragraph}>
-                        {ride.description}
-                      </div>
-                      <Typography color="inherit" variant="subtitle1">
-                        Age Restriciton
-                      </Typography>
-                      <div className={classes.paragraph}>
-                        {ride.age_restriction ? ride.age_restriction : "None"}
-                      </div>
-                      <Typography color="inherit" variant="subtitle1">
-                        Height Resctriction
-                      </Typography>
-                      <div className={classes.paragraph}>
-                        {ride.height_restriction
-                          ? ride.height_restriction
-                          : "None"}
-                      </div>
-                    </React.Fragment>
-                  }
-                >
-                  <Button variant="contained">Info</Button>
-                </Tooltip>
-              </CardActions>
-            </Card>
-          </Grid>
-        ))}
+        {!validpass ? (
+          <PassNeeded type={"rides"} />
+        ) : (
+          rides.map((ride) => (
+            <Grid item key={ride.ride_id} md={3}>
+              <Card className={classes.card}>
+                <CardMedia
+                  className={classes.cardMedia}
+                  image={ride.picture}
+                  title="Image title"
+                />
+                <CardContent className={classes.cardContent}>
+                  <Typography variant="h5">
+                    {ride.name}
+                    {ride.broken ? (
+                      <Tooltip title="broken">
+                        <BrokenImageIcon color="disabled" />
+                      </Tooltip>
+                    ) : null}
+                    {ride.rainedout ? (
+                      <Tooltip title="rained out">
+                        <OpacityIcon color="disabled" />
+                      </Tooltip>
+                    ) : null}
+                  </Typography>
+                </CardContent>
+                <CardActions className={classes.buttons}>
+                  {ride.rainedout || ride.broken ? (
+                    <Button color="primary" variant="contained" disabled>
+                      Ride!
+                    </Button>
+                  ) : (
+                    <Button
+                      color="primary"
+                      variant="contained"
+                      onClick={() => visit(ride.ride_id)}
+                    >
+                      Ride!
+                    </Button>
+                  )}
+
+                  <Tooltip
+                    title={
+                      <React.Fragment>
+                        <Typography color="inherit" variant="subtitle1">
+                          Description
+                        </Typography>
+                        <div className={classes.paragraph}>
+                          {ride.description}
+                        </div>
+                        <Typography color="inherit" variant="subtitle1">
+                          Location
+                        </Typography>
+                        <div className={classes.paragraph}>{ride.location}</div>
+                        <Typography color="inherit" variant="subtitle1">
+                          Age Restriciton
+                        </Typography>
+                        <div className={classes.paragraph}>
+                          {ride.age_restriction ? ride.age_restriction : "None"}
+                        </div>
+                        <Typography color="inherit" variant="subtitle1">
+                          Height Resctriction
+                        </Typography>
+                        <div className={classes.paragraph}>
+                          {ride.height_restriction
+                            ? ride.height_restriction
+                            : "None"}
+                        </div>
+                      </React.Fragment>
+                    }
+                  >
+                    <Button variant="contained">Info</Button>
+                  </Tooltip>
+                </CardActions>
+              </Card>
+            </Grid>
+          ))
+        )}
         <Snackbar open={open} autoHideDuration={2000} onClose={handleClose}>
           <Alert onClose={handleClose} severity="success">
             Wheee! enjoying the fun ride

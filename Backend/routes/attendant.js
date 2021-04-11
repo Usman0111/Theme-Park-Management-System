@@ -81,7 +81,7 @@ router.put("/declare-rainout", async (req, res) => {
       const { ride_id } = req.body;
 
       const rainout = await pool.query(
-        `INSERT INTO riderainout (ride_id,attendant_id) VALUES($1,$1) RETURNING *`,
+        `INSERT INTO riderainout (ride_id,attendant_id) VALUES($1,$2) RETURNING *`,
         [ride_id, attendant_id]
       );
 

@@ -13,6 +13,8 @@ import Container from "@material-ui/core/Container";
 import axios from "axios";
 import Snackbar from "@material-ui/core/Snackbar";
 import MuiAlert from "@material-ui/lab/Alert";
+import PassNeeded from "./PassNeeded";
+import OpacityIcon from "@material-ui/icons/Opacity";
 
 function Alert(props) {
   return <MuiAlert elevation={6} variant="filled" {...props} />;
@@ -47,12 +49,20 @@ const useStyles = makeStyles((theme) => ({
 export default function CustomerAttractions() {
   const classes = useStyles();
   const [attractions, setAttractions] = useState([]);
+  const [validpass, setValidpass] = useState(true);
 
   useEffect(() => {
     axios
-      .get("attraction/all")
+      .post("attraction/all-customer", {
+        customer_id: localStorage.getItem("user_id"),
+      })
       .then((res) => {
-        setAttractions(res.data);
+        if (res.data !== "You have an unexpired entry pass") {
+          console.log(res.data);
+          setAttractions(res.data.attractions);
+        } else {
+          setValidpass(false);
+        }
       })
       .catch((err) => console.log(err));
   }, []);
@@ -71,12 +81,11 @@ export default function CustomerAttractions() {
     setOpen(false);
   };
 
-  const visit = (attraction_id) => {
+  const visit = (attraction) => {
     const data = {
-      attraction_id,
+      attraction_id: attraction.attraction_id,
       customer_id: Number(localStorage.getItem("user_id")),
     };
-    console.log(attraction_id);
     axios
       .post("attraction/visit", data)
       .then((res) => {
@@ -86,65 +95,82 @@ export default function CustomerAttractions() {
         console.log(err);
       });
   };
+
   console.log(attractions);
 
   return (
     <Container className={classes.cardGrid}>
       <CssBaseline />
       <Grid container spacing={4}>
-        {attractions.map((attraction) => (
-          <Grid item key={attraction.attraction_id} md={3}>
-            <Card className={classes.card}>
-              <CardMedia
-                className={classes.cardMedia}
-                image={attraction.picture}
-                title="Image title"
-              />
-              <CardContent className={classes.cardContent}>
-                <Typography variant="h5">{attraction.name}</Typography>
-              </CardContent>
-              <CardActions className={classes.buttons}>
-                <Button
-                  color="primary"
-                  variant="contained"
-                  onClick={() => visit(attraction.attraction_id)}
-                >
-                  Visit!
-                </Button>
-                <Tooltip
-                  title={
-                    <React.Fragment>
-                      <Typography color="inherit" variant="subtitle1">
-                        Description
-                      </Typography>
-                      <div className={classes.paragraph}>
-                        {attraction.description}
-                      </div>
-                      <Typography color="inherit" variant="subtitle1">
-                        Age Restriciton
-                      </Typography>
-                      <div className={classes.paragraph}>
-                        {attraction.age_restriction
-                          ? attraction.age_restriction
-                          : "None"}
-                      </div>
-                      {/* <Typography color="inherit" variant="subtitle1">
-                        Height Resctriction
-                      </Typography>
-                      <div className={classes.paragraph}>
-                        {attraction.height_restriction
-                          ? attraction.height_restriction
-                          : "None"}
-                      </div> */}
-                    </React.Fragment>
-                  }
-                >
-                  <Button variant="contained">Info</Button>
-                </Tooltip>
-              </CardActions>
-            </Card>
-          </Grid>
-        ))}
+        {!validpass ? (
+          <PassNeeded type={"attractions"} />
+        ) : (
+          attractions.map((attraction) => (
+            <Grid item key={attraction.attraction_id} md={3}>
+              <Card className={classes.card}>
+                <CardMedia
+                  className={classes.cardMedia}
+                  image={attraction.picture}
+                  title="Image title"
+                />
+                <CardContent className={classes.cardContent}>
+                  <Typography variant="h5">
+                    {attraction.name}{" "}
+                    {attraction.rainedout ? (
+                      <Tooltip title="rained out">
+                        <OpacityIcon color="disabled" />
+                      </Tooltip>
+                    ) : null}
+                  </Typography>
+                </CardContent>
+                <CardActions className={classes.buttons}>
+                  {attraction.rainedout ? (
+                    <Button disabled color="primary" variant="contained">
+                      Visit!
+                    </Button>
+                  ) : (
+                    <Button
+                      color="primary"
+                      variant="contained"
+                      onClick={() => visit(attraction)}
+                    >
+                      Visit!
+                    </Button>
+                  )}
+
+                  <Tooltip
+                    title={
+                      <React.Fragment>
+                        <Typography color="inherit" variant="subtitle1">
+                          Description
+                        </Typography>
+                        <div className={classes.paragraph}>
+                          {attraction.description}
+                        </div>
+                        <Typography color="inherit" variant="subtitle1">
+                          Location
+                        </Typography>
+                        <div className={classes.paragraph}>
+                          {attraction.location}
+                        </div>
+                        <Typography color="inherit" variant="subtitle1">
+                          Age Restriciton
+                        </Typography>
+                        <div className={classes.paragraph}>
+                          {attraction.age_restriction
+                            ? attraction.age_restriction
+                            : "None"}
+                        </div>
+                      </React.Fragment>
+                    }
+                  >
+                    <Button variant="contained">Info</Button>
+                  </Tooltip>
+                </CardActions>
+              </Card>
+            </Grid>
+          ))
+        )}
         <Snackbar open={open} autoHideDuration={2000} onClose={handleClose}>
           <Alert onClose={handleClose} severity="success">
             Whaaa! having fun at the attraction
