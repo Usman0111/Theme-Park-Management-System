@@ -9,6 +9,7 @@ import Grid from "@material-ui/core/Grid";
 import Typography from "@material-ui/core/Typography";
 import { makeStyles } from "@material-ui/core/styles";
 import Container from "@material-ui/core/Container";
+import { useHistory } from "react-router-dom";
 
 const useStyles = makeStyles((theme) => ({
   card: {
@@ -37,10 +38,13 @@ const cards = [1, 2, 3, 4, 5, 6, 7, 8];
 
 export default function ManagerRides() {
   const classes = useStyles();
+  let history = useHistory();
 
   return (
     <Container className={classes.cardGrid}>
       <CssBaseline />
+      <button onClick={() => history.push(`rides/add-ride`)}>Move</button>
+
       <Grid container spacing={4}>
         {cards.map((card) => (
           <Grid item key={card} xs={3}>

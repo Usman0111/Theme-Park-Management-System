@@ -19,6 +19,7 @@ import ManagerReports from "./ManagerReports";
 import ManagerRides from "./ManagerRides";
 import ManagerAttractions from "./ManagerAttractions";
 import AssessmentIcon from "@material-ui/icons/Assessment";
+import ManagerAddRide from "./ManagerAddRide";
 
 const drawerWidth = 240;
 
@@ -110,8 +111,9 @@ export default function ManagerDashboard() {
         <Toolbar />
         <Switch>
           <Route path={`${path}`} component={ManagerReports} exact />
-          <Route path={`${path}/rides`} component={ManagerRides} />
+          <Route path={`${path}/rides`} component={ManagerRides} exact />
           <Route path={`${path}/attractions`} component={ManagerAttractions} />
+          <Route path={`${path}/rides/add-ride`} component={ManagerAddRide} />
         </Switch>
       </main>
     </div>
