@@ -357,4 +357,469 @@ router.delete("/remove-assignment", async (req, res) => {
 });
 
 //Manager Reports
+
+/**
+ *  Visits on time range
+ */
+
+//all the visits based on time range, time format "2021-01-01"
+/*
+router.get("/report-visits-time-range", async (req, res) => {
+  try {
+    const { start_date, end_date } = req.body;
+    const report = await pool.query(
+      "SELECT * FROM ENTRYPASS WHERE time_purchased BETWEEN $1 AND $2",
+      [start_date, end_date]
+    );
+
+    res.json(report.rows);
+  } catch (err) {
+    console.log(err);
+  }
+});
+*/
+
+//visit total based on time range, time format "2021-01-01"
+router.get("/report-total-visits-time-range", async (req, res) => {
+  try {
+    const { start_date, end_date } = req.body;
+    const report = await pool.query(
+      "SELECT count(*) FROM ENTRYPASS WHERE time_purchased BETWEEN $1 AND $2",
+      [start_date, end_date]
+    );
+
+    res.json(report.rows);
+  } catch (err) {
+    console.log(err);
+  }
+});
+
+
+//visit average based on time range, time format "2021-01-01"
+router.get("/report-average-visits-time-range", async (req, res) => {
+  try {
+    const { start_date, end_date } = req.body;
+    const report = await pool.query(
+      `SELECT AVG(c) FROM (
+        SELECT count(*) AS c FROM ENTRYPASS WHERE time_purchased BETWEEN $1 AND $2) a;`,
+      [start_date, end_date]
+    );
+
+    res.json(report.rows);
+  } catch (err) {
+    console.log(err);
+  }
+});
+
+//visit maximum based on time range, time format "2021-01-01"
+router.get("/report-max-visits-time-range", async (req, res) => {
+  try {
+    const { start_date, end_date } = req.body;
+    const report = await pool.query(
+      `SELECT count(*) AS max_visits, DATE(time_purchased) AS date
+        FROM ENTRYPASS WHERE time_purchased BETWEEN $1 AND $2
+        GROUP BY date
+        ORDER BY max_visits DESC limit 1;`,
+      [start_date, end_date]
+    );
+
+    res.json(report.rows);
+  } catch (err) {
+    console.log(err);
+  }
+});
+
+//all the visits based on time range, time format "2021-01-01"
+router.get("/report-visits-time-range", async (req, res) => {
+  try {
+    const { start_date, end_date } = req.body;
+    const report = await pool.query(
+      "SELECT * FROM ENTRYPASS WHERE time_purchased BETWEEN $1 AND $2",
+      [start_date, end_date]
+    );
+
+    res.json(report.rows);
+  } catch (err) {
+    console.log(err);
+  }
+});
+
+/**
+ *  Visits based on month
+ */
+
+//all the visits based on a certain month
+/*
+router.get("/report-visits-month", async (req, res) => {
+  try {
+    const { month, year } = req.body;
+    const report = await pool.query(
+      "SELECT * FROM ENTRYPASS WHERE EXTRACT(MONTH FROM time_purchased) = $1 AND EXTRACT(YEAR FROM time_purchased)=$2",
+      [month, year]
+    );
+
+    res.json(report.rows);
+  } catch (err) {
+    console.log(err);
+  }
+});
+*/
+
+//visit total based on month
+router.get("/report-total-visits-month", async (req, res) => {
+  try {
+    const { month, year } = req.body;
+    const report = await pool.query(
+      "SELECT count(*) FROM ENTRYPASS WHERE EXTRACT(MONTH FROM time_purchased) = $1 AND EXTRACT(YEAR FROM time_purchased)=$2",
+      [month, year]
+    );
+
+    res.json(report.rows);
+  } catch (err) {
+    console.log(err);
+  }
+});
+
+//visit average based on month
+
+// AVG function not work as expected.
+// router.get("/report-average-visits-month", async (req, res) => {
+//   try {
+//     const { month, year } = req.body;
+//     const report = await pool.query(
+//       `SELECT AVG(c) FROM (
+//         SELECT count(*) as c FROM ENTRYPASS WHERE EXTRACT(MONTH FROM time_purchased) = $1 AND EXTRACT(YEAR FROM time_purchased)=$2) a;`,
+//       [month, year]
+//     );
+
+//     res.json(report.rows);
+//   } catch (err) {
+//     console.log(err);
+//   }
+// });
+
+
+//visit average based on month, total/(days of the month)
+router.get("/report-average-visits-month", async (req, res) => {
+  try {
+    const { month, year } = req.body;
+    //get the days of the month
+    const d = new Date(year, month, 0);
+    const number_days = d.getDate();
+    console.log(number_days);
+    const report = await pool.query(
+      `SELECT c/$3 as average_visit FROM (
+        SELECT count(*) as c FROM ENTRYPASS WHERE EXTRACT(MONTH FROM time_purchased) = $1 AND EXTRACT(YEAR FROM time_purchased)=$2) a;`,
+      [month, year, number_days]
+    );
+
+    res.json(report.rows);
+  } catch (err) {
+    console.log(err);
+  }
+});
+
+//visit maximum based on month, which day in the month most visitors.
+router.get("/report-max-visits-month", async (req, res) => {
+  try {
+    const { month, year } = req.body;
+    const report = await pool.query(
+      `SELECT count(*) AS max_visits, DATE(time_purchased) AS date
+        FROM ENTRYPASS WHERE EXTRACT(MONTH FROM time_purchased) = $1 AND EXTRACT(YEAR FROM time_purchased)=$2
+        GROUP BY date
+        ORDER BY max_visits DESC limit 1;`,
+      [month, year]
+    );
+
+    res.json(report.rows);
+  } catch (err) {
+    console.log(err);
+  }
+});
+
+/**
+ *  Usage Reports
+ */
+//usage total based on time range, type is ride or attraction
+router.get("/report-total-usage-time-range", async (req, res) => {
+  try {
+    const { type, ride_id, start_date, attraction_id, end_date } = req.body;
+    if (type == "ride") {
+      const report = await pool.query(
+        `SELECT SUM(usage_count) AS total_usage
+          FROM rideusage WHERE ride_id=$1
+            AND date_used BETWEEN $2 AND $3;`,
+        [ride_id, start_date, end_date]
+      );
+      res.json(report.rows);
+    }
+    else {
+      const report = await pool.query(
+        `SELECT SUM(visit_count) AS total_usage
+          FROM AttractionVisit WHERE attraction_id=$1
+            AND date_visited BETWEEN $2 AND $3;`,
+        [attraction_id, start_date, end_date]
+      );
+      res.json(report.rows);
+    }
+
+    //res.json(report.rows);
+  } catch (err) {
+    console.log(err);
+  }
+});
+
+
+//usage daily average usage based on time range
+router.get("/report-average-usage-time-range", async (req, res) => {
+  try {
+    const { type, ride_id, start_date, attraction_id, end_date } = req.body;
+    if (type == "ride") {
+      const report = await pool.query(
+        `SELECT AVG(daily_usage) as average_usage FROM
+          (SELECT SUM(usage_count) AS daily_usage, DATE(date_used)
+          FROM rideusage WHERE ride_id=$1
+          AND date_used BETWEEN $2 AND $3 GROUP BY DATE(date_used)) a;`,
+        [ride_id, start_date, end_date]
+      );
+      res.json(report.rows);
+    }
+    else {
+      const report = await pool.query(
+        `SELECT AVG(daily_usage) as average_usage FROM
+          (SELECT SUM(visit_count) AS daily_usage, DATE(date_visited)
+          FROM AttractionVisit WHERE attraction_id=$1
+          AND date_visited BETWEEN $2 AND $3 GROUP BY DATE(date_visited)) a;`,
+        [attraction_id, start_date, end_date]
+      );
+      res.json(report.rows);
+    }
+
+    //res.json(report.rows);
+  } catch (err) {
+    console.log(err);
+  }
+});
+
+//usage maximum based on time range
+router.get("/report-max-usage-time-range", async (req, res) => {
+  try {
+    const { type, ride_id, start_date, attraction_id, end_date } = req.body;
+    if (type == "ride") {
+      const report = await pool.query(
+        `SELECT SUM(usage_count) AS max_usage, DATE(date_used)
+          FROM rideusage WHERE ride_id=$1
+          AND date_used BETWEEN $2 AND $3 GROUP BY DATE(date_used)
+          ORDER BY max_usage DESC LIMIT 1;`,
+        [ride_id, start_date, end_date]
+      );
+      res.json(report.rows);
+    }
+    else {
+      const report = await pool.query(
+        `SELECT SUM(visit_count) AS max_usage, DATE(date_visited)
+          FROM AttractionVisit WHERE attraction_id=$1
+          AND date_visited BETWEEN $2 AND $3 GROUP BY DATE(date_visited)
+          ORDER BY max_usage DESC LIMIT 1;`,
+        [attraction_id, start_date, end_date]
+      );
+      res.json(report.rows);
+    }
+
+    //res.json(report.rows);
+  } catch (err) {
+    console.log(err);
+  }
+});
+
+/**
+ * Usage report base on month.
+ */
+//visit total based on time range, type is ride or attraction
+router.get("/report-total-usage-month", async (req, res) => {
+  try {
+    const { type, ride_id, attraction_id, month, year } = req.body;
+    if (type == "ride") {
+      const report = await pool.query(
+        `SELECT SUM(usage_count) AS total_usage
+          FROM rideusage WHERE ride_id=$1
+            AND EXTRACT(MONTH FROM date_used) = $2 
+            AND EXTRACT(YEAR FROM date_used)=$3;`,
+        [ride_id, month, year]
+      );
+      res.json(report.rows);
+    }
+    else {
+      const report = await pool.query(
+        `SELECT SUM(visit_count) AS total_usage
+          FROM AttractionVisit WHERE attraction_id=$1
+            AND EXTRACT(MONTH FROM date_visited) = $2
+            AND EXTRACT(YEAR FROM date_visited)=$3;`,
+        [attraction_id, month, year]
+      );
+      res.json(report.rows);
+    }
+
+    //res.json(report.rows);
+  } catch (err) {
+    console.log(err);
+  }
+});
+
+
+//visit daily average usage based on month
+
+//Avg function based on total/row_numbers, not we want.
+// router.get("/report-average-usage-month", async (req, res) => {
+
+//   try {
+//     const { type, ride_id, attraction_id, month, year } = req.body;
+//     //get the days of the month
+//     var d = new Date(year,month,0);
+//     console.log(d.getDate());
+//     if (type == "ride") {
+//       const report = await pool.query(
+//         `SELECT AVG(daily_usage) as average_usage FROM
+//           (SELECT SUM(usage_count) AS daily_usage, DATE(date_used)
+//           FROM rideusage WHERE ride_id=$1
+//             AND EXTRACT(MONTH FROM date_used) = $2 
+//             AND EXTRACT(YEAR FROM date_used)=$3
+//             GROUP BY DATE(date_used)) a;`,
+//             [ride_id, month, year]
+//       );
+//       res.json(report.rows);
+//     }
+//     else
+//     {
+//       const report = await pool.query(
+//         `SELECT AVG(daily_usage) as average_usage FROM
+//           (SELECT SUM(visit_count) AS daily_usage, DATE(date_visited)
+//           FROM AttractionVisit WHERE attraction_id=$1
+//             AND EXTRACT(MONTH FROM date_visited) = $2
+//             AND EXTRACT(YEAR FROM date_visited)=$3
+//             GROUP BY DATE(date_visited)) a;`,
+//             [attraction_id, month, year]
+//       );
+//       res.json(report.rows);
+//     }
+
+//     //res.json(report.rows);
+//   } catch (err) {
+//     console.log(err);
+//   }
+// });
+
+
+//Avg function based on total/row_numbers, not we want.
+router.get("/report-average-usage-month", async (req, res) => {
+
+  try {
+    const { type, ride_id, attraction_id, month, year } = req.body;
+    //get the days of the month
+    const d = new Date(year, month, 0);
+    const number_days = d.getDate();
+    console.log(number_days);
+    if (type == "ride") {
+      const report = await pool.query(
+        `SELECT (daily_usage/$4) AS average_usage FROM
+          (SELECT SUM(usage_count) AS daily_usage
+          FROM rideusage WHERE ride_id=$1
+            AND EXTRACT(MONTH FROM date_used) = $2 
+            AND EXTRACT(YEAR FROM date_used)=$3
+            ) a;`,
+        [ride_id, month, year, number_days]
+      );
+      res.json(report.rows);
+    }
+    else {
+      const report = await pool.query(
+        `SELECT (daily_usage/$4) as average_usage FROM
+          (SELECT SUM(visit_count) AS daily_usage
+          FROM AttractionVisit WHERE attraction_id=$1
+            AND EXTRACT(MONTH FROM date_visited) = $2
+            AND EXTRACT(YEAR FROM date_visited)=$3) a;`,
+        [attraction_id, month, year, number_days]
+      );
+      res.json(report.rows);
+    }
+
+    //res.json(report.rows);
+  } catch (err) {
+    console.log(err);
+  }
+});
+
+//usage maximum based on month, which day use maximum
+router.get("/report-max-usage-month", async (req, res) => {
+  try {
+    const { type, ride_id, attraction_id, month, year } = req.body;
+    if (type == "ride") {
+      const report = await pool.query(
+        `SELECT SUM(usage_count) AS max_usage, DATE(date_used)
+          FROM rideusage WHERE ride_id=$1
+            AND EXTRACT(MONTH FROM date_used) = $2
+            AND EXTRACT(YEAR FROM date_used)=$3
+            GROUP BY DATE(date_used)
+            ORDER BY max_usage DESC LIMIT 1;`,
+        [ride_id, month, year]
+      );
+      res.json(report.rows);
+    }
+    else {
+      const report = await pool.query(
+        `SELECT SUM(visit_count) AS max_usage, DATE(date_visited)
+          FROM AttractionVisit WHERE attraction_id=$1
+            AND EXTRACT(MONTH FROM date_visited) = $2
+            AND EXTRACT(YEAR FROM date_visited)=$3
+            GROUP BY DATE(date_visited)
+            ORDER BY max_usage DESC LIMIT 1;`,
+        [attraction_id, month, year]
+      );
+      res.json(report.rows);
+    }
+
+    //res.json(report.rows);
+  } catch (err) {
+    console.log(err);
+  }
+});
+
+/**
+ * Get most popular ride
+ */
+router.get("/report-popular-month", async (req, res) => {
+  try {
+    const { type, month, year } = req.body;
+    if (type == "ride") {
+      const report = await pool.query(
+        `SELECT SUM(usage_count) AS max_usage, ride_id
+          FROM rideusage WHERE
+            EXTRACT(MONTH FROM date_used) = $1
+            AND EXTRACT(YEAR FROM date_used)=$2
+            GROUP BY ride_id
+            ORDER BY max_usage DESC LIMIT 1;`,
+        [month, year]
+      );
+      res.json(report.rows);
+    }
+    else {
+      const report = await pool.query(
+        `SELECT SUM(visit_count) AS max_usage, attraction_id
+          FROM AttractionVisit WHERE
+            EXTRACT(MONTH FROM date_visited) = $1
+            AND EXTRACT(YEAR FROM date_visited)=$2
+            GROUP BY attraction_id
+            ORDER BY max_usage DESC LIMIT 1;`,
+        [month, year]
+      );
+      res.json(report.rows);
+    }
+
+    //res.json(report.rows);
+  } catch (err) {
+    console.log(err);
+  }
+});
+
+
 module.exports = router;
