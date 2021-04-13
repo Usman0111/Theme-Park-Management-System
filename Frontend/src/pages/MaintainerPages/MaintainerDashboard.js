@@ -14,6 +14,7 @@ import ListItemIcon from "@material-ui/core/ListItemIcon";
 import ListItemText from "@material-ui/core/ListItemText";
 import ExitToAppIcon from "@material-ui/icons/ExitToApp";
 import ConfirmationNumberIcon from "@material-ui/icons/ConfirmationNumber";
+import MaintainerFixRequests from "./MaintainerFixRequests";
 
 const drawerWidth = 240;
 
@@ -102,7 +103,7 @@ export default function MaintainerDashboard() {
       <main className={classes.content}>
         <Toolbar />
         <Switch>
-          <Route path={`${path}`} component={<h1>test</h1>} exact />
+          <Route path={`${path}`} component={MaintainerFixRequests} exact />
         </Switch>
       </main>
     </div>
