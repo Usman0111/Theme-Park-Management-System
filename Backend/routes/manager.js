@@ -358,468 +358,541 @@ router.delete("/remove-assignment", async (req, res) => {
 
 //Manager Reports
 
-/**
- *  Visits on time range
- */
-
-//all the visits based on time range, time format "2021-01-01"
-/*
-router.get("/report-visits-time-range", async (req, res) => {
+// Visits(range, daily totals or month 4 vals, price): fake data -> valid customer_id
+// - select on date range
+// - daily visits (group by day)
+// - monthly total, avg, max, min (extract and group by month and year)
+router.post("/visits", async (req, res) => {
   try {
-    const { start_date, end_date } = req.body;
-    const report = await pool.query(
-      "SELECT * FROM ENTRYPASS WHERE time_purchased BETWEEN $1 AND $2",
-      [start_date, end_date]
-    );
+    const { start_date, end_date, calculate } = req.body;
 
-    res.json(report.rows);
-  } catch (err) {
-    console.log(err);
-  }
-});
-*/
-
-//visit total based on time range, time format "2021-01-01"
-router.get("/report-total-visits-time-range", async (req, res) => {
-  try {
-    const { start_date, end_date } = req.body;
-    const report = await pool.query(
-      "SELECT count(*) FROM ENTRYPASS WHERE time_purchased BETWEEN $1 AND $2",
-      [start_date, end_date]
-    );
-
-    res.json(report.rows);
-  } catch (err) {
-    console.log(err);
-  }
-});
-
-
-//visit average based on time range, time format "2021-01-01"
-router.get("/report-average-visits-time-range", async (req, res) => {
-  try {
-    const { start_date, end_date } = req.body;
-    const report = await pool.query(
-      `SELECT AVG(c) FROM (
-        SELECT count(*) AS c FROM ENTRYPASS WHERE time_purchased BETWEEN $1 AND $2) a;`,
-      [start_date, end_date]
-    );
-
-    res.json(report.rows);
-  } catch (err) {
-    console.log(err);
-  }
-});
-
-//visit maximum based on time range, time format "2021-01-01"
-router.get("/report-max-visits-time-range", async (req, res) => {
-  try {
-    const { start_date, end_date } = req.body;
-    const report = await pool.query(
-      `SELECT count(*) AS max_visits, DATE(time_purchased) AS date
-        FROM ENTRYPASS WHERE time_purchased BETWEEN $1 AND $2
-        GROUP BY date
-        ORDER BY max_visits DESC limit 1;`,
-      [start_date, end_date]
-    );
-
-    res.json(report.rows);
-  } catch (err) {
-    console.log(err);
-  }
-});
-
-//all the visits based on time range, time format "2021-01-01"
-router.get("/report-visits-time-range", async (req, res) => {
-  try {
-    const { start_date, end_date } = req.body;
-    const report = await pool.query(
-      "SELECT * FROM ENTRYPASS WHERE time_purchased BETWEEN $1 AND $2",
-      [start_date, end_date]
-    );
-
-    res.json(report.rows);
-  } catch (err) {
-    console.log(err);
-  }
-});
-
-/**
- *  Visits based on month
- */
-
-//all the visits based on a certain month
-/*
-router.get("/report-visits-month", async (req, res) => {
-  try {
-    const { month, year } = req.body;
-    const report = await pool.query(
-      "SELECT * FROM ENTRYPASS WHERE EXTRACT(MONTH FROM time_purchased) = $1 AND EXTRACT(YEAR FROM time_purchased)=$2",
-      [month, year]
-    );
-
-    res.json(report.rows);
-  } catch (err) {
-    console.log(err);
-  }
-});
-*/
-
-//visit total based on month
-router.get("/report-total-visits-month", async (req, res) => {
-  try {
-    const { month, year } = req.body;
-    const report = await pool.query(
-      "SELECT count(*) FROM ENTRYPASS WHERE EXTRACT(MONTH FROM time_purchased) = $1 AND EXTRACT(YEAR FROM time_purchased)=$2",
-      [month, year]
-    );
-
-    res.json(report.rows);
-  } catch (err) {
-    console.log(err);
-  }
-});
-
-//visit average based on month
-
-// AVG function not work as expected.
-// router.get("/report-average-visits-month", async (req, res) => {
-//   try {
-//     const { month, year } = req.body;
-//     const report = await pool.query(
-//       `SELECT AVG(c) FROM (
-//         SELECT count(*) as c FROM ENTRYPASS WHERE EXTRACT(MONTH FROM time_purchased) = $1 AND EXTRACT(YEAR FROM time_purchased)=$2) a;`,
-//       [month, year]
-//     );
-
-//     res.json(report.rows);
-//   } catch (err) {
-//     console.log(err);
-//   }
-// });
-
-
-//visit average based on month, total/(days of the month)
-router.get("/report-average-visits-month", async (req, res) => {
-  try {
-    const { month, year } = req.body;
-    //get the days of the month
-    const d = new Date(year, month, 0);
-    const number_days = d.getDate();
-    console.log(number_days);
-    const report = await pool.query(
-      `SELECT c/$3 as average_visit FROM (
-        SELECT count(*) as c FROM ENTRYPASS WHERE EXTRACT(MONTH FROM time_purchased) = $1 AND EXTRACT(YEAR FROM time_purchased)=$2) a;`,
-      [month, year, number_days]
-    );
-
-    res.json(report.rows);
-  } catch (err) {
-    console.log(err);
-  }
-});
-
-//visit maximum based on month, which day in the month most visitors.
-router.get("/report-max-visits-month", async (req, res) => {
-  try {
-    const { month, year } = req.body;
-    const report = await pool.query(
-      `SELECT count(*) AS max_visits, DATE(time_purchased) AS date
-        FROM ENTRYPASS WHERE EXTRACT(MONTH FROM time_purchased) = $1 AND EXTRACT(YEAR FROM time_purchased)=$2
-        GROUP BY date
-        ORDER BY max_visits DESC limit 1;`,
-      [month, year]
-    );
-
-    res.json(report.rows);
-  } catch (err) {
-    console.log(err);
-  }
-});
-
-/**
- *  Usage Reports
- */
-//usage total based on time range, type is ride or attraction
-router.get("/report-total-usage-time-range", async (req, res) => {
-  try {
-    const { type, ride_id, start_date, attraction_id, end_date } = req.body;
-    if (type == "ride") {
+    if (calculate === "daily total") {
       const report = await pool.query(
-        `SELECT SUM(usage_count) AS total_usage
-          FROM rideusage WHERE ride_id=$1
-            AND date_used BETWEEN $2 AND $3;`,
-        [ride_id, start_date, end_date]
+        "SELECT COUNT(entrypass_id) AS visits, EXTRACT(month from time_purchased) AS month, EXTRACT(day from time_purchased) AS day, EXTRACT(year from time_purchased) AS year FROM entrypass WHERE time_purchased BETWEEN $1 and $2 GROUP BY day, month, year ORDER by year, month, day ASC;",
+        [start_date, end_date]
       );
-      res.json(report.rows);
+
+      return res.json(report.rows);
     }
-    else {
+    if (calculate === "monthly total") {
       const report = await pool.query(
-        `SELECT SUM(visit_count) AS total_usage
-          FROM AttractionVisit WHERE attraction_id=$1
-            AND date_visited BETWEEN $2 AND $3;`,
-        [attraction_id, start_date, end_date]
+        "SELECT SUM(daily.visits) AS visits, month, year FROM(SELECT COUNT(entrypass_id) AS visits, EXTRACT(month from time_purchased) AS month, EXTRACT(day from time_purchased) AS day, EXTRACT(year from time_purchased) AS year FROM entrypass WHERE time_purchased BETWEEN $1 and $2 GROUP BY day, month, year) AS daily GROUP BY month, year ORDER BY year, month ASC;",
+        [start_date, end_date]
       );
-      res.json(report.rows);
+
+      return res.json(report.rows);
+    }
+    if (calculate === "daily average by month") {
+      const report = await pool.query(
+        "SELECT AVG(daily.visits) AS visits, month, year FROM(SELECT COUNT(entrypass_id) AS visits, EXTRACT(month from time_purchased) AS month, EXTRACT(day from time_purchased) AS day, EXTRACT(year from time_purchased) AS year FROM entrypass WHERE time_purchased BETWEEN $1 and $2 GROUP BY day, month, year) AS daily GROUP BY month, year ORDER BY year, month ASC;",
+        [start_date, end_date]
+      );
+
+      return res.json(report.rows);
+    }
+    if (calculate === "daily max by month") {
+      const report = await pool.query(
+        "SELECT MAX(daily.visits) AS visits, month, year FROM(SELECT COUNT(entrypass_id) AS visits, EXTRACT(month from time_purchased) AS month, EXTRACT(day from time_purchased) AS day, EXTRACT(year from time_purchased) AS year FROM entrypass WHERE time_purchased BETWEEN $1 and $2 GROUP BY day, month, year) AS daily GROUP BY month, year ORDER BY year, month ASC;",
+        [start_date, end_date]
+      );
+
+      return res.json(report.rows);
+    }
+    if (calculate === "daily min by month") {
+      const report = await pool.query(
+        "SELECT MIN(daily.visits) AS visits, month, year FROM(SELECT COUNT(entrypass_id) AS visits, EXTRACT(month from time_purchased) AS month, EXTRACT(day from time_purchased) AS day, EXTRACT(year from time_purchased) AS year FROM entrypass WHERE time_purchased BETWEEN $1 and $2 GROUP BY day, month, year) AS daily GROUP BY month, year ORDER BY year, month ASC;",
+        [start_date, end_date]
+      );
+
+      return res.json(report.rows);
     }
 
-    //res.json(report.rows);
+    res.status(400).send("Incorrect fields provided");
   } catch (err) {
+    res.status(500).send("Server Error while generating reports");
     console.log(err);
   }
 });
 
-
-//usage daily average usage based on time range
-router.get("/report-average-usage-time-range", async (req, res) => {
+// Usage(range, type, all or one, daily totals or month 4 vals): fake data -> valid customer_id, ride_id/attraction_id
+// - select on date range and type of table
+// - group by day and ride/attraction (all or one)
+// - daily visits (group by day)
+// - monthly total, avg, max, min (extract and group by month and year)
+router.post("/usage", async (req, res) => {
   try {
-    const { type, ride_id, start_date, attraction_id, end_date } = req.body;
-    if (type == "ride") {
-      const report = await pool.query(
-        `SELECT AVG(daily_usage) as average_usage FROM
-          (SELECT SUM(usage_count) AS daily_usage, DATE(date_used)
-          FROM rideusage WHERE ride_id=$1
-          AND date_used BETWEEN $2 AND $3 GROUP BY DATE(date_used)) a;`,
-        [ride_id, start_date, end_date]
-      );
-      res.json(report.rows);
-    }
-    else {
-      const report = await pool.query(
-        `SELECT AVG(daily_usage) as average_usage FROM
-          (SELECT SUM(visit_count) AS daily_usage, DATE(date_visited)
-          FROM AttractionVisit WHERE attraction_id=$1
-          AND date_visited BETWEEN $2 AND $3 GROUP BY DATE(date_visited)) a;`,
-        [attraction_id, start_date, end_date]
-      );
-      res.json(report.rows);
+    const { start_date, end_date, type, calculate, show } = req.body;
+
+    if (type === "ride") {
+      if (show === "all") {
+        if (calculate === "daily total") {
+          const report = await pool.query(
+            "SELECT name, SUM(usage_count) AS usage, EXTRACT(month from date_used) AS month, EXTRACT(day from date_used) AS day, EXTRACT(year from date_used) AS year FROM rideusage, ride WHERE date_used BETWEEN $1 and $2 AND rideusage.ride_id = ride.ride_id GROUP BY ride.name, day, month, year ORDER BY year, month, day ASC;",
+            [start_date, end_date]
+          );
+
+          return res.json(report.rows);
+        }
+        if (calculate === "monthly total") {
+          const report = await pool.query(
+            "SELECT name, SUM(usage_count) AS usage , EXTRACT(month from date_used) AS month, EXTRACT(year from date_used) AS year FROM rideusage, ride WHERE date_used BETWEEN $1 and $2 AND rideusage.ride_id = ride.ride_id GROUP BY ride.name, month, year ORDER by year, month ASC;",
+            [start_date, end_date]
+          );
+
+          return res.json(report.rows);
+        }
+        if (calculate === "daily average by month") {
+          const report = await pool.query(
+            "SELECT name, AVG(daily.usage) AS usage, month, year FROM (SELECT name, EXTRACT(month from date_used) AS month, EXTRACT(day from date_used) AS day, EXTRACT(year from date_used) AS year, SUM(usage_count) AS usage FROM rideusage, ride WHERE date_used BETWEEN $1 and $2 AND rideusage.ride_id = ride.ride_id GROUP BY ride.name, day, month, year) AS daily GROUP BY name, month, year ORDER by year, month ASC;",
+            [start_date, end_date]
+          );
+
+          return res.json(report.rows);
+        }
+        if (calculate === "daily max by month") {
+          const report = await pool.query(
+            "SELECT name, MAX(daily.usage) AS usage, month, year FROM (SELECT name, EXTRACT(month from date_used) AS month, EXTRACT(day from date_used) AS day, EXTRACT(year from date_used) AS year, SUM(usage_count) AS usage FROM rideusage, ride WHERE date_used BETWEEN $1 and $2 AND rideusage.ride_id = ride.ride_id GROUP BY ride.name, day, month, year) AS daily GROUP BY name, month, year ORDER by year, month ASC;",
+            [start_date, end_date]
+          );
+
+          return res.json(report.rows);
+        }
+        if (calculate === "daily min by month") {
+          const report = await pool.query(
+            "SELECT name, MIN(daily.usage) AS usage, month, year FROM (SELECT name, EXTRACT(month from date_used) AS month, EXTRACT(day from date_used) AS day, EXTRACT(year from date_used) AS year, SUM(usage_count) AS usage FROM rideusage, ride WHERE date_used BETWEEN $1 and $2 AND rideusage.ride_id = ride.ride_id GROUP BY ride.name, day, month, year) AS daily GROUP BY name, month, year ORDER by year, month ASC;",
+            [start_date, end_date]
+          );
+          return res.json(report.rows);
+        }
+      }
+
+      if (show === "one") {
+        const { ride_id } = req.body;
+        if (calculate === "daily total") {
+          const report = await pool.query(
+            "SELECT  SUM(usage_count) AS usage, EXTRACT(month from date_used) AS month, EXTRACT(day from date_used) AS day, EXTRACT(year from date_used) AS year FROM rideusage WHERE date_used BETWEEN $1 and $2 AND rideusage.ride_id = $3 GROUP BY day, month, year ORDER BY year, month, day ASC;",
+            [start_date, end_date, ride_id]
+          );
+
+          return res.json(report.rows);
+        }
+        if (calculate === "monthly total") {
+          const report = await pool.query(
+            "SELECT SUM(usage_count) AS usage , EXTRACT(month from date_used) AS month, EXTRACT(year from date_used) AS year FROM rideusage WHERE date_used BETWEEN $1 and $2 AND rideusage.ride_id = $3 GROUP BY month, year ORDER by year, month ASC;",
+            [start_date, end_date, ride_id]
+          );
+
+          return res.json(report.rows);
+        }
+        if (calculate === "daily average by month") {
+          const report = await pool.query(
+            "SELECT AVG(daily.usage) AS usage, month, year FROM (SELECT EXTRACT(month from date_used) AS month, EXTRACT(day from date_used) AS day, EXTRACT(year from date_used) AS year, SUM(usage_count) AS usage FROM rideusage WHERE date_used BETWEEN $1 and $2 AND rideusage.ride_id = $3 GROUP BY day, month, year) AS daily GROUP BY month, year ORDER by year, month ASC;",
+            [start_date, end_date, ride_id]
+          );
+
+          return res.json(report.rows);
+        }
+        if (calculate === "daily max by month") {
+          const report = await pool.query(
+            "SELECT MAX(daily.usage) AS usage, month, year FROM (SELECT EXTRACT(month from date_used) AS month, EXTRACT(day from date_used) AS day, EXTRACT(year from date_used) AS year, SUM(usage_count) AS usage FROM rideusage WHERE date_used BETWEEN $1 and $2 AND rideusage.ride_id = $3 GROUP BY day, month, year) AS daily GROUP BY month, year ORDER by year, month ASC;",
+            [start_date, end_date, ride_id]
+          );
+
+          return res.json(report.rows);
+        }
+        if (calculate === "daily min by month") {
+          const report = await pool.query(
+            "SELECT MIN(daily.usage) AS usage, month, year FROM (SELECT EXTRACT(month from date_used) AS month, EXTRACT(day from date_used) AS day, EXTRACT(year from date_used) AS year, SUM(usage_count) AS usage FROM rideusage WHERE date_used BETWEEN $1 and $2 AND rideusage.ride_id = $3 GROUP BY day, month, year) AS daily GROUP BY month, year ORDER by year, month ASC;",
+            [start_date, end_date, ride_id]
+          );
+          return res.json(report.rows);
+        }
+      }
     }
 
-    //res.json(report.rows);
+    if (type === "attraction") {
+      if (show === "all") {
+        if (calculate === "daily total") {
+          const report = await pool.query(
+            "SELECT name, SUM(usage_count) AS usage, EXTRACT(month from date_used) AS month, EXTRACT(day from date_used) AS day, EXTRACT(year from date_used) AS year FROM attractionusage, attraction WHERE date_used BETWEEN $1 and $2 AND attractionusage.attraction_id = attraction.attraction_id GROUP BY attraction.name, day, month, year ORDER BY year, month, day ASC;",
+            [start_date, end_date]
+          );
+
+          return res.json(report.rows);
+        }
+        if (calculate === "monthly total") {
+          const report = await pool.query(
+            "SELECT name, SUM(usage_count) AS usage , EXTRACT(month from date_used) AS month, EXTRACT(year from date_used) AS year FROM attractionusage, attraction WHERE date_used BETWEEN $1 and $2 AND attractionusage.attraction_id = attraction.attraction_id GROUP BY attraction.name, month, year ORDER by year, month ASC;",
+            [start_date, end_date]
+          );
+
+          return res.json(report.rows);
+        }
+        if (calculate === "daily average by month") {
+          const report = await pool.query(
+            "SELECT name, AVG(daily.usage) AS usage, month, year FROM (SELECT name, EXTRACT(month from date_used) AS month, EXTRACT(day from date_used) AS day, EXTRACT(year from date_used) AS year, SUM(usage_count) AS usage FROM attractionusage, attraction WHERE date_used BETWEEN $1 and $2 AND attractionusage.attraction_id = attraction.attraction_id GROUP BY attraction.name, day, month, year) AS daily GROUP BY name, month, year ORDER by year, month ASC;",
+            [start_date, end_date]
+          );
+
+          return res.json(report.rows);
+        }
+        if (calculate === "daily max by month") {
+          const report = await pool.query(
+            "SELECT name, MAX(daily.usage) AS usage, month, year FROM (SELECT name, EXTRACT(month from date_used) AS month, EXTRACT(day from date_used) AS day, EXTRACT(year from date_used) AS year, SUM(usage_count) AS usage FROM attractionusage, attraction WHERE date_used BETWEEN $1 and $2 AND attractionusage.attraction_id = attraction.attraction_id GROUP BY attraction.name, day, month, year) AS daily GROUP BY name, month, year ORDER by year, month ASC;",
+            [start_date, end_date]
+          );
+
+          return res.json(report.rows);
+        }
+        if (calculate === "daily min by month") {
+          const report = await pool.query(
+            "SELECT name, MIN(daily.usage) AS usage, month, year FROM (SELECT name, EXTRACT(month from date_used) AS month, EXTRACT(day from date_used) AS day, EXTRACT(year from date_used) AS year, SUM(usage_count) AS usage FROM attractionusage, attraction WHERE date_used BETWEEN $1 and $2 AND attractionusage.attraction_id = attraction.attraction_id GROUP BY attraction.name, day, month, year) AS daily GROUP BY name, month, year ORDER by year, month ASC;",
+            [start_date, end_date]
+          );
+          return res.json(report.rows);
+        }
+      }
+
+      if (show === "one") {
+        const { attraction_id } = req.body;
+        if (calculate === "daily total") {
+          const report = await pool.query(
+            "SELECT  SUM(usage_count) AS usage, EXTRACT(month from date_used) AS month, EXTRACT(day from date_used) AS day, EXTRACT(year from date_used) AS year FROM attractionusage WHERE date_used BETWEEN $1 and $2 AND attractionusage.attraction_id = $3 GROUP BY day, month, year ORDER BY year, month, day ASC;",
+            [start_date, end_date, attraction_id]
+          );
+
+          return res.json(report.rows);
+        }
+        if (calculate === "monthly total") {
+          const report = await pool.query(
+            "SELECT SUM(usage_count) AS usage , EXTRACT(month from date_used) AS month, EXTRACT(year from date_used) AS year FROM attractionusage WHERE date_used BETWEEN $1 and $2 AND attractionusage.attraction_id = $3 GROUP BY month, year ORDER by year, month ASC;",
+            [start_date, end_date, attraction_id]
+          );
+
+          return res.json(report.rows);
+        }
+        if (calculate === "daily average by month") {
+          const report = await pool.query(
+            "SELECT AVG(daily.usage) AS usage, month, year FROM (SELECT EXTRACT(month from date_used) AS month, EXTRACT(day from date_used) AS day, EXTRACT(year from date_used) AS year, SUM(usage_count) AS usage FROM attractionusage WHERE date_used BETWEEN $1 and $2 AND attractionusage.attraction_id = $3 GROUP BY day, month, year) AS daily GROUP BY month, year ORDER by year, month ASC;",
+            [start_date, end_date, attraction_id]
+          );
+
+          return res.json(report.rows);
+        }
+        if (calculate === "daily max by month") {
+          const report = await pool.query(
+            "SELECT MAX(daily.usage) AS usage, month, year FROM (SELECT EXTRACT(month from date_used) AS month, EXTRACT(day from date_used) AS day, EXTRACT(year from date_used) AS year, SUM(usage_count) AS usage FROM attractionusage WHERE date_used BETWEEN $1 and $2 AND attractionusage.attraction_id = $3 GROUP BY day, month, year) AS daily GROUP BY month, year ORDER by year, month ASC;",
+            [start_date, end_date, attraction_id]
+          );
+
+          return res.json(report.rows);
+        }
+        if (calculate === "daily min by month") {
+          const report = await pool.query(
+            "SELECT MIN(daily.usage) AS usage, month, year FROM (SELECT EXTRACT(month from date_used) AS month, EXTRACT(day from date_used) AS day, EXTRACT(year from date_used) AS year, SUM(usage_count) AS usage FROM attractionusage WHERE date_used BETWEEN $1 and $2 AND attractionusage.attraction_id = $3 GROUP BY day, month, year) AS daily GROUP BY month, year ORDER by year, month ASC;",
+            [start_date, end_date, attraction_id]
+          );
+          return res.json(report.rows);
+        }
+      }
+    }
+
+    res.status(400).send("Incorrect fields provided");
   } catch (err) {
+    res.status(500).send("Server Error while generating reports");
     console.log(err);
   }
 });
 
-//usage maximum based on time range
-router.get("/report-max-usage-time-range", async (req, res) => {
+// Breakdowns(range, all or one or by maintainer, daily totals or month 4 vals): fake data -> valid attedant_id, ride_id, maintainer_id
+// - select on date range
+// - group by day and ride (all or one)
+// - daily visits (group by day)
+// - monthly total, avg, max, min (extract and group by month and year)
+router.post("/breakdowns", async (req, res) => {
   try {
-    const { type, ride_id, start_date, attraction_id, end_date } = req.body;
-    if (type == "ride") {
-      const report = await pool.query(
-        `SELECT SUM(usage_count) AS max_usage, DATE(date_used)
-          FROM rideusage WHERE ride_id=$1
-          AND date_used BETWEEN $2 AND $3 GROUP BY DATE(date_used)
-          ORDER BY max_usage DESC LIMIT 1;`,
-        [ride_id, start_date, end_date]
-      );
-      res.json(report.rows);
-    }
-    else {
-      const report = await pool.query(
-        `SELECT SUM(visit_count) AS max_usage, DATE(date_visited)
-          FROM AttractionVisit WHERE attraction_id=$1
-          AND date_visited BETWEEN $2 AND $3 GROUP BY DATE(date_visited)
-          ORDER BY max_usage DESC LIMIT 1;`,
-        [attraction_id, start_date, end_date]
-      );
-      res.json(report.rows);
+    const { start_date, end_date, calculate, show } = req.body;
+
+    if (show === "all") {
+      if (calculate === "daily total") {
+        const report = await pool.query(
+          "SELECT name, COUNT(breakdown_id) AS breakdowns, EXTRACT(month from breakdown_date) AS month, EXTRACT(day from  breakdown_date) AS day, EXTRACT(year from breakdown_date) AS year FROM ridebreakdowns, ride WHERE breakdown_date BETWEEN $1 and $2 AND ridebreakdowns.ride_id = ride.ride_id GROUP BY name, day, month, year ORDER by year, month, day ASC",
+          [start_date, end_date]
+        );
+
+        return res.json(report.rows);
+      }
+      if (calculate === "monthly total") {
+        const report = await pool.query(
+          "SELECT name, SUM(daily.breakdowns) AS breakdowns, month, year FROM (SELECT name, COUNT(breakdown_id) AS breakdowns, EXTRACT(month from breakdown_date) AS month, EXTRACT(day from  breakdown_date) AS day, EXTRACT(year from breakdown_date) AS year FROM ridebreakdowns, ride WHERE breakdown_date BETWEEN $1 and $2 AND ridebreakdowns.ride_id = ride.ride_id GROUP BY name, day, month, year) AS daily  GROUP BY name, month, year  ORDER by year, month ASC",
+          [start_date, end_date]
+        );
+
+        return res.json(report.rows);
+      }
+      if (calculate === "daily average by month") {
+        const report = await pool.query(
+          "SELECT name, AVG(daily.breakdowns) AS breakdowns, month, year FROM (SELECT name, COUNT(breakdown_id) AS breakdowns, EXTRACT(month from breakdown_date) AS month, EXTRACT(day from  breakdown_date) AS day, EXTRACT(year from breakdown_date) AS year FROM ridebreakdowns, ride WHERE breakdown_date BETWEEN $1 and $2 AND ridebreakdowns.ride_id = ride.ride_id GROUP BY name, day, month, year) AS daily  GROUP BY name, month, year  ORDER by year, month ASC",
+          [start_date, end_date]
+        );
+
+        return res.json(report.rows);
+      }
+      if (calculate === "daily max by month") {
+        const report = await pool.query(
+          "SELECT name, MAX(daily.breakdowns) AS breakdowns, month, year FROM (SELECT name, COUNT(breakdown_id) AS breakdowns, EXTRACT(month from breakdown_date) AS month, EXTRACT(day from  breakdown_date) AS day, EXTRACT(year from breakdown_date) AS year FROM ridebreakdowns, ride WHERE breakdown_date BETWEEN $1 and $2 AND ridebreakdowns.ride_id = ride.ride_id GROUP BY name, day, month, year) AS daily  GROUP BY name, month, year  ORDER by year, month ASC;",
+          [start_date, end_date]
+        );
+
+        return res.json(report.rows);
+      }
+      if (calculate === "daily min by month") {
+        const report = await pool.query(
+          "SELECT name, MIN(daily.breakdowns) AS breakdowns, month, year FROM (SELECT name, COUNT(breakdown_id) AS breakdowns, EXTRACT(month from breakdown_date) AS month, EXTRACT(day from  breakdown_date) AS day, EXTRACT(year from breakdown_date) AS year FROM ridebreakdowns, ride WHERE breakdown_date BETWEEN $1 and $2 AND ridebreakdowns.ride_id = ride.ride_id GROUP BY name, day, month, year) AS daily  GROUP BY name, month, year  ORDER by year, month ASC;",
+          [start_date, end_date]
+        );
+        return res.json(report.rows);
+      }
     }
 
-    //res.json(report.rows);
+    if (show === "one") {
+      const { ride_id } = req.body;
+      if (calculate === "daily total") {
+        const report = await pool.query(
+          "SELECT COUNT(breakdown_id) AS breakdowns, EXTRACT(month from breakdown_date) AS month, EXTRACT(day from  breakdown_date) AS day, EXTRACT(year from breakdown_date) AS year FROM ridebreakdowns, ride WHERE breakdown_date BETWEEN $1 and $2 AND ridebreakdowns.ride_id = $3 GROUP BY day, month, year ORDER by year, month, day ASC;",
+          [start_date, end_date, ride_id]
+        );
+
+        return res.json(report.rows);
+      }
+      if (calculate === "monthly total") {
+        const report = await pool.query(
+          "SELECT SUM(daily.breakdowns) AS breakdowns, month, year FROM (SELECT COUNT(breakdown_id) AS breakdowns, EXTRACT(month from breakdown_date) AS month, EXTRACT(day from  breakdown_date) AS day, EXTRACT(year from breakdown_date) AS year FROM ridebreakdowns, ride WHERE breakdown_date BETWEEN $1 and $2 AND ridebreakdowns.ride_id = $3 GROUP BY day, month, year ORDER by year, month, day ASC) AS daily  GROUP BY month, year  ORDER by year, month ASC;",
+          [start_date, end_date, ride_id]
+        );
+
+        return res.json(report.rows);
+      }
+      if (calculate === "daily average by month") {
+        const report = await pool.query(
+          "SELECT AVG(daily.breakdowns) AS breakdowns, month, year FROM (SELECT COUNT(breakdown_id) AS breakdowns, EXTRACT(month from breakdown_date) AS month, EXTRACT(day from  breakdown_date) AS day, EXTRACT(year from breakdown_date) AS year FROM ridebreakdowns, ride WHERE breakdown_date BETWEEN $1 and $2 AND ridebreakdowns.ride_id = $3 GROUP BY day, month, year ORDER by year, month, day ASC) AS daily  GROUP BY month, year  ORDER by year, month ASC;",
+          [start_date, end_date, ride_id]
+        );
+
+        return res.json(report.rows);
+      }
+      if (calculate === "daily max by month") {
+        const report = await pool.query(
+          "SELECT MAX(daily.breakdowns) AS breakdowns, month, year FROM (SELECT COUNT(breakdown_id) AS breakdowns, EXTRACT(month from breakdown_date) AS month, EXTRACT(day from  breakdown_date) AS day, EXTRACT(year from breakdown_date) AS year FROM ridebreakdowns, ride WHERE breakdown_date BETWEEN $1 and $2 AND ridebreakdowns.ride_id = $3 GROUP BY day, month, year ORDER by year, month, day ASC) AS daily  GROUP BY month, year  ORDER by year, month ASC;",
+          [start_date, end_date, ride_id]
+        );
+
+        return res.json(report.rows);
+      }
+      if (calculate === "daily min by month") {
+        const report = await pool.query(
+          "SELECT MIN(daily.breakdowns) AS breakdowns, month, year FROM (SELECT COUNT(breakdown_id) AS breakdowns, EXTRACT(month from breakdown_date) AS month, EXTRACT(day from  breakdown_date) AS day, EXTRACT(year from breakdown_date) AS year FROM ridebreakdowns, ride WHERE breakdown_date BETWEEN $1 and $2 AND ridebreakdowns.ride_id = $3 GROUP BY day, month, year ORDER by year, month, day ASC) AS daily  GROUP BY month, year  ORDER by year, month ASC;",
+          [start_date, end_date, ride_id]
+        );
+        return res.json(report.rows);
+      }
+    }
+
+    res.status(400).send("Incorrect fields provided");
   } catch (err) {
+    res.status(500).send("Server Error while generating reports");
     console.log(err);
   }
 });
 
-/**
- * Usage report base on month.
- */
-//visit total based on time range, type is ride or attraction
-router.get("/report-total-usage-month", async (req, res) => {
+// Rainouts(range, type, all or one, daily totals or month 4 vals): fake data -> valid attedant_id, ride_id/attraction_id
+// - select on date range and type of table
+// - group by day and ride/attraction (all or one)
+// - daily visits (group by day)
+// - monthly total, avg, max, min (extract and group by month and year)
+router.post("/rainouts", async (req, res) => {
   try {
-    const { type, ride_id, attraction_id, month, year } = req.body;
-    if (type == "ride") {
-      const report = await pool.query(
-        `SELECT SUM(usage_count) AS total_usage
-          FROM rideusage WHERE ride_id=$1
-            AND EXTRACT(MONTH FROM date_used) = $2 
-            AND EXTRACT(YEAR FROM date_used)=$3;`,
-        [ride_id, month, year]
-      );
-      res.json(report.rows);
-    }
-    else {
-      const report = await pool.query(
-        `SELECT SUM(visit_count) AS total_usage
-          FROM AttractionVisit WHERE attraction_id=$1
-            AND EXTRACT(MONTH FROM date_visited) = $2
-            AND EXTRACT(YEAR FROM date_visited)=$3;`,
-        [attraction_id, month, year]
-      );
-      res.json(report.rows);
+    const { start_date, end_date, type, calculate, show } = req.body;
+
+    if (type === "ride") {
+      if (show === "all") {
+        if (calculate === "daily total") {
+          const report = await pool.query(
+            "SELECT name, COUNT(rainout_id) AS rainouts, EXTRACT(month from date_rainedout) AS month, EXTRACT(day from  date_rainedout) AS day, EXTRACT(year from date_rainedout) AS year FROM riderainout, ride WHERE date_rainedout BETWEEN $1 and $2 AND riderainout.ride_id = ride.ride_id GROUP BY name, day, month, year ORDER by year, month, day ASC",
+            [start_date, end_date]
+          );
+
+          return res.json(report.rows);
+        }
+        if (calculate === "monthly total") {
+          const report = await pool.query(
+            "SELECT name, SUM(daily.rainouts) AS rainouts, month, year FROM (SELECT name, COUNT(rainout_id) AS rainouts, EXTRACT(month from date_rainedout) AS month, EXTRACT(day from  date_rainedout) AS day, EXTRACT(year from date_rainedout) AS year FROM riderainout, ride WHERE date_rainedout BETWEEN $1 and $2 AND riderainout.ride_id = ride.ride_id GROUP BY name, day, month, year) AS daily  GROUP BY name, month, year  ORDER by year, month ASC",
+            [start_date, end_date]
+          );
+
+          return res.json(report.rows);
+        }
+        if (calculate === "daily average by month") {
+          const report = await pool.query(
+            "SELECT name, AVG(daily.rainouts) AS rainouts, month, year FROM (SELECT name, COUNT(rainout_id) AS rainouts, EXTRACT(month from date_rainedout) AS month, EXTRACT(day from  date_rainedout) AS day, EXTRACT(year from date_rainedout) AS year FROM riderainout, ride WHERE date_rainedout BETWEEN $1 and $2 AND riderainout.ride_id = ride.ride_id GROUP BY name, day, month, year) AS daily  GROUP BY name, month, year  ORDER by year, month ASC",
+            [start_date, end_date]
+          );
+
+          return res.json(report.rows);
+        }
+        if (calculate === "daily max by month") {
+          const report = await pool.query(
+            "SELECT name, MAX(daily.rainouts) AS rainouts, month, year FROM (SELECT name, COUNT(rainout_id) AS rainouts, EXTRACT(month from date_rainedout) AS month, EXTRACT(day from  date_rainedout) AS day, EXTRACT(year from date_rainedout) AS year FROM riderainout, ride WHERE date_rainedout BETWEEN $1 and $2 AND riderainout.ride_id = ride.ride_id GROUP BY name, day, month, year) AS daily  GROUP BY name, month, year  ORDER by year, month ASC;",
+            [start_date, end_date]
+          );
+
+          return res.json(report.rows);
+        }
+        if (calculate === "daily min by month") {
+          const report = await pool.query(
+            "SELECT name, MIN(daily.rainouts) AS rainouts, month, year FROM (SELECT name, COUNT(rainout_id) AS rainouts, EXTRACT(month from date_rainedout) AS month, EXTRACT(day from  date_rainedout) AS day, EXTRACT(year from date_rainedout) AS year FROM riderainout, ride WHERE date_rainedout BETWEEN $1 and $2 AND riderainout.ride_id = ride.ride_id GROUP BY name, day, month, year) AS daily  GROUP BY name, month, year  ORDER by year, month ASC;",
+            [start_date, end_date]
+          );
+          return res.json(report.rows);
+        }
+      }
+
+      if (show === "one") {
+        const { ride_id } = req.body;
+        if (calculate === "daily total") {
+          const report = await pool.query(
+            "SELECT COUNT(rainout_id) AS rainouts, EXTRACT(month from date_rainedout) AS month, EXTRACT(day from  date_rainedout) AS day, EXTRACT(year from date_rainedout) AS year FROM riderainout, ride WHERE date_rainedout BETWEEN $1 and $2 AND riderainout.ride_id = $3 GROUP BY day, month, year ORDER by year, month, day ASC;",
+            [start_date, end_date, ride_id]
+          );
+
+          return res.json(report.rows);
+        }
+        if (calculate === "monthly total") {
+          const report = await pool.query(
+            "SELECT SUM(daily.rainouts) AS rainouts, month, year FROM (SELECT COUNT(rainout_id) AS rainouts, EXTRACT(month from date_rainedout) AS month, EXTRACT(day from  date_rainedout) AS day, EXTRACT(year from date_rainedout) AS year FROM riderainout, ride WHERE date_rainedout BETWEEN $1 and $2 AND riderainout.ride_id = $3 GROUP BY day, month, year ORDER by year, month, day ASC) AS daily  GROUP BY month, year  ORDER by year, month ASC;",
+            [start_date, end_date, ride_id]
+          );
+
+          return res.json(report.rows);
+        }
+        if (calculate === "daily average by month") {
+          const report = await pool.query(
+            "SELECT AVG(daily.rainouts) AS rainouts, month, year FROM (SELECT COUNT(rainout_id) AS rainouts, EXTRACT(month from date_rainedout) AS month, EXTRACT(day from  date_rainedout) AS day, EXTRACT(year from date_rainedout) AS year FROM riderainout, ride WHERE date_rainedout BETWEEN $1 and $2 AND riderainout.ride_id = $3 GROUP BY day, month, year ORDER by year, month, day ASC) AS daily  GROUP BY month, year  ORDER by year, month ASC;",
+            [start_date, end_date, ride_id]
+          );
+
+          return res.json(report.rows);
+        }
+        if (calculate === "daily max by month") {
+          const report = await pool.query(
+            "SELECT MAX(daily.rainouts) AS rainouts, month, year FROM (SELECT COUNT(rainout_id) AS rainouts, EXTRACT(month from date_rainedout) AS month, EXTRACT(day from  date_rainedout) AS day, EXTRACT(year from date_rainedout) AS year FROM riderainout, ride WHERE date_rainedout BETWEEN $1 and $2 AND riderainout.ride_id = $3 GROUP BY day, month, year ORDER by year, month, day ASC) AS daily  GROUP BY month, year  ORDER by year, month ASC;",
+            [start_date, end_date, ride_id]
+          );
+
+          return res.json(report.rows);
+        }
+        if (calculate === "daily min by month") {
+          const report = await pool.query(
+            "SELECT MIN(daily.rainouts) AS rainouts, month, year FROM (SELECT COUNT(rainout_id) AS rainouts, EXTRACT(month from date_rainedout) AS month, EXTRACT(day from  date_rainedout) AS day, EXTRACT(year from date_rainedout) AS year FROM riderainout, ride WHERE date_rainedout BETWEEN $1 and $2 AND ridebreakdowns.ride_id = $3 GROUP BY day, month, year ORDER by year, month, day ASC) AS daily  GROUP BY month, year  ORDER by year, month ASC;",
+            [start_date, end_date, ride_id]
+          );
+          return res.json(report.rows);
+        }
+      }
     }
 
-    //res.json(report.rows);
+    if (type === "attraction") {
+      if (show === "all") {
+        if (calculate === "daily total") {
+          const report = await pool.query(
+            "SELECT name, COUNT(rainout_id) AS rainouts, EXTRACT(month from date_rainedout) AS month, EXTRACT(day from  date_rainedout) AS day, EXTRACT(year from date_rainedout) AS year FROM attractionrainout, attraction WHERE date_rainedout BETWEEN $1 and $2 AND attractionrainout.attraction_id = attraction.attraction_id GROUP BY name, day, month, year ORDER by year, month, day ASC",
+            [start_date, end_date]
+          );
+
+          return res.json(report.rows);
+        }
+        if (calculate === "monthly total") {
+          const report = await pool.query(
+            "SELECT name, SUM(daily.rainouts) AS rainouts, month, year FROM (SELECT name, COUNT(rainout_id) AS rainouts, EXTRACT(month from date_rainedout) AS month, EXTRACT(day from  date_rainedout) AS day, EXTRACT(year from date_rainedout) AS year FROM attractionrainout, attraction WHERE date_rainedout BETWEEN $1 and $2 AND attractionrainout.attraction_id = attraction.attraction_id GROUP BY name, day, month, year) AS daily  GROUP BY name, month, year  ORDER by year, month ASC",
+            [start_date, end_date]
+          );
+
+          return res.json(report.rows);
+        }
+        if (calculate === "daily average by month") {
+          const report = await pool.query(
+            "SELECT name, AVG(daily.rainouts) AS rainouts, month, year FROM (SELECT name, COUNT(rainout_id) AS rainouts, EXTRACT(month from date_rainedout) AS month, EXTRACT(day from  date_rainedout) AS day, EXTRACT(year from date_rainedout) AS year FROM attractionrainout, attraction WHERE date_rainedout BETWEEN $1 and $2 AND attractionrainout.attraction_id = attraction.attraction_id GROUP BY name, day, month, year) AS daily  GROUP BY name, month, year  ORDER by year, month ASC",
+            [start_date, end_date]
+          );
+
+          return res.json(report.rows);
+        }
+        if (calculate === "daily max by month") {
+          const report = await pool.query(
+            "SELECT name, MAX(daily.rainouts) AS rainouts, month, year FROM (SELECT name, COUNT(rainout_id) AS rainouts, EXTRACT(month from date_rainedout) AS month, EXTRACT(day from  date_rainedout) AS day, EXTRACT(year from date_rainedout) AS year FROM attractionrainout, attraction WHERE date_rainedout BETWEEN $1 and $2 AND attractionrainout.attraction_id = attraction.attraction_id GROUP BY name, day, month, year) AS daily  GROUP BY name, month, year  ORDER by year, month ASC;",
+            [start_date, end_date]
+          );
+
+          return res.json(report.rows);
+        }
+        if (calculate === "daily min by month") {
+          const report = await pool.query(
+            "SELECT name, MIN(daily.rainouts) AS rainouts, month, year FROM (SELECT name, COUNT(rainout_id) AS rainouts, EXTRACT(month from date_rainedout) AS month, EXTRACT(day from  date_rainedout) AS day, EXTRACT(year from date_rainedout) AS year FROM attractionrainout, attraction WHERE date_rainedout BETWEEN $1 and $2 AND attractionrainout.attraction_id = attraction.attraction_id GROUP BY name, day, month, year) AS daily  GROUP BY name, month, year  ORDER by year, month ASC;",
+            [start_date, end_date]
+          );
+          return res.json(report.rows);
+        }
+      }
+
+      if (show === "one") {
+        const { attraction_id } = req.body;
+        if (calculate === "daily total") {
+          const report = await pool.query(
+            "SELECT COUNT(rainout_id) AS rainouts, EXTRACT(month from date_rainedout) AS month, EXTRACT(day from  date_rainedout) AS day, EXTRACT(year from date_rainedout) AS year FROM attractionrainout, attraction WHERE date_rainedout BETWEEN $1 and $2 AND attractionrainout.attraction_id = $3 GROUP BY day, month, year ORDER by year, month, day ASC;",
+            [start_date, end_date, attraction_id]
+          );
+
+          return res.json(report.rows);
+        }
+        if (calculate === "monthly total") {
+          const report = await pool.query(
+            "SELECT SUM(daily.rainouts) AS rainouts, month, year FROM (SELECT COUNT(rainout_id) AS rainouts, EXTRACT(month from date_rainedout) AS month, EXTRACT(day from  date_rainedout) AS day, EXTRACT(year from date_rainedout) AS year FROM attractionrainout, attraction WHERE date_rainedout BETWEEN $1 and $2 AND attractionrainout.attraction_id = $3 GROUP BY day, month, year ORDER by year, month, day ASC) AS daily  GROUP BY month, year  ORDER by year, month ASC;",
+            [start_date, end_date, attraction_id]
+          );
+
+          return res.json(report.rows);
+        }
+        if (calculate === "daily average by month") {
+          const report = await pool.query(
+            "SELECT AVG(daily.rainouts) AS rainouts, month, year FROM (SELECT COUNT(rainout_id) AS rainouts, EXTRACT(month from date_rainedout) AS month, EXTRACT(day from  date_rainedout) AS day, EXTRACT(year from date_rainedout) AS year FROM attractionrainout, attraction WHERE date_rainedout BETWEEN $1 and $2 AND attractionrainout.attraction_id = $3 GROUP BY day, month, year ORDER by year, month, day ASC) AS daily  GROUP BY month, year  ORDER by year, month ASC;",
+            [start_date, end_date, attraction_id]
+          );
+
+          return res.json(report.rows);
+        }
+        if (calculate === "daily max by month") {
+          const report = await pool.query(
+            "SELECT MAX(daily.rainouts) AS rainouts, month, year FROM (SELECT COUNT(rainout_id) AS rainouts, EXTRACT(month from date_rainedout) AS month, EXTRACT(day from  date_rainedout) AS day, EXTRACT(year from date_rainedout) AS year FROM attractionrainout, attraction WHERE date_rainedout BETWEEN $1 and $2 AND attractionrainout.attraction_id = $3 GROUP BY day, month, year ORDER by year, month, day ASC) AS daily  GROUP BY month, year  ORDER by year, month ASC;",
+            [start_date, end_date, attraction_id]
+          );
+
+          return res.json(report.rows);
+        }
+        if (calculate === "daily min by month") {
+          const report = await pool.query(
+            "SELECT MIN(daily.rainouts) AS rainouts, month, year FROM (SELECT COUNT(rainout_id) AS rainouts, EXTRACT(month from date_rainedout) AS month, EXTRACT(day from  date_rainedout) AS day, EXTRACT(year from date_rainedout) AS year FROM attractionrainout, attraction WHERE date_rainedout BETWEEN $1 and $2 AND attractionbreakdowns.attraction_id = $3 GROUP BY day, month, year ORDER by year, month, day ASC) AS daily  GROUP BY month, year  ORDER by year, month ASC;",
+            [start_date, end_date, attraction_id]
+          );
+          return res.json(report.rows);
+        }
+      }
+    }
+
+    res.status(400).send("Incorrect fields provided");
   } catch (err) {
+    res.status(500).send("Server Error while generating reports");
     console.log(err);
   }
 });
-
-
-//visit daily average usage based on month
-
-//Avg function based on total/row_numbers, not we want.
-// router.get("/report-average-usage-month", async (req, res) => {
-
-//   try {
-//     const { type, ride_id, attraction_id, month, year } = req.body;
-//     //get the days of the month
-//     var d = new Date(year,month,0);
-//     console.log(d.getDate());
-//     if (type == "ride") {
-//       const report = await pool.query(
-//         `SELECT AVG(daily_usage) as average_usage FROM
-//           (SELECT SUM(usage_count) AS daily_usage, DATE(date_used)
-//           FROM rideusage WHERE ride_id=$1
-//             AND EXTRACT(MONTH FROM date_used) = $2 
-//             AND EXTRACT(YEAR FROM date_used)=$3
-//             GROUP BY DATE(date_used)) a;`,
-//             [ride_id, month, year]
-//       );
-//       res.json(report.rows);
-//     }
-//     else
-//     {
-//       const report = await pool.query(
-//         `SELECT AVG(daily_usage) as average_usage FROM
-//           (SELECT SUM(visit_count) AS daily_usage, DATE(date_visited)
-//           FROM AttractionVisit WHERE attraction_id=$1
-//             AND EXTRACT(MONTH FROM date_visited) = $2
-//             AND EXTRACT(YEAR FROM date_visited)=$3
-//             GROUP BY DATE(date_visited)) a;`,
-//             [attraction_id, month, year]
-//       );
-//       res.json(report.rows);
-//     }
-
-//     //res.json(report.rows);
-//   } catch (err) {
-//     console.log(err);
-//   }
-// });
-
-
-//Avg function based on total/row_numbers, not we want.
-router.get("/report-average-usage-month", async (req, res) => {
-
-  try {
-    const { type, ride_id, attraction_id, month, year } = req.body;
-    //get the days of the month
-    const d = new Date(year, month, 0);
-    const number_days = d.getDate();
-    console.log(number_days);
-    if (type == "ride") {
-      const report = await pool.query(
-        `SELECT (daily_usage/$4) AS average_usage FROM
-          (SELECT SUM(usage_count) AS daily_usage
-          FROM rideusage WHERE ride_id=$1
-            AND EXTRACT(MONTH FROM date_used) = $2 
-            AND EXTRACT(YEAR FROM date_used)=$3
-            ) a;`,
-        [ride_id, month, year, number_days]
-      );
-      res.json(report.rows);
-    }
-    else {
-      const report = await pool.query(
-        `SELECT (daily_usage/$4) as average_usage FROM
-          (SELECT SUM(visit_count) AS daily_usage
-          FROM AttractionVisit WHERE attraction_id=$1
-            AND EXTRACT(MONTH FROM date_visited) = $2
-            AND EXTRACT(YEAR FROM date_visited)=$3) a;`,
-        [attraction_id, month, year, number_days]
-      );
-      res.json(report.rows);
-    }
-
-    //res.json(report.rows);
-  } catch (err) {
-    console.log(err);
-  }
-});
-
-//usage maximum based on month, which day use maximum
-router.get("/report-max-usage-month", async (req, res) => {
-  try {
-    const { type, ride_id, attraction_id, month, year } = req.body;
-    if (type == "ride") {
-      const report = await pool.query(
-        `SELECT SUM(usage_count) AS max_usage, DATE(date_used)
-          FROM rideusage WHERE ride_id=$1
-            AND EXTRACT(MONTH FROM date_used) = $2
-            AND EXTRACT(YEAR FROM date_used)=$3
-            GROUP BY DATE(date_used)
-            ORDER BY max_usage DESC LIMIT 1;`,
-        [ride_id, month, year]
-      );
-      res.json(report.rows);
-    }
-    else {
-      const report = await pool.query(
-        `SELECT SUM(visit_count) AS max_usage, DATE(date_visited)
-          FROM AttractionVisit WHERE attraction_id=$1
-            AND EXTRACT(MONTH FROM date_visited) = $2
-            AND EXTRACT(YEAR FROM date_visited)=$3
-            GROUP BY DATE(date_visited)
-            ORDER BY max_usage DESC LIMIT 1;`,
-        [attraction_id, month, year]
-      );
-      res.json(report.rows);
-    }
-
-    //res.json(report.rows);
-  } catch (err) {
-    console.log(err);
-  }
-});
-
-/**
- * Get most popular ride
- */
-router.get("/report-popular-month", async (req, res) => {
-  try {
-    const { type, month, year } = req.body;
-    if (type == "ride") {
-      const report = await pool.query(
-        `SELECT SUM(usage_count) AS max_usage, ride_id
-          FROM rideusage WHERE
-            EXTRACT(MONTH FROM date_used) = $1
-            AND EXTRACT(YEAR FROM date_used)=$2
-            GROUP BY ride_id
-            ORDER BY max_usage DESC LIMIT 1;`,
-        [month, year]
-      );
-      res.json(report.rows);
-    }
-    else {
-      const report = await pool.query(
-        `SELECT SUM(visit_count) AS max_usage, attraction_id
-          FROM AttractionVisit WHERE
-            EXTRACT(MONTH FROM date_visited) = $1
-            AND EXTRACT(YEAR FROM date_visited)=$2
-            GROUP BY attraction_id
-            ORDER BY max_usage DESC LIMIT 1;`,
-        [month, year]
-      );
-      res.json(report.rows);
-    }
-
-    //res.json(report.rows);
-  } catch (err) {
-    console.log(err);
-  }
-});
-
 
 module.exports = router;
