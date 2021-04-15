@@ -73,7 +73,7 @@ export default function ManagerDashboard() {
       <AppBar position="fixed" className={classes.appBar}>
         <Toolbar>
           <Typography variant="h6" noWrap>
-            User's Name
+            {localStorage.getItem("user_name")}
           </Typography>
         </Toolbar>
       </AppBar>

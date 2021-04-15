@@ -63,9 +63,10 @@ router.post("/login", async (req, res) => {
 
     const user_id = user.rows[0].account_id;
     const user_type = user.rows[0].user_type;
+    const user_name = user.rows[0].first_name + " " + user.rows[0].last_name;
     const token = jwtGenerator(user_id, user_type);
 
-    return res.json({ user_id, user_type, token });
+    return res.json({ user_id, user_type, user_name, user_name });
   } catch (err) {
     console.error(err.message);
     res.status(500).send("Server Error");
