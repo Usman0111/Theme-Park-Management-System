@@ -17,6 +17,7 @@ import DialogTitle from "@material-ui/core/DialogTitle";
 import DialogContent from "@material-ui/core/DialogContent";
 import DialogContentText from "@material-ui/core/DialogContentText";
 import DialogActions from "@material-ui/core/DialogActions";
+import { green, grey } from "@material-ui/core/colors";
 
 function Alert(props) {
   return <MuiAlert elevation={6} variant="filled" {...props} />;
@@ -50,10 +51,7 @@ const useStyles = makeStyles((theme) => ({
 
 const getInfo = (breakdown) => {
   const indexT = breakdown.breakdown_date.indexOf("T");
-  // Attempt to grab attendant name from the api
-  // const attendantName = await axios
-  //   .post("manager/get-one-attendant", { attendant_id: breakdown.attendant_id })
-  //   .then((res) => console.log(res.data));
+  console.log(breakdown);
 
   return {
     r_id: breakdown.ride_id,
@@ -63,6 +61,7 @@ const getInfo = (breakdown) => {
     descript: breakdown.breakdown_description,
     location: breakdown.location,
     picture: breakdown.picture,
+    attendant_name: breakdown.first_name + " " + breakdown.last_name,
   };
 };
 
@@ -88,12 +87,12 @@ const MaintainerFixRequests = () => {
     setOpenModal(false);
   };
   const handleClickOpenModal = (request) => {
-    console.log(request);
     setInspectIssue({
       ride_id: request.r_id,
       ride_name: request.name,
       breakdown_description: request.descript,
       breakdown_date: request.date,
+      attendant_name: request.attendant_name,
     });
     setOpenModal(true);
   };
@@ -151,7 +150,7 @@ const MaintainerFixRequests = () => {
                 <CardActions className={classes.buttons}>
                   <Button
                     onClick={() => handleClickOpenModal(request)}
-                    variant="outlined"
+                    variant="contained"
                     color="primary"
                   >
                     Inspect Issue
@@ -165,20 +164,33 @@ const MaintainerFixRequests = () => {
             <DialogTitle>{"Breakdown Information"}</DialogTitle>
             <DialogContent>
               <DialogContentText>
-                Breakdown Description: {inspectIssue.breakdown_description}
+                <strong>Breakdown Description: </strong>
+                {inspectIssue.breakdown_description}
               </DialogContentText>
-              {/* <DialogContentText >
-                        Reported by Attendant: {request.attendant}
-                      </DialogContentText> */}
               <DialogContentText>
-                Date of Breakdown: {inspectIssue.breakdown_date}
+                <strong>Reported by Attendant: </strong>
+
+                {inspectIssue.attendant_name}
+              </DialogContentText>
+              <DialogContentText>
+                <strong>Date of Breakdown: </strong>
+
+                {inspectIssue.breakdown_date}
               </DialogContentText>
             </DialogContent>
             <DialogActions>
-              <Button id="fixed" color="primary" onClick={() => fixRide()}>
+              <Button
+                variant="contained"
+                color="primary"
+                onClick={() => fixRide()}
+              >
                 Fix Ride
               </Button>
-              <Button onClick={handleCloseModal} color="primary">
+              <Button
+                variant="contained"
+                onClick={handleCloseModal}
+                style={{ backgroundColor: grey[400] }}
+              >
                 Cancel
               </Button>
             </DialogActions>
