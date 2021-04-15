@@ -16,15 +16,14 @@ import DialogActions from '@material-ui/core/DialogActions';
 import DialogContent from '@material-ui/core/DialogContent';
 import DialogContentText from '@material-ui/core/DialogContentText';
 import DialogTitle from '@material-ui/core/DialogTitle';
-import { Paper, TextareaAutosize } from "@material-ui/core";
+import { GridListTileBar, Paper, TextareaAutosize } from "@material-ui/core";
 
 const boxStyle = { margin: "10px 10px", fontSize: 25 };
-const btnStyle = { fontSize: 15, margin: "10px 0" };
+const btnStyle = { fontSize: 15, margin: "10px 5px" };
 const root = {
-  height: "20vh",
-  backgroundPosition: "center",
-  backgroundRepeat: "no-repeat",
-  backgroundSize: "cover",
+  width: "100vh",
+  margin: "auto",
+  padding: 20
 };
 
 export default function ManagerAddRide () {
@@ -38,14 +37,15 @@ export default function ManagerAddRide () {
   };
 
   return (
-  <Paper style={root} square>
+  <Paper style={root} square elevation={3}>
+    <Typography align='center'>Add Ride</Typography> 
       <Container>
-    <Typography>Add Ride</Typography>
     <Grid
         container
+        spacing={0}
         alignItems="center"
         justify="center"
-
+        style={{ minHeight: "20vh"}}
     >
       <TextField
           required
@@ -66,23 +66,57 @@ export default function ManagerAddRide () {
           label="Age Restriction"
           id="age_restriction"
           variant="filled"
+          type="number"
           style = {boxStyle}
       />
-      <TextareaAutosize
+       <TextField
           required
+          label="Height Restriction Feet"
+          id="height_restriction_feet"
+          variant="filled"
+          type="number"
+          style = {boxStyle}
+      />
+      <TextField
+          required
+          label="Height Restriction Inches"
+          id="height_restriction_inches"
+          variant="filled"
+          type="number"
+          style = {boxStyle}
+      />
+  </Grid>
+  <Grid 
+    container
+    spacing={0}
+    alignItems="center"
+    justify="center">
+  <TextareaAutosize
+          required
+          rowsMin={4}
           label="Description"
           id="description"
           placeholder="Description"
           style = {boxStyle}
       />
+  </Grid>
+      <Grid 
+        container
+        spacing={0}
+        alignItems="center"
+        justify="flex-end">
       <Button
-              type="submit"
-              variant="contained"
-              color="primary"
-              style={btnStyle}
-              onClick={handleClickOpen}
+          variant="contained"
+          style={btnStyle}
+         >
+          Cancel
+        </Button>
+      <Button
+        variant="contained"
+        style={btnStyle}
+        onClick={handleClickOpen}
       >
-              Add Picture
+        Add Picture
       </Button>
       <Dialog open={open} onClose={handleClose}>
                   <DialogTitle id="form-dialog-title">Add Picture</DialogTitle>
@@ -99,7 +133,7 @@ export default function ManagerAddRide () {
                         style = {boxStyle}
                     />
                     
-                  </Grid>
+                </Grid>
                   <DialogActions>
                     <Button onClick={handleClose}>
                       Cancel
@@ -110,7 +144,15 @@ export default function ManagerAddRide () {
                   </DialogActions>
 
                 </Dialog>
-    </Grid>
+        <Button
+          type="submit"
+          variant="contained"
+          color="primary"
+          style={btnStyle}
+         >
+          Submit
+        </Button>
+        </Grid>
   </Container>
   </Paper>
 
