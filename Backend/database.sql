@@ -30,7 +30,7 @@ CREATE TABLE Ride
 	age_restriction int,
 	height_restriction int,
 	picture varchar(300),
-	archived NOT NULL DEFAULT FALSE,
+	archived boolean NOT NULL DEFAULT false,
 	attendant_id int,
     PRIMARY KEY (ride_id)
 );
@@ -44,7 +44,7 @@ CREATE TABLE Attraction
 	rainedout boolean NOT NULL,
 	age_restriction int,
 	picture varchar(300),
-	archived NOT NULL DEFAULT FALSE,
+	archived boolean NOT NULL DEFAULT FALSE,
 	attendant_id int,
     PRIMARY KEY (attraction_id)
 );
