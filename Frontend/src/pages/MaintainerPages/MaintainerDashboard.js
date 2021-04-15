@@ -13,7 +13,7 @@ import ListItem from "@material-ui/core/ListItem";
 import ListItemIcon from "@material-ui/core/ListItemIcon";
 import ListItemText from "@material-ui/core/ListItemText";
 import ExitToAppIcon from "@material-ui/icons/ExitToApp";
-import ConfirmationNumberIcon from "@material-ui/icons/ConfirmationNumber";
+import BuildIcon from "@material-ui/icons/Build";
 import MaintainerFixRequests from "./MaintainerFixRequests";
 
 const drawerWidth = 240;
@@ -57,7 +57,7 @@ export default function MaintainerDashboard() {
   console.log(path);
 
   const options = [
-    { text: "My Assignment", url: `${url}`, icon: <ConfirmationNumberIcon /> },
+    { text: "Fix Requests", url: `${url}`, icon: <BuildIcon /> },
   ];
 
   return (
