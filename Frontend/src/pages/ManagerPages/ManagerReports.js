@@ -15,6 +15,7 @@ import RadioGroup from '@material-ui/core/RadioGroup';
 import FormControlLabel from '@material-ui/core/FormControlLabel';
 import FormLabel from '@material-ui/core/FormLabel';
 
+
 const useStyles = makeStyles((theme) => ({
   formControl: {
     margin: theme.spacing(1),
@@ -47,11 +48,6 @@ const MenuProps = {
   },
 };
 
-const reports = [
-  'Park visits',
-  'Usage',
-];
-
 function getStyles(name, personName, theme) {
   return {
     fontWeight:
@@ -69,35 +65,48 @@ export default function AdminReport() {
   const [type, setType] = React.useState('Ride');
   const [reportType, setReportType] = React.useState('ReportType');
 
-  const [showHide, setShow] = React.useState('show');
+  const [TimeType, setTimeType] = React.useState('TimeType');
+
+  const [isHideTimeRange, setHideTimeRange] = React.useState('HideTimeRange');
+  const [isHideMonthPick, setHideMonthPick] = React.useState('HideMonthPick');
 
   const [isHideType, setHideType] = React.useState('HideType');
 
   const handleReportTypeChange = (event) => {
     setReportType(event.target.value);
-    console.log(event.target.value);
-    setShow(event.target.value);
     switch (event.target.value) {
-
       case 1:
-        setShow(classes.hide);
-        setHideType(classes.show);
-        break;
-      case 2:
-        setShow(classes.show);
         setHideType(classes.hide);
         break;
       case 2:
-        setShow(classes.hide);
         setHideType(classes.show);
         break;
-      case 2:
-        setShow(classes.show);
-        setHideType(classes.hide);
+      case 3:
+        setHideType(classes.show);
+        break;
+      case 4:
+        setHideType(classes.show);
         break;
       default:
-        setShow(classes.show);
         setHideType(classes.hide);
+    }
+
+  };
+
+  const handleReportTimeChange = (event) => {
+    setTimeType(event.target.value);
+    switch (event.target.value) {
+      case 1:
+        setHideTimeRange(classes.hide);
+        setHideMonthPick(classes.show);
+        break;
+      case 2:
+        setHideTimeRange(classes.show);
+        setHideMonthPick(classes.hide);
+        break;
+      default:
+        setHideTimeRange(classes.hide);
+        setHideMonthPick(classes.show);
     }
 
   };
@@ -109,7 +118,7 @@ export default function AdminReport() {
   return (
     <div>
       <FormControl className={classes.formControl}>
-        <InputLabel id="demo-simple-select-label">Report Type</InputLabel>
+        <InputLabel>Report Type</InputLabel>
         <Select value={reportType}
           onChange={handleReportTypeChange}>
           <MenuItem value={1}>Visits</MenuItem>
@@ -118,10 +127,20 @@ export default function AdminReport() {
           <MenuItem value={4}>Rainouts</MenuItem>
         </Select>
       </FormControl>
-      <div className={showHide}>
+
+      <FormControl className={classes.formControl}>
+        <InputLabel>Report time setting</InputLabel>
+        <Select value={TimeType} defaultValue = {1}
+          onChange={handleReportTimeChange}>
+          <MenuItem value={1}>Monthly Report</MenuItem>
+          <MenuItem value={2}>Time range</MenuItem>
+        </Select>
+      </FormControl>
+
+      <div className={isHideTimeRange}>
         <FormControl className={classes.formControl}>
           <TextField
-            id="date"
+            id="start_date"
             label="Start date"
             type="date"
             defaultValue="2017-05-24"
@@ -133,11 +152,26 @@ export default function AdminReport() {
         </FormControl>
         <FormControl className={classes.formControl}>
           <TextField
-            id="date"
+            id="end_date"
             label="End date"
             type="date"
             defaultValue="2017-05-24"
             className={classes.textField}
+            InputLabelProps={{
+              shrink: true,
+            }}
+          />
+        </FormControl>
+        </div>
+        <div className={isHideMonthPick}>
+        <FormControl className={classes.formControl}>
+          <TextField
+            id="month_year"
+            label="Month Year"
+            type="date"
+            dateFormat="mm/yyyy"
+            className={classes.textField}
+            
             InputLabelProps={{
               shrink: true,
             }}
