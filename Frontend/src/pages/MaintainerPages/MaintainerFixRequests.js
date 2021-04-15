@@ -69,21 +69,16 @@ const getInfo = (breakdown) => {
 const MaintainerFixRequests = () => {
   const classes = useStyles();
   const [open, setOpen] = React.useState(false);
-
+  const[openSnackbar, setOpenSnackBar] = React.useState(false);
   const [requests, setRequest] = useState([]);
 
-  useEffect(() => {
-    axios
-      .get("maintainer/all-maintainence-requests")
-      .then((res) => {
-        console.log(res.data);
-        const req = res.data.map((breakdown) => getInfo(breakdown));
-        setRequest(req);
-      })
-      .catch((err) => {
-        console.log(err.res);
-      });
-  }, []);
+  const handleCloseSnackbar = (event, reason) => {
+    if (reason === "clickaway") {
+      return;
+    }
+
+    setOpen(false);
+  };
 
   const handleClose = (event, reason) => {
     if (reason === "clickaway") {
@@ -92,10 +87,22 @@ const MaintainerFixRequests = () => {
 
     setOpen(false);
   };
-
-  const handleClick = () => {
+  const handleClickOpen = () => {
     setOpen(true);
   };
+
+  useEffect(() => {
+    axios
+      .get("maintainer/all-maintainence-requests")
+      .then((res) => {
+        console.log(res.data[2].ride_id);
+        const req = res.data.map((breakdown) => getInfo(breakdown));
+        setRequest(req);
+      })
+      .catch((err) => {
+        console.log(err.res);
+      });
+  }, []);
 
   const fixRide = (ride_id) => {
     const data = {
@@ -105,8 +112,8 @@ const MaintainerFixRequests = () => {
     axios
       .put("maintainer/resolve-request", data)
       .then((res) => {
-        handleClick();
-        this.setState({
+        handleClose();
+        this.setRequest({
           status: "false",
         });
         console.log(res.data.broken);
@@ -134,7 +141,68 @@ const MaintainerFixRequests = () => {
                   <Typography>Location: {request.location}</Typography>
                 </CardContent>
                 <CardActions className={classes.buttons}>
-                  <Button
+                <Button
+                onClick={handleClickOpen}
+                variant="outlined" 
+                color="primary" >
+                  Inspect Issue
+                </Button>
+                <Dialog
+                  open={open}
+                  keepMounted
+                >
+                  <DialogTitle>{"Breakdown Information"}</DialogTitle>
+                    <DialogContent >
+                      <DialogContentText >
+                        Breakdown Description: {request.descript}
+                      </DialogContentText>
+                      <DialogContentText >
+                        Reported by Attendant: {request.attendant}
+                      </DialogContentText>
+                      <DialogContentText >
+                        Date of Breakdown: {request.date}
+                      </DialogContentText>
+                      <DialogContentText >
+                        Time of Breakdown: {request.r_id}
+                      </DialogContentText>
+                    </DialogContent>
+                    <DialogActions>
+                      <Button
+                        id = "fixed"
+                        color="primary"
+                        onClick={() => 
+                          fixRide(request.r_id)
+                        }>
+                        Fix Ride
+                      </Button>
+                      <Button 
+                        onClick={handleClose}
+                        color="primary">
+                        Cancel
+                      </Button>
+                    </DialogActions>
+                </Dialog>
+                </CardActions>
+              </Card>
+              
+            </Grid>
+            
+          ))}
+          <Snackbar open={openSnackbar} autoHideDuration={2000} onClick={handleCloseSnackbar}>
+          <Alert onClick={handleCloseSnackbar} severity="success">
+            test
+          </Alert>
+        </Snackbar>
+          
+        </Grid>
+      </Container>
+    </div>
+  );
+};
+
+export default MaintainerFixRequests;
+
+      /*<Button
                     color="primary"
                     variant="outlined"
                     onClick={() => fixRide(request.r_id)}
@@ -168,65 +236,4 @@ const MaintainerFixRequests = () => {
                     }
                   >
                     <Button variant="contained">Inspect Issue</Button>
-                  </Tooltip>
-                </CardActions>
-              </Card>
-            </Grid>
-          ))}
-          <Snackbar open={open} autoHideDuration={2000} onClose={handleClose}>
-            <Alert onClose={handleClose} severity="success">
-              Ride was successfully fixed and the ride attendant was notified!
-            </Alert>
-          </Snackbar>
-        </Grid>
-      </Container>
-    </div>
-  );
-};
-
-export default MaintainerFixRequests;
-
-/*<CardActions className={classes.buttons}>
-                <Button
-                variant="outlined" 
-                color="primary" >
-                  Inspect Issue
-                </Button>
-                <Dialog
-                  open={open}
-                  keepMounted
-                  onClose={handleClose}
-                >
-                  <DialogTitle>{"Breakdown Information"}</DialogTitle>
-                    <DialogContent >
-                      <DialogContentText >
-                        Breakdown Description: {request.descript}
-                      </DialogContentText>
-                      <DialogContentText >
-                        Reported by Attendant: {request.attendant}
-                      </DialogContentText>
-                      <DialogContentText >
-                        Date of Breakdown: {request.date}
-                      </DialogContentText>
-                      <DialogContentText >
-                        Time of Breakdown: {request.time}
-                      </DialogContentText>
-                    </DialogContent>
-                    <DialogActions>
-                      <Button 
-                      id = "fixed"
-                      color="primary"
-                      onClick={() => fixRide(request.r_id)}>
-                        Fix Ride
-                      </Button>
-                      <Snackbar open={open} autoHideDuration={2000} onClose={handleClose}>
-                        <Alert onClick={handleClose} severity="success">
-                          Ride was successfully fixed and the ride attendant was notified!
-                        </Alert>
-                      </Snackbar>
-                      <Button onClick={handleClose} color="primary">
-                        Cancel
-                      </Button>
-                    </DialogActions>
-                </Dialog>
-              </CardActions> */
+                  </Tooltip> */
