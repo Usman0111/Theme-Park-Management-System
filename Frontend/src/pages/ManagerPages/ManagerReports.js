@@ -1,7 +1,7 @@
 import React from "react";
 
 const AdminReports = () => {
-  return <div>Nothing Here</div>;
+  return <div>Noth Here</div>;
 };
 
 export default AdminReports;

@@ -1,4 +1,3 @@
-
 import React, { useState, useEffect } from "react";
 import Button from "@material-ui/core/Button";
 import Card from "@material-ui/core/Card";
@@ -15,10 +14,10 @@ import Snackbar from "@material-ui/core/Snackbar";
 import Tooltip from "@material-ui/core/Tooltip";
 import { Dialog } from "@material-ui/core";
 import MuiAlert from "@material-ui/lab/Alert";
-import DialogTitle from '@material-ui/core/DialogTitle';
-import DialogContent from '@material-ui/core/DialogContent';
-import DialogContentText from '@material-ui/core/DialogContentText';
-import DialogActions from '@material-ui/core/DialogActions';
+import DialogTitle from "@material-ui/core/DialogTitle";
+import DialogContent from "@material-ui/core/DialogContent";
+import DialogContentText from "@material-ui/core/DialogContentText";
+import DialogActions from "@material-ui/core/DialogActions";
 
 function Alert(props) {
   return <MuiAlert elevation={6} variant="filled" {...props} />;
@@ -35,7 +34,7 @@ const useStyles = makeStyles((theme) => ({
     margin: 0,
   },
   cardMedia: {
-    paddingTop: "56.25%", 
+    paddingTop: "56.25%",
   },
   cardContent: {
     flexGrow: 1,
@@ -49,7 +48,6 @@ const useStyles = makeStyles((theme) => ({
     fontSize: 12,
   },
 }));
-
 
 const getInfo = (breakdown) => {
   const indexT = breakdown.breakdown_date.indexOf("T");
@@ -68,11 +66,9 @@ const getInfo = (breakdown) => {
   };
 };
 
-
 const MaintainerFixRequests = () => {
   const classes = useStyles();
   const [open, setOpen] = React.useState(false);
-
 
   const [requests, setRequest] = useState([]);
 
@@ -80,9 +76,9 @@ const MaintainerFixRequests = () => {
     axios
       .get("maintainer/all-maintainence-requests")
       .then((res) => {
-        console.log(res.data)
+        console.log(res.data);
         const req = res.data.map((breakdown) => getInfo(breakdown));
-        setRequest(req)
+        setRequest(req);
       })
       .catch((err) => {
         console.log(err.res);
@@ -105,52 +101,47 @@ const MaintainerFixRequests = () => {
     const data = {
       maintainer_id: Number(localStorage.getItem("user_id")),
       ride_id,
-      
     };
     axios
-    .put("maintainer/resolve-request", data)
-      .then(res => {
+      .put("maintainer/resolve-request", data)
+      .then((res) => {
         handleClick();
         this.setState({
-          status: "false"
+          status: "false",
         });
-        console.log(res.data.broken)
+        console.log(res.data.broken);
       })
       .catch((err) => {
         console.log(err);
       });
   };
 
-
-  return <div>
-    <Container>
-      <CssBaseline/>
-      <Grid container spacing={4}>
-      {requests.map((request) => (
-        <Grid item key={request.bd_id} md={3}>
-          <Card className={classes.card}>
-            <CardMedia
-              className={classes.cardMedia}
-              image={request.picture}
-              title="Image title"
-              />
-              <CardContent classsName={classes.cardContent}>
-                <Typography>
-                  Ride Name: {request.name}
-                </Typography>
-                <Typography>
-                  Location: {request.location}
-                </Typography>
-              </CardContent>
-              <CardActions className={classes.buttons}>
-                <Button
-                  color="primary"
-                  variant="outlined"
-                  onClick={() => fixRide(request.r_id)}
-                >
-                  Fix Ride
-                </Button>
-                <Tooltip
+  return (
+    <div>
+      <Container>
+        <CssBaseline />
+        <Grid container spacing={4}>
+          {requests.map((request) => (
+            <Grid item key={request.bd_id} md={3}>
+              <Card className={classes.card}>
+                <CardMedia
+                  className={classes.cardMedia}
+                  image={request.picture}
+                  title="Image title"
+                />
+                <CardContent classsName={classes.cardContent}>
+                  <Typography>Ride Name: {request.name}</Typography>
+                  <Typography>Location: {request.location}</Typography>
+                </CardContent>
+                <CardActions className={classes.buttons}>
+                  <Button
+                    color="primary"
+                    variant="outlined"
+                    onClick={() => fixRide(request.r_id)}
+                  >
+                    Fix Ride
+                  </Button>
+                  <Tooltip
                     title={
                       <React.Fragment>
                         <Typography color="inherit" variant="subtitle1">
@@ -163,36 +154,34 @@ const MaintainerFixRequests = () => {
                           Repoted by Attendant:
                         </Typography>
                         <div className={classes.paragraph}>
-                          {request.attendant}</div>
+                          {request.attendant}
+                        </div>
                         <Typography color="inherit" variant="subtitle1">
                           Date of Breakdown:
                         </Typography>
-                        <div className={classes.paragraph}>
-                          {request.date}
-                        </div>
+                        <div className={classes.paragraph}>{request.date}</div>
                         <Typography color="inherit" variant="subtitle1">
                           Time of Breakdown:
                         </Typography>
-                        <div className={classes.paragraph}>
-                          {request.time}
-                        </div>
+                        <div className={classes.paragraph}>{request.time}</div>
                       </React.Fragment>
                     }
                   >
                     <Button variant="contained">Inspect Issue</Button>
                   </Tooltip>
-              </CardActions>
-          </Card>
+                </CardActions>
+              </Card>
+            </Grid>
+          ))}
+          <Snackbar open={open} autoHideDuration={2000} onClose={handleClose}>
+            <Alert onClose={handleClose} severity="success">
+              Ride was successfully fixed and the ride attendant was notified!
+            </Alert>
+          </Snackbar>
         </Grid>
-        ))}
-        <Snackbar open={open} autoHideDuration={2000} onClose={handleClose}>
-          <Alert onClose={handleClose} severity="success">
-          Ride was successfully fixed and the ride attendant was notified!
-          </Alert>
-        </Snackbar>
-      </Grid>
-    </Container>    
-  </div>;
+      </Container>
+    </div>
+  );
 };
 
 export default MaintainerFixRequests;
