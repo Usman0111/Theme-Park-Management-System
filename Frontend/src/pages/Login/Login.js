@@ -75,6 +75,8 @@ const Login = () => {
         console.log(res.data);
         localStorage.setItem("user_id", res.data.user_id);
         localStorage.setItem("user_type", res.data.user_type);
+        localStorage.setItem("user_type", res.data.user_name);
+
         history.push("/dashboard");
       })
       .catch((err) => {

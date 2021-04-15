@@ -81,7 +81,7 @@ function Registration() {
     age: "",
     height_inch: "",
     height_feet: "",
-    user_type: "customer",
+    user_type: "maintainer",
   });
 
   const [employeeD, setEmployeeD] = useState({
@@ -127,7 +127,10 @@ function Registration() {
     e.preventDefault();
     console.log(e);
     axios
-      .post("http://100.26.17.215:5000/auth/register", employeeD)
+      .post("http://100.26.17.215:5000/auth/register", {
+        ...employeeD,
+        user_type: value,
+      })
       .then((res) => {
         history.push("/");
         console.log(res);
@@ -143,6 +146,7 @@ function Registration() {
 
   const labelChange = (event, value) => {
     setValue(event.target.value);
+    console.log(event.target.value);
   };
   const handleChange = (event, newValue) => {
     setV(newValue);
