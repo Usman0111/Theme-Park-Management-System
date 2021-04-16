@@ -7,7 +7,9 @@ const validpass = require("../middleware/validpass");
 //get all rides
 router.get("/all", async (req, res) => {
   try {
-    const rides = await pool.query("SELECT * FROM ride");
+    const rides = await pool.query(
+      "SELECT * from ride LEFT JOIN useraccount ON ride.attendant_id = useraccount.account_id;"
+    );
 
     res.json(rides.rows);
   } catch (err) {

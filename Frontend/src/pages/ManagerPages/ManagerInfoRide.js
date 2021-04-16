@@ -16,7 +16,7 @@ import IconButton from "@material-ui/core/IconButton";
 import Dialog from "@material-ui/core/Dialog";
 import DialogActions from "@material-ui/core/DialogActions";
 import DialogContent from "@material-ui/core/DialogContent";
-import DialogTitle from "@material-ui/core/DialogTitle";
+import CircularProgress from "@material-ui/core/CircularProgress";
 
 const useStyles = makeStyles({
   input: {
@@ -43,6 +43,7 @@ export default function ManagerAddRide() {
   const [editRide, setEditRide] = useState({});
   const [openModal, setOpenModal] = useState(false);
   const [editPicture, setEditPicture] = useState(null);
+  const [loading, setLoading] = useState(false);
 
   const handleCloseModal = () => {
     setOpenModal(false);
@@ -84,11 +85,17 @@ export default function ManagerAddRide() {
     if (editPicture) {
       const formData = new FormData();
       formData.append("image", editPicture.picture);
-      axios
+      setLoading(true);
+      await axios
         .post("manager/upload-image", formData)
         .then((res) => {
           const name = res.data.path.split("/")[1];
-          console.log(name);
+          setEditRide({
+            ...editRide,
+            picture: `http://100.26.17.215:5000/${name}`,
+          });
+          setLoading(false);
+          handleCloseModal();
         })
         .catch((err) => console.log(err));
     }
@@ -102,6 +109,8 @@ export default function ManagerAddRide() {
       })
       .catch((err) => console.log(err));
   }, []);
+
+  console.log(ride);
 
   return (
     <div>
@@ -277,6 +286,7 @@ export default function ManagerAddRide() {
                       color="disable"
                       variant="contained"
                       onClick={() => {
+                        setLoading(false);
                         setEditRide({});
                         setEditBool(false);
                       }}
@@ -301,7 +311,7 @@ export default function ManagerAddRide() {
               <Card square className={classes.cover}>
                 <CardMedia
                   style={{ height: "100%" }}
-                  image={ride.picture}
+                  image={editRide.picture}
                   title="your assignment"
                 >
                   <IconButton aria-label="upload picture" component="span">
@@ -322,27 +332,37 @@ export default function ManagerAddRide() {
       <Dialog open={openModal} onClose={handleCloseModal}>
         <DialogContent>
           <Grid justify="center">
-            <div style={{ marginBottom: 20 }}>
-              {editPicture ? editPicture.picture.name : null}
-            </div>
-            <Button variant="outlined" component="label" style={{ margin: 5 }}>
-              Select
-              <input
-                type="file"
-                hidden
-                onChange={(event) =>
-                  setEditPicture({ picture: event.target.files[0] })
-                }
-              />
-            </Button>
-            <Button
-              onClick={() => uploadPicture()}
-              color="primary"
-              variant="contained"
-              style={{ margin: 5 }}
-            >
-              Upload
-            </Button>
+            {loading ? (
+              <CircularProgress />
+            ) : (
+              <div>
+                <div style={{ marginBottom: 20 }}>
+                  {editPicture ? editPicture.picture.name : null}
+                </div>
+                <Button
+                  variant="outlined"
+                  component="label"
+                  style={{ margin: 5 }}
+                >
+                  Select
+                  <input
+                    type="file"
+                    hidden
+                    onChange={(event) =>
+                      setEditPicture({ picture: event.target.files[0] })
+                    }
+                  />
+                </Button>
+                <Button
+                  onClick={() => uploadPicture()}
+                  color="primary"
+                  variant="contained"
+                  style={{ margin: 5 }}
+                >
+                  Upload
+                </Button>
+              </div>
+            )}
           </Grid>
         </DialogContent>
       </Dialog>
