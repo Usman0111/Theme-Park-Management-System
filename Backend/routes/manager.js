@@ -12,9 +12,9 @@ const storage = multer.diskStorage({
   filename: function (req, file, cb) {
     cb(
       null,
-      file.originalname
+      //file.originalname
       //switch to this to rename files before storing
-      //file.fieldname + "-" + Date.now() + path.extname(file.originalname)
+      file.fieldname + "-" + Date.now() + path.extname(file.originalname)
     );
   },
 });

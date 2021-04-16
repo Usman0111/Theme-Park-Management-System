@@ -18,6 +18,19 @@ import OpacityIcon from "@material-ui/icons/Opacity";
 import { useRouteMatch, Link } from "react-router-dom";
 import RestoreFromTrashIcon from "@material-ui/icons/RestoreFromTrash";
 import DeleteIcon from "@material-ui/icons/Delete";
+import TextField from "@material-ui/core/TextField";
+import Dialog from "@material-ui/core/Dialog";
+import DialogActions from "@material-ui/core/DialogActions";
+import DialogContent from "@material-ui/core/DialogContent";
+import DialogContentText from "@material-ui/core/DialogContentText";
+import DialogTitle from "@material-ui/core/DialogTitle";
+import InputLabel from "@material-ui/core/InputLabel";
+import MenuItem from "@material-ui/core/MenuItem";
+import FormHelperText from "@material-ui/core/FormHelperText";
+import FormControl from "@material-ui/core/FormControl";
+import Select from "@material-ui/core/Select";
+import ArchiveIcon from "@material-ui/icons/Archive";
+import UnarchiveIcon from "@material-ui/icons/Unarchive";
 
 function Alert(props) {
   return <MuiAlert elevation={6} variant="filled" {...props} />;
@@ -51,8 +64,94 @@ const useStyles = makeStyles((theme) => ({
 
 export default function ManagerRides() {
   const classes = useStyles();
-  const [rides, setRides] = useState([]);
   let { url, path } = useRouteMatch();
+  const [rides, setRides] = useState([]);
+  const [unassinged, setUnassinged] = useState([]);
+  const [attendant, setAttendant] = React.useState({});
+  const [ridePicked, setRidePicked] = useState({});
+
+  const handleChange = (event) => {
+    console.log(event.target.value);
+
+    setAttendant(event.target.value);
+  };
+
+  const [open, setOpen] = React.useState(false);
+
+  const handleClickOpen = async (ride) => {
+    setRidePicked(ride);
+    const unassingedAttendants = await axios
+      .get("manager/unassinged-attendants")
+      .then((res) => res.data)
+      .catch((err) => console.log(err));
+    setUnassinged(unassingedAttendants);
+
+    if (ride.attendant_id) {
+      const currentAttendant = await axios
+        .post("manager/get-one-attendant", { attendant_id: ride.attendant_id })
+        .then((res) => res.data)
+        .catch((err) => console.log(err));
+      setAttendant(currentAttendant);
+    } else {
+      setAttendant({});
+    }
+    setOpen(true);
+  };
+
+  const handleClose = () => {
+    setOpen(false);
+  };
+
+  const assign = () => {
+    if (
+      ridePicked.attendant_id !== attendant.account_id &&
+      attendant.account_id != null
+    ) {
+      axios
+        .post("manager/new-assignment", {
+          assignment_type: "ride",
+          attendant_id: attendant.account_id,
+          ride_id: ridePicked.ride_id,
+        })
+        .then((res) => {
+          console.log(res.data);
+          const newRide = res.data;
+          setRides(
+            rides.map((ride) =>
+              ride.ride_id === newRide.ride_id ? newRide : ride
+            )
+          );
+        })
+        .catch((err) => console.log(err));
+    }
+    handleClose();
+  };
+
+  const unassgin = (ride) => {
+    console.log({
+      assignment_type: "ride",
+      attendant_id: ride.attendant_id,
+      ride_id: ride.ride_id,
+    });
+    axios
+      .delete("manager/remove-assignment", {
+        data: {
+          assignment_type: "ride",
+          attendant_id: ride.attendant_id,
+          ride_id: ride.ride_id,
+        },
+      })
+      .then((res) => {
+        console.log(res.data);
+        const newRide = res.data;
+        setRides(
+          rides.map((ride) =>
+            ride.ride_id === newRide.ride_id ? newRide : ride
+          )
+        );
+      })
+      .catch((err) => console.log(err));
+  };
 
   useEffect(() => {
     axios
@@ -64,25 +163,8 @@ export default function ManagerRides() {
       .catch((err) => console.log(err));
   }, []);
 
-  const [open, setOpen] = React.useState(false);
-
-  const handleClick = () => {
-    setOpen(true);
-  };
-
-  const handleClose = (event, reason) => {
-    if (reason === "clickaway") {
-      return;
-    }
-
-    setOpen(false);
-  };
-
-  const assign = () => {};
-
-  const reassign = () => {};
-
-  console.log(rides);
+  // console.log(rides);
+  // console.log(unassinged);
 
   return (
     <Container className={classes.cardGrid}>
@@ -113,22 +195,25 @@ export default function ManagerRides() {
               </CardContent>
               <CardActions className={classes.buttons}>
                 {ride.attendant_id ? (
-                  <Button
-                    color="primary"
-                    variant="contained"
-                    onClick={() => assign(ride.ride_id)}
-                  >
-                    Reassign
-                  </Button>
+                  <div>
+                    <Button
+                      color="primary"
+                      variant="contained"
+                      onClick={() => unassgin(ride)}
+                    >
+                      Unassign
+                    </Button>
+                  </div>
                 ) : (
                   <Button
                     color="primary"
                     variant="contained"
-                    onClick={() => reassign(ride.ride_id)}
+                    onClick={() => handleClickOpen(ride)}
                   >
-                    assign
+                    Assign
                   </Button>
                 )}
+
                 <Link
                   to={`${url}/info-ride/${ride.ride_id}`}
                   style={{ textDecoration: "none" }}
@@ -138,16 +223,72 @@ export default function ManagerRides() {
                   </Button>
                 </Link>
 
-                <Button variant="contained">archive</Button>
+                <Button variant="contained">
+                  <ArchiveIcon />
+                </Button>
               </CardActions>
             </Card>
           </Grid>
         ))}
-        <Snackbar open={open} autoHideDuration={2000} onClose={handleClose}>
-          <Alert onClose={handleClose} severity="success">
-            Wheee! enjoying the fun ride
-          </Alert>
-        </Snackbar>
+        <div>
+          <Dialog
+            open={open}
+            onClose={handleClose}
+            aria-labelledby="form-dialog-title"
+          >
+            <DialogContent>
+              <FormControl className={classes.formControl} fullWidth>
+                <InputLabel>Attendant</InputLabel>
+                {console.log()}
+                <Select
+                  value={attendant.account_id ? attendant : ""}
+                  onChange={handleChange}
+                >
+                  {attendant.account_id ? (
+                    <MenuItem value={attendant}>
+                      {attendant.first_name + " " + attendant.last_name}
+                    </MenuItem>
+                  ) : null}
+                  {unassinged.map((attendant) => (
+                    <MenuItem value={attendant} key={attendant.account_id}>
+                      {/* {console.log(attendant.account_id)} */}
+                      {attendant.first_name + " " + attendant.last_name}
+                    </MenuItem>
+                  ))}
+                </Select>
+              </FormControl>
+            </DialogContent>
+            <DialogActions>
+              <Button onClick={() => assign()} color="primary">
+                Confirm
+              </Button>
+              <Button onClick={handleClose} color="primary">
+                Cancel
+              </Button>
+            </DialogActions>
+          </Dialog>
+        </div>
+
+        {/* add do attendant name is shown be before unassinging them
+        <div>
+          <Dialog
+            open={open}
+            onClose={handleClose}
+            aria-labelledby="form-dialog-title"
+          >
+            <DialogContent>
+              Do want to Unassign attenat from ?
+            </DialogContent>
+            <DialogActions>
+              <Button onClick={() => assign()} color="primary">
+                Confirm
+              </Button>
+              <Button onClick={handleClose} color="primary">
+                Cancel
+              </Button>
+            </DialogActions>
+          </Dialog>
+        </div> */}
       </Grid>
     </Container>
   );
