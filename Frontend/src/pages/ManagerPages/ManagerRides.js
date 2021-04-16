@@ -67,8 +67,18 @@ export default function ManagerRides() {
   let { url, path } = useRouteMatch();
   const [rides, setRides] = useState([]);
   const [unassinged, setUnassinged] = useState([]);
-  const [attendant, setAttendant] = React.useState({});
+  const [attendant, setAttendant] = useState({});
   const [ridePicked, setRidePicked] = useState({});
+  const [openSnack, setOpenSnack] = useState(false);
+  const [snackMsg, setSnackMsg] = useState("");
+
+  const handleCloseSnack = (event, reason) => {
+    if (reason === "clickaway") {
+      return;
+    }
+
+    setOpenSnack(false);
+  };
 
   const handleChange = (event) => {
     console.log(event.target.value);
@@ -121,6 +131,8 @@ export default function ManagerRides() {
               ride.ride_id === newRide.ride_id ? newRide : ride
             )
           );
+          setSnackMsg("Attendant successfully assigned!");
+          setOpenSnack(true);
         })
         .catch((err) => console.log(err));
     }
@@ -149,6 +161,8 @@ export default function ManagerRides() {
             ride.ride_id === newRide.ride_id ? newRide : ride
           )
         );
+        setSnackMsg("Attendant successfully removed!");
+        setOpenSnack(true);
       })
       .catch((err) => console.log(err));
   };
@@ -158,7 +172,6 @@ export default function ManagerRides() {
       .get("ride/all")
       .then((res) => {
         setRides(res.data);
-        // console.log(res.data);
       })
       .catch((err) => console.log(err));
   }, []);
@@ -268,27 +281,15 @@ export default function ManagerRides() {
             </DialogActions>
           </Dialog>
         </div>
-
-        {/* add do attendant name is shown be before unassinging them
-        <div>
-          <Dialog
-            open={open}
-            onClose={handleClose}
-            aria-labelledby="form-dialog-title"
-          >
-            <DialogContent>
-              Do want to Unassign attenat from ?
-            </DialogContent>
-            <DialogActions>
-              <Button onClick={() => assign()} color="primary">
-                Confirm
-              </Button>
-              <Button onClick={handleClose} color="primary">
-                Cancel
-              </Button>
-            </DialogActions>
-          </Dialog>
-        </div> */}
+        <Snackbar
+          open={openSnack}
+          autoHideDuration={2000}
+          onClose={handleCloseSnack}
+        >
+          <Alert onClose={handleCloseSnack} severity="success">
+            {snackMsg}
+          </Alert>
+        </Snackbar>
       </Grid>
     </Container>
   );
