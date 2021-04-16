@@ -225,7 +225,7 @@ export default function AttendantAssignment() {
           <CardMedia
             className={classes.cover}
             image={assignment.picture}
-            title="Live from space album cover"
+            title="your assignment"
           />
         </Card>
       </Card>

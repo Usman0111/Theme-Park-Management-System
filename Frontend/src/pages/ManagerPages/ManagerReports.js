@@ -1,76 +1,72 @@
-import React from 'react';
-import clsx from 'clsx';
-import { makeStyles, useTheme } from '@material-ui/core/styles';
-import Input from '@material-ui/core/Input';
-import InputLabel from '@material-ui/core/InputLabel';
-import MenuItem from '@material-ui/core/MenuItem';
-import FormControl from '@material-ui/core/FormControl';
-import ListItemText from '@material-ui/core/ListItemText';
-import Select from '@material-ui/core/Select';
-import Checkbox from '@material-ui/core/Checkbox';
-import Chip from '@material-ui/core/Chip';
-import TextField from '@material-ui/core/TextField';
-import Radio from '@material-ui/core/Radio';
-import RadioGroup from '@material-ui/core/RadioGroup';
-import FormControlLabel from '@material-ui/core/FormControlLabel';
-import FormLabel from '@material-ui/core/FormLabel';
-
+import React, { useState } from "react";
+import { makeStyles, useTheme } from "@material-ui/core/styles";
+import InputLabel from "@material-ui/core/InputLabel";
+import MenuItem from "@material-ui/core/MenuItem";
+import FormControl from "@material-ui/core/FormControl";
+import Select from "@material-ui/core/Select";
+import TextField from "@material-ui/core/TextField";
+import Paper from "@material-ui/core/Paper";
+import Grid from "@material-ui/core/Grid";
+import Table from "@material-ui/core/Table";
+import TableBody from "@material-ui/core/TableBody";
+import TableCell from "@material-ui/core/TableCell";
+import TableContainer from "@material-ui/core/TableContainer";
+import TableHead from "@material-ui/core/TableHead";
+import TableRow from "@material-ui/core/TableRow";
+import { Button } from "@material-ui/core";
+import ManagerChart from "./ManagerChart";
 
 const useStyles = makeStyles((theme) => ({
+  root: {
+    flexGrow: 1,
+  },
+  paper: {
+    padding: theme.spacing(2),
+  },
   formControl: {
     margin: theme.spacing(1),
-    minWidth: 120,
-    maxWidth: 300,
+    minWidth: 150,
+    maxWidth: 150,
+    textAlign: "left",
   },
-  chips: {
-    display: 'flex',
-    flexWrap: 'wrap',
-  },
-  chip: {
-    margin: 2,
-  },
-  noLabel: {
-    marginTop: theme.spacing(3),
-  },
-
-  show: { display: 'block' },
-  hide: { display: 'none' },
 }));
 
-const ITEM_HEIGHT = 48;
-const ITEM_PADDING_TOP = 8;
-const MenuProps = {
-  PaperProps: {
-    style: {
-      maxHeight: ITEM_HEIGHT * 4.5 + ITEM_PADDING_TOP,
-      width: 250,
-    },
-  },
-};
-
-function getStyles(name, personName, theme) {
-  return {
-    fontWeight:
-      personName.indexOf(name) === -1
-        ? theme.typography.fontWeightRegular
-        : theme.typography.fontWeightMedium,
-  };
+function createData(name, calories, fat, carbs, protein) {
+  return { name, calories, fat, carbs, protein };
 }
+
+const rows = [
+  createData("Gingerbread", 356, 16.0, 49, 3.9),
+  createData("Gingerbread", 356, 16.0, 49, 3.9),
+  createData("Gingerbread", 356, 16.0, 49, 3.9),
+  createData("Gingerbread", 356, 16.0, 49, 3.9),
+  createData("Gingerbread", 356, 16.0, 49, 3.9),
+  createData("Gingerbread", 356, 16.0, 49, 3.9),
+  createData("Gingerbread", 356, 16.0, 49, 3.9),
+  createData("Gingerbread", 356, 16.0, 49, 3.9),
+  createData("Gingerbread", 356, 16.0, 49, 3.9),
+  createData("Gingerbread", 356, 16.0, 49, 3.9),
+  createData("Gingerbread", 356, 16.0, 49, 3.9),
+  createData("Gingerbread", 356, 16.0, 49, 3.9),
+  createData("Gingerbread", 356, 16.0, 49, 3.9),
+  createData("Gingerbread", 356, 16.0, 49, 3.9),
+];
 
 export default function AdminReport() {
   const classes = useStyles();
   const theme = useTheme();
   const [personName, setPersonName] = React.useState([]);
+  const [report, setReport] = useState(false);
 
-  const [type, setType] = React.useState('Ride');
-  const [reportType, setReportType] = React.useState('ReportType');
+  const [type, setType] = React.useState("Ride");
+  const [reportType, setReportType] = React.useState("ReportType");
 
-  const [TimeType, setTimeType] = React.useState('TimeType');
+  const [TimeType, setTimeType] = React.useState("TimeType");
 
-  const [isHideTimeRange, setHideTimeRange] = React.useState('HideTimeRange');
-  const [isHideMonthPick, setHideMonthPick] = React.useState('HideMonthPick');
+  const [isHideTimeRange, setHideTimeRange] = React.useState("HideTimeRange");
+  const [isHideMonthPick, setHideMonthPick] = React.useState("HideMonthPick");
 
-  const [isHideType, setHideType] = React.useState('HideType');
+  const [isHideType, setHideType] = React.useState("HideType");
 
   const handleReportTypeChange = (event) => {
     setReportType(event.target.value);
@@ -90,7 +86,6 @@ export default function AdminReport() {
       default:
         setHideType(classes.hide);
     }
-
   };
 
   const handleReportTimeChange = (event) => {
@@ -108,7 +103,6 @@ export default function AdminReport() {
         setHideTimeRange(classes.hide);
         setHideMonthPick(classes.show);
     }
-
   };
 
   const handleChange = (event) => {
@@ -116,77 +110,154 @@ export default function AdminReport() {
   };
 
   return (
-    <div>
-      <FormControl className={classes.formControl}>
-        <InputLabel>Report Type</InputLabel>
-        <Select value={reportType}
-          onChange={handleReportTypeChange}>
-          <MenuItem value={1}>Visits</MenuItem>
-          <MenuItem value={2}>Usage</MenuItem>
-          <MenuItem value={3}>Breakdowns</MenuItem>
-          <MenuItem value={4}>Rainouts</MenuItem>
-        </Select>
-      </FormControl>
+    <div className={classes.root}>
+      <Grid container spacing={1}>
+        <Grid item xs={12}>
+          <div>
+            <Button
+              color="primary"
+              variant="contained"
+              size="medium"
+              onClick={() => setReport(true)}
+            >
+              Generate Report
+            </Button>
+            {/* <Button
+              color="primary"
+              variant="contained"
+              style={{ marginLeft: "10px" }}
+              size="medium"
+            >
+              Download Excel
+            </Button> */}
+          </div>
+        </Grid>
+        <Grid item xs={12}>
+          <Paper className={classes.paper}>
+            <FormControl className={classes.formControl}>
+              <InputLabel>Report Type</InputLabel>
+              <Select value={reportType} onChange={handleReportTypeChange}>
+                <MenuItem value={1}>Visits</MenuItem>
+                <MenuItem value={2}>Usage</MenuItem>
+                <MenuItem value={3}>Breakdowns</MenuItem>
+                <MenuItem value={4}>Rainouts</MenuItem>
+              </Select>
+            </FormControl>
+            <FormControl className={classes.formControl}>
+              <TextField
+                id="start_date"
+                label="Start date"
+                type="date"
+                defaultValue="2017-05-24"
+                className={classes.textField}
+                InputLabelProps={{
+                  shrink: true,
+                }}
+              />
+            </FormControl>
+            <FormControl className={classes.formControl}>
+              <TextField
+                id="end_date"
+                label="End date"
+                type="date"
+                defaultValue="2017-05-24"
+                className={classes.textField}
+                InputLabelProps={{
+                  shrink: true,
+                }}
+              />
+            </FormControl>
 
-      <FormControl className={classes.formControl}>
-        <InputLabel>Report time setting</InputLabel>
-        <Select value={TimeType} defaultValue = {1}
-          onChange={handleReportTimeChange}>
-          <MenuItem value={1}>Monthly Report</MenuItem>
-          <MenuItem value={2}>Time range</MenuItem>
-        </Select>
-      </FormControl>
+            <FormControl className={classes.formControl}>
+              <InputLabel>Calculate</InputLabel>
+              <Select
+                value={TimeType}
+                defaultValue={1}
+                onChange={handleReportTimeChange}
+              >
+                <MenuItem value={1}>Daily Total</MenuItem>
+                <MenuItem value={2}>Monthly Total</MenuItem>
+                <MenuItem value={3}>Daily Average by Month</MenuItem>
+                <MenuItem value={4}>Daily Maximum by Month</MenuItem>
+                <MenuItem value={5}>Daily Minimum by Month</MenuItem>
+              </Select>
+            </FormControl>
 
-      <div className={isHideTimeRange}>
-        <FormControl className={classes.formControl}>
-          <TextField
-            id="start_date"
-            label="Start date"
-            type="date"
-            defaultValue="2017-05-24"
-            className={classes.textField}
-            InputLabelProps={{
-              shrink: true,
-            }}
-          />
-        </FormControl>
-        <FormControl className={classes.formControl}>
-          <TextField
-            id="end_date"
-            label="End date"
-            type="date"
-            defaultValue="2017-05-24"
-            className={classes.textField}
-            InputLabelProps={{
-              shrink: true,
-            }}
-          />
-        </FormControl>
-        </div>
-        <div className={isHideMonthPick}>
-        <FormControl className={classes.formControl}>
-          <TextField
-            id="month_year"
-            label="Month Year"
-            type="date"
-            dateFormat="mm/yyyy"
-            className={classes.textField}
-            
-            InputLabelProps={{
-              shrink: true,
-            }}
-          />
-        </FormControl>
-        </div>
-        <div className={isHideType}>
-          <FormControl component="fieldset">
-            <FormLabel component="legend">Type</FormLabel>
-            <RadioGroup aria-label="type" name="type" value={type} onChange={handleChange}>
-              <FormControlLabel value="ride" control={<Radio />} label="Ride" />
-              <FormControlLabel value="attraction" control={<Radio />} label="Attraction" />
-            </RadioGroup>
-          </FormControl>
-        </div>
+            <FormControl className={classes.formControl}>
+              <InputLabel>Show</InputLabel>
+              <Select
+                value={TimeType}
+                defaultValue={1}
+                onChange={handleReportTimeChange}
+              >
+                <MenuItem value={1}>One</MenuItem>
+                <MenuItem value={2}>All</MenuItem>
+              </Select>
+            </FormControl>
+
+            <FormControl className={classes.formControl}>
+              <InputLabel>Type</InputLabel>
+              <Select
+                value={TimeType}
+                defaultValue={1}
+                onChange={handleReportTimeChange}
+              >
+                <MenuItem value={1}>Ride</MenuItem>
+                <MenuItem value={2}>Attraction</MenuItem>
+              </Select>
+            </FormControl>
+            <FormControl className={classes.formControl}>
+              <InputLabel>Name</InputLabel>
+              <Select
+                value={TimeType}
+                defaultValue={1}
+                onChange={handleReportTimeChange}
+              >
+                <MenuItem value={1}>Roler Coaster</MenuItem>
+                <MenuItem value={2}>Water Ride</MenuItem>
+              </Select>
+            </FormControl>
+          </Paper>
+        </Grid>
+
+        <Grid item xs={5}>
+          <TableContainer component={Paper}>
+            <Table
+              className={classes.table}
+              aria-label="simple table"
+              size="small"
+            >
+              <TableHead>
+                <TableRow>
+                  <TableCell>Dessert (100g serving)</TableCell>
+                  <TableCell align="right">Calories</TableCell>
+                  <TableCell align="right">Fat&nbsp;(g)</TableCell>
+                  <TableCell align="right">Carbs&nbsp;(g)</TableCell>
+                  <TableCell align="right">Protein&nbsp;(g)</TableCell>
+                </TableRow>
+              </TableHead>
+              <TableBody>
+                {rows.map((row) => (
+                  <TableRow key={row.name}>
+                    <TableCell component="th" scope="row">
+                      {row.name}
+                    </TableCell>
+                    <TableCell align="right">{row.calories}</TableCell>
+                    <TableCell align="right">{row.fat}</TableCell>
+                    <TableCell align="right">{row.carbs}</TableCell>
+                    <TableCell align="right">{row.protein}</TableCell>
+                  </TableRow>
+                ))}
+              </TableBody>
+            </Table>
+          </TableContainer>
+        </Grid>
+        <Grid item xs={7}>
+          <Paper className={classes.paper}>
+            <ManagerChart />
+          </Paper>
+        </Grid>
+      </Grid>
     </div>
   );
 }

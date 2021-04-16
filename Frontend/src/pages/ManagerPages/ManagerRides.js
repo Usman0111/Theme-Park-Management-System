@@ -15,6 +15,9 @@ import Snackbar from "@material-ui/core/Snackbar";
 import MuiAlert from "@material-ui/lab/Alert";
 import BrokenImageIcon from "@material-ui/icons/BrokenImage";
 import OpacityIcon from "@material-ui/icons/Opacity";
+import { useRouteMatch, Link } from "react-router-dom";
+import RestoreFromTrashIcon from "@material-ui/icons/RestoreFromTrash";
+import DeleteIcon from "@material-ui/icons/Delete";
 
 function Alert(props) {
   return <MuiAlert elevation={6} variant="filled" {...props} />;
@@ -49,6 +52,7 @@ const useStyles = makeStyles((theme) => ({
 export default function ManagerRides() {
   const classes = useStyles();
   const [rides, setRides] = useState([]);
+  let { url, path } = useRouteMatch();
 
   useEffect(() => {
     axios
@@ -74,21 +78,9 @@ export default function ManagerRides() {
     setOpen(false);
   };
 
-  const visit = (ride_id) => {
-    const data = {
-      ride_id,
-      customer_id: Number(localStorage.getItem("user_id")),
-    };
+  const assign = () => {};
 
-    axios
-      .post("ride/ride", data)
-      .then((res) => {
-        handleClick();
-      })
-      .catch((err) => {
-        console.log(err);
-      });
-  };
+  const reassign = () => {};
 
   console.log(rides);
 
@@ -120,52 +112,33 @@ export default function ManagerRides() {
                 </Typography>
               </CardContent>
               <CardActions className={classes.buttons}>
-                {ride.rainedout || ride.broken ? (
-                  <Button color="primary" variant="contained" disabled>
-                    Ride!
+                {ride.attendant_id ? (
+                  <Button
+                    color="primary"
+                    variant="contained"
+                    onClick={() => assign(ride.ride_id)}
+                  >
+                    Reassign
                   </Button>
                 ) : (
                   <Button
                     color="primary"
                     variant="contained"
-                    onClick={() => visit(ride.ride_id)}
+                    onClick={() => reassign(ride.ride_id)}
                   >
-                    Ride!
+                    assign
                   </Button>
                 )}
-
-                <Tooltip
-                  title={
-                    <React.Fragment>
-                      <Typography color="inherit" variant="subtitle1">
-                        Description
-                      </Typography>
-                      <div className={classes.paragraph}>
-                        {ride.description}
-                      </div>
-                      <Typography color="inherit" variant="subtitle1">
-                        Location
-                      </Typography>
-                      <div className={classes.paragraph}>{ride.location}</div>
-                      <Typography color="inherit" variant="subtitle1">
-                        Age Restriciton
-                      </Typography>
-                      <div className={classes.paragraph}>
-                        {ride.age_restriction ? ride.age_restriction : "None"}
-                      </div>
-                      <Typography color="inherit" variant="subtitle1">
-                        Height Resctriction
-                      </Typography>
-                      <div className={classes.paragraph}>
-                        {ride.height_restriction
-                          ? ride.height_restriction
-                          : "None"}
-                      </div>
-                    </React.Fragment>
-                  }
+                <Link
+                  to={`${url}/info-ride/${ride.ride_id}`}
+                  style={{ textDecoration: "none" }}
                 >
-                  <Button variant="contained">Info</Button>
-                </Tooltip>
+                  <Button variant="contained" style={{ paddingLeft: 13 }}>
+                    Info
+                  </Button>
+                </Link>
+
+                <Button variant="contained">archive</Button>
               </CardActions>
             </Card>
           </Grid>
