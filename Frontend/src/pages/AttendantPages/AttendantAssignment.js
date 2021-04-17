@@ -32,7 +32,7 @@ const useStyles = makeStyles((theme) => ({
   details: {
     display: "flex",
     flexDirection: "column",
-    flexShrink: 100,
+    flexGrow: 100,
   },
   content: {
     flex: "1 0 auto",
@@ -90,7 +90,10 @@ export default function AttendantAssignment() {
       })
       .then((res) => {
         console.log(res.data);
-        if(res.data != null){
+        if(res.data === null || res.data === "No assignment"){
+
+        }
+        else{
           setRetreived(true)
           setAssignment(res.data.assignment);
           setType(res.data.type);
@@ -98,7 +101,11 @@ export default function AttendantAssignment() {
             setIsRide(true);
           }
         }
+        /*
+        if(res.data === "No assignment"){
+        }
         
+        }*/
       })
       .catch((err) => console.log(err));
   }, []);
