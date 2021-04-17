@@ -71,7 +71,6 @@ export default function ManagerAddRide() {
         editRide.height_restriction_inches,
       picture: editRide.picture,
     };
-    console.log(newRide);
 
     axios
       .put("manager/ride-edit", newRide)
@@ -109,8 +108,6 @@ export default function ManagerAddRide() {
       })
       .catch((err) => console.log(err));
   }, []);
-
-  console.log(ride);
 
   return (
     <div>
