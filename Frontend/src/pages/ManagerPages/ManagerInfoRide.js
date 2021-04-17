@@ -105,7 +105,17 @@ export default function ManagerAddRide() {
     axios
       .get("ride/all")
       .then((res) => {
-        setRide(res.data.find((ride) => ride.ride_id === Number(id)));
+        const currentRide = res.data.find(
+          (ride) => ride.ride_id === Number(id)
+        );
+        if (currentRide.picture) {
+          setRide(currentRide);
+        } else {
+          setRide({
+            ...currentRide,
+            picture: "http://100.26.17.215:5000/default-coverImage.png",
+          });
+        }
       })
       .catch((err) => console.log(err));
   }, []);
@@ -310,11 +320,18 @@ export default function ManagerAddRide() {
                 <CardMedia
                   style={{ height: "100%" }}
                   image={editRide.picture}
-                  title="your assignment"
+                  title="ride picture"
                 >
                   <IconButton aria-label="upload picture" component="span">
                     <EditIcon
-                      style={{ margin: "5px", color: "white" }}
+                      style={{
+                        margin: "5px",
+                        color:
+                          editRide.picture ==
+                          "http://100.26.17.215:5000/default-coverImage.png"
+                            ? "black"
+                            : "white",
+                      }}
                       onClick={() => {
                         setOpenModal(true);
                         setEditPicture(null);

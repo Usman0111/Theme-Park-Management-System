@@ -57,8 +57,8 @@ client.query("LISTEN new_attendant_notification");
 client.query("LISTEN ride_fixed_notification");
 
 client.on("notification", async (msg) => {
-  // console.log(msg.channel);
-  // console.log(JSON.parse(msg.payload));
+  console.log(msg.channel);
+  console.log(JSON.parse(msg.payload));
   const channel = msg.channel;
   const payload = JSON.parse(msg.payload);
 
@@ -79,9 +79,9 @@ client.on("notification", async (msg) => {
     const email = { receiver, subject, message };
 
     console.log(`sending email to park manager`);
-    // sendEmail(email).then((res) =>
-    //   console.log("email sent successfuly to ", res.accepted)
-    // );
+    sendEmail(email).then((res) =>
+      console.log("email sent successfuly to ", res.accepted)
+    );
   }
 
   if (channel === "ride_fixed_notification") {
@@ -98,8 +98,8 @@ client.on("notification", async (msg) => {
 
     const email = { receiver, subject, message };
     console.log(`sending email to attendant`);
-    // sendEmail(email).then((res) =>
-    //   console.log("email sent successfuly to ", res.accepted)
-    // );
+    sendEmail(email).then((res) =>
+      console.log("email sent successfuly to ", res.accepted)
+    );
   }
 });
