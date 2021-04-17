@@ -35,13 +35,13 @@ const useStyles = makeStyles({
   },
 });
 
-export default function ManagerAddAttraction() {
+export default function ManagerAddattraction() {
   const classes = useStyles();
   const { id } = useParams();
 
-  const [Attraction, setAttraction] = useState({});
+  const [attraction, setattraction] = useState({});
   const [editBool, setEditBool] = useState(false);
-  const [editAttraction, setEditAttraction] = useState({});
+  const [editattraction, setEditattraction] = useState({});
   const [openModal, setOpenModal] = useState(false);
   const [editPicture, setEditPicture] = useState(null);
   const [loading, setLoading] = useState(false);
@@ -52,31 +52,31 @@ export default function ManagerAddAttraction() {
 
   const openEdit = () => {
     const split = {
-      ...Attraction,
-      height_restriction_feet: Math.floor(Attraction.height_restriction / 12),
-      height_restriction_inches: Attraction.height_restriction % 12,
+      ...attraction,
+      height_restriction_feet: Math.floor(attraction.height_restriction / 12),
+      height_restriction_inches: attraction.height_restriction % 12,
     };
-    setEditAttraction(split);
+    setEditattraction(split);
     setEditBool(true);
   };
 
   const confrimEdit = () => {
-    const newAttraction = {
-      Attraction_id: editAttraction.Attraction_id,
-      name: editAttraction.name,
-      description: editAttraction.description,
-      location: editAttraction.location,
-      age_restriction: editAttraction.age_restriction,
+    const newattraction = {
+      attraction_id: editattraction.attraction_id,
+      name: editattraction.name,
+      description: editattraction.description,
+      location: editattraction.location,
+      age_restriction: editattraction.age_restriction,
       height_restriction:
-        editAttraction.height_restriction_feet * 12 +
-        editAttraction.height_restriction_inches,
-      picture: editAttraction.picture,
+        editattraction.height_restriction_feet * 12 +
+        editattraction.height_restriction_inches,
+      picture: editattraction.picture,
     };
 
     axios
-      .put("manager/Attraction-edit", newAttraction)
+      .put("manager/attraction-edit", newattraction)
       .then((res) => {
-        setAttraction(newAttraction);
+        setattraction(newattraction);
         setEditBool(false);
       })
       .catch((err) => console.log(err));
@@ -90,8 +90,8 @@ export default function ManagerAddAttraction() {
         .post("manager/upload-image", formData)
         .then((res) => {
           const name = res.data.path.split("/")[1];
-          setEditAttraction({
-            ...editAttraction,
+          setEditattraction({
+            ...editattraction,
             picture: `http://100.26.17.215:5000/${name}`,
           });
           setLoading(false);
@@ -103,11 +103,19 @@ export default function ManagerAddAttraction() {
 
   useEffect(() => {
     axios
-      .get("Attraction/all")
+      .get("attraction/all")
       .then((res) => {
-        setAttraction(
-          res.data.find((Attraction) => Attraction.Attraction_id === Number(id))
+        const currentattraction = res.data.find(
+          (attraction) => attraction.attraction_id === Number(id)
         );
+        if (currentattraction.picture) {
+          setattraction(currentattraction);
+        } else {
+          setattraction({
+            ...currentattraction,
+            picture: "http://100.26.17.215:5000/default-coverImage.png",
+          });
+        }
       })
       .catch((err) => console.log(err));
   }, []);
@@ -125,22 +133,22 @@ export default function ManagerAddAttraction() {
                       <strong>Name</strong>
                     </Typography>
                     <Typography variant="subtitle1" gutterBottom>
-                      {Attraction.name}
+                      {attraction.name}
                     </Typography>
                     <Typography variant="h6" gutterBottom>
                       <strong>Location</strong>
                     </Typography>
                     <Typography variant="subtitle1" gutterBottom>
-                      {Attraction.location}
+                      {attraction.location}
                     </Typography>
 
                     <Typography variant="h6" gutterBottom>
                       <strong>Height Restriction</strong>
                     </Typography>
                     <Typography variant="subtitle1" gutterBottom>
-                      {Attraction.height_restriction
-                        ? `${Math.floor(Attraction.height_restriction / 12)}' ${
-                            Attraction.height_restriction % 12
+                      {attraction.height_restriction
+                        ? `${Math.floor(attraction.height_restriction / 12)}' ${
+                            attraction.height_restriction % 12
                           }'' `
                         : "None"}
                     </Typography>
@@ -149,15 +157,15 @@ export default function ManagerAddAttraction() {
                       <strong>Age Restriction</strong>
                     </Typography>
                     <Typography variant="subtitle1" gutterBottom>
-                      {Attraction.age_restriction
-                        ? Attraction.age_restriction
+                      {attraction.age_restriction
+                        ? attraction.age_restriction
                         : "None"}
                     </Typography>
                     <Typography variant="h6" gutterBottom>
                       <strong>Description</strong>
                     </Typography>
                     <Typography variant="subtitle1" gutterBottom>
-                      {Attraction.description}
+                      {attraction.description}
                     </Typography>
                   </div>
                   <CardActions>
@@ -177,14 +185,14 @@ export default function ManagerAddAttraction() {
                   <TextField
                     className={classes.textField}
                     required
-                    label="Attraction Name"
+                    label="attraction Name"
                     id="name"
                     variant="outlined"
                     fullWidth
-                    value={editAttraction.name}
+                    value={editattraction.name}
                     onChange={(event) =>
-                      setEditAttraction({
-                        ...editAttraction,
+                      setEditattraction({
+                        ...editattraction,
                         name: event.target.value,
                       })
                     }
@@ -196,10 +204,10 @@ export default function ManagerAddAttraction() {
                     id="location"
                     variant="outlined"
                     fullWidth
-                    value={editAttraction.location}
+                    value={editattraction.location}
                     onChange={(event) =>
-                      setEditAttraction({
-                        ...editAttraction,
+                      setEditattraction({
+                        ...editattraction,
                         location: event.target.value,
                       })
                     }
@@ -213,10 +221,10 @@ export default function ManagerAddAttraction() {
                     type="number"
                     variant="outlined"
                     fullWidth
-                    value={editAttraction.age_restriction}
+                    value={editattraction.age_restriction}
                     onChange={(event) =>
-                      setEditAttraction({
-                        ...editAttraction,
+                      setEditattraction({
+                        ...editattraction,
                         age_restriction:
                           event.target.value < 0
                             ? (event.target.value = 0)
@@ -232,10 +240,10 @@ export default function ManagerAddAttraction() {
                     type="number"
                     variant="outlined"
                     fullWidth
-                    value={editAttraction.height_restriction_feet}
+                    value={editattraction.height_restriction_feet}
                     onChange={(event) =>
-                      setEditAttraction({
-                        ...editAttraction,
+                      setEditattraction({
+                        ...editattraction,
                         height_restriction_feet:
                           event.target.value < 0
                             ? (event.target.value = 0)
@@ -251,10 +259,10 @@ export default function ManagerAddAttraction() {
                     type="number"
                     variant="outlined"
                     fullWidth
-                    value={editAttraction.height_restriction_inches}
+                    value={editattraction.height_restriction_inches}
                     onChange={(event) =>
-                      setEditAttraction({
-                        ...editAttraction,
+                      setEditattraction({
+                        ...editattraction,
                         height_restriction_inches:
                           event.target.value < 0
                             ? (event.target.value = 0)
@@ -272,10 +280,10 @@ export default function ManagerAddAttraction() {
                     fullWidth
                     rows={5}
                     required
-                    value={editAttraction.description}
+                    value={editattraction.description}
                     onChange={(event) =>
-                      setEditAttraction({
-                        ...editAttraction,
+                      setEditattraction({
+                        ...editattraction,
                         description: event.target.value,
                       })
                     }
@@ -295,7 +303,7 @@ export default function ManagerAddAttraction() {
                       variant="contained"
                       onClick={() => {
                         setLoading(false);
-                        setEditAttraction({});
+                        setEditattraction({});
                         setEditBool(false);
                       }}
                     >
@@ -311,7 +319,7 @@ export default function ManagerAddAttraction() {
               <Card square className={classes.cover}>
                 <CardMedia
                   style={{ height: "100%" }}
-                  image={Attraction.picture}
+                  image={attraction.picture}
                   title="your assignment"
                 />
               </Card>
@@ -319,12 +327,19 @@ export default function ManagerAddAttraction() {
               <Card square className={classes.cover}>
                 <CardMedia
                   style={{ height: "100%" }}
-                  image={editAttraction.picture}
-                  title="your assignment"
+                  image={editattraction.picture}
+                  title="attraction picture"
                 >
                   <IconButton aria-label="upload picture" component="span">
                     <EditIcon
-                      style={{ margin: "5px", color: "white" }}
+                      style={{
+                        margin: "5px",
+                        color:
+                          editattraction.picture ==
+                          "http://100.26.17.215:5000/default-coverImage.png"
+                            ? "black"
+                            : "white",
+                      }}
                       onClick={() => {
                         setOpenModal(true);
                         setEditPicture(null);

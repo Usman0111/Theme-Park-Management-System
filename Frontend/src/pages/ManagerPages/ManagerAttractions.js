@@ -63,10 +63,10 @@ const useStyles = makeStyles((theme) => ({
   },
 }));
 
-export default function ManagerAttractions() {
+export default function Managerattractions() {
   const classes = useStyles();
   let { url, path } = useRouteMatch();
-  const [Attractions, setAttractions] = useState([]);
+  const [attractions, setattractions] = useState([]);
   const [unassinged, setUnassinged] = useState([]);
   const [attendant, setAttendant] = useState({});
   const [attractionPicked, setattractionPicked] = useState({});
@@ -99,7 +99,9 @@ export default function ManagerAttractions() {
 
     if (attraction.attendant_id) {
       const currentAttendant = await axios
-        .post("manager/get-one-attendant", { attendant_id: attraction.attendant_id })
+        .post("manager/get-one-attendant", {
+          attendant_id: attraction.attendant_id,
+        })
         .then((res) => res.data)
         .catch((err) => console.log(err));
       setAttendant(currentAttendant);
@@ -127,9 +129,11 @@ export default function ManagerAttractions() {
         .then((res) => {
           console.log(res.data);
           const newattraction = res.data;
-          setAttractions(
-            Attractions.map((attraction) =>
-              attraction.attraction_id === newattraction.attraction_id ? newattraction : attraction
+          setattractions(
+            attractions.map((attraction) =>
+              attraction.attraction_id === newattraction.attraction_id
+                ? newattraction
+                : attraction
             )
           );
           setSnackMsg("Attendant successfully assigned!");
@@ -157,9 +161,11 @@ export default function ManagerAttractions() {
       .then((res) => {
         console.log(res.data);
         const newattraction = res.data;
-        setAttractions(
-          Attractions.map((attraction) =>
-            attraction.attraction_id === newattraction.attraction_id ? newattraction : attraction
+        setattractions(
+          attractions.map((attraction) =>
+            attraction.attraction_id === newattraction.attraction_id
+              ? newattraction
+              : attraction
           )
         );
         setSnackMsg("Attendant successfully removed!");
@@ -172,8 +178,8 @@ export default function ManagerAttractions() {
     axios
       .put("manager/attraction-archive", config)
       .then((res) => {
-        setAttractions(
-          Attractions.map((attraction) =>
+        setattractions(
+          attractions.map((attraction) =>
             attraction.attraction_id === config.attraction_id
               ? { ...attraction, archived: config.archive }
               : attraction
@@ -194,12 +200,12 @@ export default function ManagerAttractions() {
     axios
       .get("attraction/all")
       .then((res) => {
-        setAttractions(res.data);
+        setattractions(res.data);
       })
       .catch((err) => console.log(err));
   }, []);
 
-  console.log(Attractions);
+  console.log(attractions);
 
   return (
     <Container className={classes.cardGrid}>
@@ -215,10 +221,17 @@ export default function ManagerAttractions() {
         </Button>
       </Link>
       <Grid container spacing={4}>
-        {Attractions.map((attraction) => (
+        {attractions.map((attraction) => (
           <Grid item key={attraction.attraction_id} md={3}>
             <Card className={classes.card}>
-              <CardMedia className={classes.cardMedia} image={attraction.picture} />
+              <CardMedia
+                className={classes.cardMedia}
+                image={
+                  attraction.picture
+                    ? attraction.picture
+                    : "http://100.26.17.215:5000/default-coverImage.png"
+                }
+              />
               <CardContent className={classes.cardContent}>
                 <Typography variant="h5">
                   {attraction.name}
@@ -270,7 +283,10 @@ export default function ManagerAttractions() {
                     title="Unarchive"
                     variant="contained"
                     onClick={() =>
-                      setArchive({ attraction_id: attraction.attraction_id, archive: false })
+                      setArchive({
+                        attraction_id: attraction.attraction_id,
+                        archive: false,
+                      })
                     }
                   >
                     <UnarchiveIcon />
@@ -280,7 +296,10 @@ export default function ManagerAttractions() {
                     title="Archive"
                     variant="contained"
                     onClick={() =>
-                      setArchive({ attraction_id: attraction.attraction_id, archive: true })
+                      setArchive({
+                        attraction_id: attraction.attraction_id,
+                        archive: true,
+                      })
                     }
                   >
                     <ArchiveIcon />
