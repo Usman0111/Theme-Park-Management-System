@@ -54,72 +54,22 @@ const rows = [
 
 export default function AdminReport() {
   const classes = useStyles();
-  const theme = useTheme();
-  const [personName, setPersonName] = React.useState([]);
-  const [report, setReport] = useState(false);
+  //menu
+  const [reportType, setReportType] = useState("");
+  const [Calculate, setCalculate] = useState("");
+  const [show, setShow] = useState(""); // one or all
+  const [type, setType] = useState(""); //ride or attraction query
+  const [rides, setRides] = useState([]);
+  const [attractions, setAttractions] = useState([]);
 
-  const [type, setType] = React.useState("Ride");
-  const [reportType, setReportType] = React.useState("ReportType");
-
-  const [TimeType, setTimeType] = React.useState("TimeType");
-
-  const [isHideTimeRange, setHideTimeRange] = React.useState("HideTimeRange");
-  const [isHideMonthPick, setHideMonthPick] = React.useState("HideMonthPick");
-
-  const [isHideType, setHideType] = React.useState("HideType");
-
-  const handleReportTypeChange = (event) => {
-    setReportType(event.target.value);
-    switch (event.target.value) {
-      case 1:
-        setHideType(classes.hide);
-        break;
-      case 2:
-        setHideType(classes.show);
-        break;
-      case 3:
-        setHideType(classes.show);
-        break;
-      case 4:
-        setHideType(classes.show);
-        break;
-      default:
-        setHideType(classes.hide);
-    }
-  };
-
-  const handleReportTimeChange = (event) => {
-    setTimeType(event.target.value);
-    switch (event.target.value) {
-      case 1:
-        setHideTimeRange(classes.hide);
-        setHideMonthPick(classes.show);
-        break;
-      case 2:
-        setHideTimeRange(classes.show);
-        setHideMonthPick(classes.hide);
-        break;
-      default:
-        setHideTimeRange(classes.hide);
-        setHideMonthPick(classes.show);
-    }
-  };
-
-  const handleChange = (event) => {
-    setPersonName(event.target.value);
-  };
+  //report
 
   return (
     <div className={classes.root}>
       <Grid container spacing={1}>
         <Grid item xs={12}>
           <div>
-            <Button
-              color="primary"
-              variant="contained"
-              size="medium"
-              onClick={() => setReport(true)}
-            >
+            <Button color="primary" variant="contained" size="medium">
               Generate Report
             </Button>
             {/* <Button
@@ -136,11 +86,14 @@ export default function AdminReport() {
           <Paper className={classes.paper}>
             <FormControl className={classes.formControl}>
               <InputLabel>Report Type</InputLabel>
-              <Select value={reportType} onChange={handleReportTypeChange}>
-                <MenuItem value={1}>Visits</MenuItem>
-                <MenuItem value={2}>Usage</MenuItem>
-                <MenuItem value={3}>Breakdowns</MenuItem>
-                <MenuItem value={4}>Rainouts</MenuItem>
+              <Select
+                value={reportType}
+                onChange={(event) => setReportType(event.target.value)}
+              >
+                <MenuItem value={"visits"}>Visits</MenuItem>
+                <MenuItem value={"usage"}>Usage</MenuItem>
+                <MenuItem value={"breakdowns"}>Breakdowns</MenuItem>
+                <MenuItem value={"rainouts"}>Rainouts</MenuItem>
               </Select>
             </FormControl>
             <FormControl className={classes.formControl}>
@@ -171,42 +124,46 @@ export default function AdminReport() {
             <FormControl className={classes.formControl}>
               <InputLabel>Calculate</InputLabel>
               <Select
-                value={TimeType}
+                value={Calculate}
                 defaultValue={1}
-                onChange={handleReportTimeChange}
+                onChange={(event) => setCalculate(event.target.value)}
               >
-                <MenuItem value={1}>Daily Total</MenuItem>
-                <MenuItem value={2}>Monthly Total</MenuItem>
-                <MenuItem value={3}>Daily Average by Month</MenuItem>
-                <MenuItem value={4}>Daily Maximum by Month</MenuItem>
-                <MenuItem value={5}>Daily Minimum by Month</MenuItem>
+                <MenuItem value={"daily total"}>Daily Total</MenuItem>
+                <MenuItem value={"monthly total"}>Monthly Total</MenuItem>
+                <MenuItem value={"daily average by month"}>
+                  Daily Average by Month
+                </MenuItem>
+                <MenuItem value={"daily maximum by month"}>
+                  Daily Maximum by Month
+                </MenuItem>
+                <MenuItem value={"daily minimum by month"}>
+                  Daily Minimum by Month
+                </MenuItem>
               </Select>
             </FormControl>
 
             <FormControl className={classes.formControl}>
               <InputLabel>Show</InputLabel>
               <Select
-                value={TimeType}
-                defaultValue={1}
-                onChange={handleReportTimeChange}
+                value={show}
+                onChange={(event) => setShow(event.target.value)}
               >
-                <MenuItem value={1}>One</MenuItem>
-                <MenuItem value={2}>All</MenuItem>
+                <MenuItem value={"one"}>One</MenuItem>
+                <MenuItem value={"all"}>All</MenuItem>
               </Select>
             </FormControl>
 
             <FormControl className={classes.formControl}>
               <InputLabel>Type</InputLabel>
               <Select
-                value={TimeType}
-                defaultValue={1}
-                onChange={handleReportTimeChange}
+                value={type}
+                onChange={(event) => setType(event.target.value)}
               >
-                <MenuItem value={1}>Ride</MenuItem>
-                <MenuItem value={2}>Attraction</MenuItem>
+                <MenuItem value={"ride"}>Ride</MenuItem>
+                <MenuItem value={"attraction"}>Attraction</MenuItem>
               </Select>
             </FormControl>
-            <FormControl className={classes.formControl}>
+            {/* <FormControl className={classes.formControl}>
               <InputLabel>Name</InputLabel>
               <Select
                 value={TimeType}
@@ -216,7 +173,7 @@ export default function AdminReport() {
                 <MenuItem value={1}>Roler Coaster</MenuItem>
                 <MenuItem value={2}>Water Ride</MenuItem>
               </Select>
-            </FormControl>
+            </FormControl> */}
           </Paper>
         </Grid>
 
