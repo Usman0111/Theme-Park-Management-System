@@ -167,6 +167,8 @@ export default function ManagerRides() {
       .catch((err) => console.log(err));
   };
 
+  const setArchive = () => {};
+
   useEffect(() => {
     axios
       .get("ride/all")
@@ -176,9 +178,6 @@ export default function ManagerRides() {
       .catch((err) => console.log(err));
   }, []);
 
-  // console.log(rides);
-  // console.log(unassinged);
-
   return (
     <Container className={classes.cardGrid}>
       <CssBaseline />
@@ -186,11 +185,7 @@ export default function ManagerRides() {
         {rides.map((ride) => (
           <Grid item key={ride.ride_id} md={3}>
             <Card className={classes.card}>
-              <CardMedia
-                className={classes.cardMedia}
-                image={ride.picture}
-                title="Image title"
-              />
+              <CardMedia className={classes.cardMedia} image={ride.picture} />
               <CardContent className={classes.cardContent}>
                 <Typography variant="h5">
                   {ride.name}
@@ -213,6 +208,7 @@ export default function ManagerRides() {
                       color="primary"
                       variant="contained"
                       onClick={() => unassgin(ride)}
+                      title={`Assigned to ${ride.first_name} ${ride.last_name}`}
                     >
                       Unassign
                     </Button>
@@ -236,9 +232,27 @@ export default function ManagerRides() {
                   </Button>
                 </Link>
 
-                <Button variant="contained">
-                  <ArchiveIcon />
-                </Button>
+                {ride.archived ? (
+                  <Button
+                    title="Unarchive"
+                    variant="contained"
+                    // onClick={() =>
+                    //   setArchive({ ride_id: ride.ride_id, archive: false })
+                    // }
+                  >
+                    <UnarchiveIcon />
+                  </Button>
+                ) : (
+                  <Button
+                    title="Archive"
+                    variant="contained"
+                    // onClick={() =>
+                    //   setArchive({ ride_id: ride.ride_id, archive: true })
+                    // }
+                  >
+                    <ArchiveIcon />
+                  </Button>
+                )}
               </CardActions>
             </Card>
           </Grid>

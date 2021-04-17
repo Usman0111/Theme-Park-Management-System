@@ -54,6 +54,7 @@ export default function AttendantAssignment() {
   const [open, setOpen] = useState(false);
   const [description, setDescription] = useState("");
   const [snackMsg, setSnackMsg] = useState("");
+  const [retrevied, setRetreived] = useState(true);
 
   const handleClickOpen = () => {
     setOpen(true);
@@ -142,123 +143,128 @@ export default function AttendantAssignment() {
 
   return (
     <div>
-      <Card className={classes.root}>
-        <div className={classes.details}>
-          <CardContent className={classes.content}>
-            <Typography variant="h2">{assignment.name}</Typography>
-            <Typography variant="h6">Description</Typography>
-            <Typography variant="subtitle1" color="textSecondary">
-              Have a seat, but don’t get too used to having your feet on the
-              ground. These chairs will soon swing in a peaceful circle around
-              the stunning 242-foot-tall tower. By the time you get to the top,
-              you will be careening around the center base at 40 miles per hour!{" "}
-            </Typography>
-            <Typography variant="h6">Location</Typography>
-            <Typography variant="subtitle1" color="textSecondary">
-              Have a seat, but don’t get too used to having your feet on the
-            </Typography>
-            <Typography variant="h6">Age Restriction</Typography>
-            <Typography variant="subtitle1" color="textSecondary">
-              Have a seat, but don’t get too used to having your feet on the
-            </Typography>
-            <Typography variant="h6">Height Resctriction</Typography>
-            <Typography variant="subtitle1" color="textSecondary">
-              Have a seat, but don’t get too used to having your feet on the
-            </Typography>
-            <Typography variant="h6">Status</Typography>
-            <div>
-              {!assignment.broken && !assignment.rainedout ? (
-                <Tooltip title="Available">
-                  <EventAvailableIcon fontSize="large" />
-                </Tooltip>
-              ) : null}
-              {assignment.broken ? (
-                <Tooltip title="Broken">
-                  <BrokenImageIcon fontSize="large" />
-                </Tooltip>
-              ) : null}
-              {assignment.rainedout ? (
-                <Tooltip title="Rainedout">
-                  <OpacityIcon fontSize="large" />
-                </Tooltip>
-              ) : null}
-            </div>
-            <Divider />
-            <div className={classes.buttons}>
-              {assignment.broken ? (
-                <Button variant="contained" color="disabled">
-                  Make Fix Request
-                </Button>
-              ) : (
-                <Button
-                  variant="contained"
-                  style={{ backgroundColor: red["A200"], color: "white" }}
-                  onClick={() => setOpen(true)}
-                >
-                  Make Fix Request
-                </Button>
-              )}
+      {retrevied ? (
+        <div>
+          <Card className={classes.root}>
+            <div className={classes.details}>
+              <CardContent className={classes.content}>
+                <Typography variant="h2">{assignment.name}</Typography>
+                <Typography variant="h6">Description</Typography>
+                <Typography variant="subtitle1" color="textSecondary">
+                  Have a seat, but don’t get too used to having your feet on the
+                  ground. These chairs will soon swing in a peaceful circle
+                  around the stunning 242-foot-tall tower. By the time you get
+                  to the top, you will be careening around the center base at 40
+                  miles per hour!{" "}
+                </Typography>
+                <Typography variant="h6">Location</Typography>
+                <Typography variant="subtitle1" color="textSecondary">
+                  Have a seat, but don’t get too used to having your feet on the
+                </Typography>
+                <Typography variant="h6">Age Restriction</Typography>
+                <Typography variant="subtitle1" color="textSecondary">
+                  Have a seat, but don’t get too used to having your feet on the
+                </Typography>
+                <Typography variant="h6">Height Resctriction</Typography>
+                <Typography variant="subtitle1" color="textSecondary">
+                  Have a seat, but don’t get too used to having your feet on the
+                </Typography>
+                <Typography variant="h6">Status</Typography>
+                <div>
+                  {!assignment.broken && !assignment.rainedout ? (
+                    <Tooltip title="Available">
+                      <EventAvailableIcon fontSize="large" />
+                    </Tooltip>
+                  ) : null}
+                  {assignment.broken ? (
+                    <Tooltip title="Broken">
+                      <BrokenImageIcon fontSize="large" />
+                    </Tooltip>
+                  ) : null}
+                  {assignment.rainedout ? (
+                    <Tooltip title="Rainedout">
+                      <OpacityIcon fontSize="large" />
+                    </Tooltip>
+                  ) : null}
+                </div>
+                <Divider />
+                <div className={classes.buttons}>
+                  {assignment.broken ? (
+                    <Button variant="contained" color="disabled">
+                      Make Fix Request
+                    </Button>
+                  ) : (
+                    <Button
+                      variant="contained"
+                      style={{ backgroundColor: red["A200"], color: "white" }}
+                      onClick={() => setOpen(true)}
+                    >
+                      Make Fix Request
+                    </Button>
+                  )}
 
-              {assignment.rainedout ? (
-                <Button
-                  variant="contained"
-                  style={{ marginLeft: "15px" }}
-                  color="primary"
-                  onClick={() => endRainout()}
-                >
-                  End Rainout
-                </Button>
-              ) : (
-                <Button
-                  variant="contained"
-                  color="primary"
-                  style={{ marginLeft: "15px" }}
-                  onClick={() => declareRainout()}
-                >
-                  Declare Rainout
-                </Button>
-              )}
+                  {assignment.rainedout ? (
+                    <Button
+                      variant="contained"
+                      style={{ marginLeft: "15px" }}
+                      color="primary"
+                      onClick={() => endRainout()}
+                    >
+                      End Rainout
+                    </Button>
+                  ) : (
+                    <Button
+                      variant="contained"
+                      color="primary"
+                      style={{ marginLeft: "15px" }}
+                      onClick={() => declareRainout()}
+                    >
+                      Declare Rainout
+                    </Button>
+                  )}
+                </div>
+              </CardContent>
             </div>
-          </CardContent>
+            <Card>
+              <CardMedia
+                className={classes.cover}
+                image={assignment.picture}
+                title="your assignment"
+              />
+            </Card>
+          </Card>
+          <Dialog
+            open={open}
+            onClose={handleClose}
+            aria-labelledby="form-dialog-title"
+          >
+            <DialogContent>
+              <DialogContentText>
+                Please leave a short description of the problem
+              </DialogContentText>
+              <TextField
+                autoFocus
+                margin="dense"
+                id="name"
+                type="description"
+                fullWidth
+                variant="filled"
+                multiline="true"
+                rows="5"
+                onChange={(event) => setDescription(event.target.value)}
+              />
+            </DialogContent>
+            <DialogActions>
+              <Button onClick={() => fixRequest()} color="primary">
+                Confirm
+              </Button>
+              <Button onClick={handleClose} color="disable">
+                Cancel
+              </Button>
+            </DialogActions>
+          </Dialog>
         </div>
-        <Card>
-          <CardMedia
-            className={classes.cover}
-            image={assignment.picture}
-            title="your assignment"
-          />
-        </Card>
-      </Card>
-      <Dialog
-        open={open}
-        onClose={handleClose}
-        aria-labelledby="form-dialog-title"
-      >
-        <DialogContent>
-          <DialogContentText>
-            Please leave a short description of the problem
-          </DialogContentText>
-          <TextField
-            autoFocus
-            margin="dense"
-            id="name"
-            type="description"
-            fullWidth
-            variant="filled"
-            multiline="true"
-            rows="5"
-            onChange={(event) => setDescription(event.target.value)}
-          />
-        </DialogContent>
-        <DialogActions>
-          <Button onClick={() => fixRequest()} color="primary">
-            Confirm
-          </Button>
-          <Button onClick={handleClose} color="disable">
-            Cancel
-          </Button>
-        </DialogActions>
-      </Dialog>
+      ) : null}
       <Snackbar
         open={openSnack}
         autoHideDuration={2000}
