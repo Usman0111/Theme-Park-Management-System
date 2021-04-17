@@ -29,22 +29,12 @@ const useStyles = makeStyles((theme) => ({
     maxWidth: 150,
     textAlign: "left",
   },
-<<<<<<< HEAD
-
-  show: { display: 'inline-block' },
-  hide: { display: 'none' },
-=======
->>>>>>> master
 }));
 
 function createData(name, calories, fat, carbs, protein) {
   return { name, calories, fat, carbs, protein };
 }
 
-<<<<<<< HEAD
-
-
-=======
 const rows = [
   createData("Gingerbread", 356, 16.0, 49, 3.9),
   createData("Gingerbread", 356, 16.0, 49, 3.9),
@@ -61,319 +51,25 @@ const rows = [
   createData("Gingerbread", 356, 16.0, 49, 3.9),
   createData("Gingerbread", 356, 16.0, 49, 3.9),
 ];
->>>>>>> master
 
 export default function AdminReport() {
   const classes = useStyles();
-  const theme = useTheme();
-  const [personName, setPersonName] = React.useState([]);
-  const [report, setReport] = useState(false);
+  //menu
+  const [reportType, setReportType] = useState("");
+  const [Calculate, setCalculate] = useState("");
+  const [show, setShow] = useState(""); // one or all
+  const [type, setType] = useState(""); //ride or attraction query
+  const [rides, setRides] = useState([]);
+  const [attractions, setAttractions] = useState([]);
 
-<<<<<<< HEAD
-  const [SingleRideAttr, setRideSelection] = React.useState('ride');
-  const [reportType, setReportType] = React.useState('ReportType');
-=======
-  const [type, setType] = React.useState("Ride");
-  const [reportType, setReportType] = React.useState("ReportType");
->>>>>>> master
-
-  const [TimeType, setTimeType] = React.useState("TimeType");
-
-<<<<<<< HEAD
-  const [RideType, setRideType] = React.useState('RideType');
-  const [OneAll, setOneAll] = React.useState('OneAll');
-
-  const [CalType, setCalType] = React.useState('CalType');
-
-  const handleCalChange = (event) => {
-    setCalType(event.target.value);
-  };
-
-  const handleRideSelection = (event) => {
-    setRideSelection(event.target.value);
-  };
-
-  const handleReportTypeChange = (event) => {
-    setReportType(event.target.value);
-=======
-  const [isHideTimeRange, setHideTimeRange] = React.useState("HideTimeRange");
-  const [isHideMonthPick, setHideMonthPick] = React.useState("HideMonthPick");
-
-  const [isHideType, setHideType] = React.useState("HideType");
-
-  const handleReportTypeChange = (event) => {
-    setReportType(event.target.value);
-    switch (event.target.value) {
-      case 1:
-        setHideType(classes.hide);
-        break;
-      case 2:
-        setHideType(classes.show);
-        break;
-      case 3:
-        setHideType(classes.show);
-        break;
-      case 4:
-        setHideType(classes.show);
-        break;
-      default:
-        setHideType(classes.hide);
-    }
->>>>>>> master
-  };
-
-  const handleReportTimeChange = (event) => {
-    setTimeType(event.target.value);
-<<<<<<< HEAD
-
-  };
-
-  const handleRideTypeChange = (event) => {
-    setRideType(event.target.value);
-
-  };
-
-  const handleOneAllChange = (event) => {
-    setOneAll(event.target.value);
-
-=======
-    switch (event.target.value) {
-      case 1:
-        setHideTimeRange(classes.hide);
-        setHideMonthPick(classes.show);
-        break;
-      case 2:
-        setHideTimeRange(classes.show);
-        setHideMonthPick(classes.hide);
-        break;
-      default:
-        setHideTimeRange(classes.hide);
-        setHideMonthPick(classes.show);
-    }
->>>>>>> master
-  };
-
-  const handleChange = (event) => {
-    setPersonName(event.target.value);
-  };
-
-  function showMonthTypeForm() {
-    return (<div>
-
-      <FormControl className={classes.formControl}>
-        <TextField
-          id="month_year"
-          label="Month Year"
-          type="date"
-          dateFormat="mm/yyyy"
-          className={classes.textField}
-
-          InputLabelProps={{
-            shrink: true,
-          }}
-        />
-      </FormControl>
-      <FormControl className={classes.formControl}>
-        <InputLabel>Calculating</InputLabel>
-        <Select value={CalType} defaultValue={1}
-          onChange={handleCalChange}>
-          <MenuItem value={1}>Sum for this Month</MenuItem>
-          <MenuItem value={2}>Average for this Month</MenuItem>
-          <MenuItem value={3}>Maximum for this Month</MenuItem>
-          <MenuItem value={4}>Minimum for this Month</MenuItem>
-        </Select>
-      </FormControl>
-
-
-    </div>);
-  }
-  function showTimeRangeFrom() {
-    return (<div>
-      <FormControl className={classes.formControl}>
-        <TextField
-          id="start_date"
-          label="Start date"
-          type="date"
-          className={classes.textField}
-          InputLabelProps={{
-            shrink: true,
-          }}
-        />
-      </FormControl>
-      <FormControl className={classes.formControl}>
-        <TextField
-          id="end_date"
-          label="End date"
-          type="date"
-          className={classes.textField}
-          InputLabelProps={{
-            shrink: true,
-          }}
-        />
-      </FormControl>
-    </div>);
-  }
-  function showRideAttacMonthly() {
-    return (<div>
-      <FormControl className={classes.formControl}>
-        <InputLabel>Type</InputLabel>
-        <Select value={RideType} defaultValue={1}
-          onChange={handleRideTypeChange}>
-          <MenuItem value={1}>Ride</MenuItem>
-          <MenuItem value={2}>Attraction</MenuItem>
-        </Select>
-      </FormControl>
-      <FormControl className={classes.formControl}>
-        <InputLabel>One or All</InputLabel>
-        <Select value={OneAll} defaultValue={1}
-          onChange={handleOneAllChange}>
-          <MenuItem value={1}>One</MenuItem>
-          <MenuItem value={2}>All</MenuItem>
-        </Select>
-      </FormControl>
-      {/*       <FormControl component="fieldset">
-        <FormLabel component="legend">Ride or Attraction</FormLabel>
-        <RadioGroup aria-label="type" name="type" value={type} onChange={handleChange}>
-          <FormControlLabel value="ride" control={<Radio />} label="Ride" />
-          <FormControlLabel value="attraction" control={<Radio />} label="Attraction" />
-        </RadioGroup>
-      </FormControl>
-
-      <FormControl component="fieldset">
-        <FormLabel component="legend">One or More</FormLabel>
-        <RadioGroup aria-label="type" name="type" value={type} onChange={handleChange}>
-          <FormControlLabel value="one" control={<Radio />} label="one" />
-          <FormControlLabel value="more" control={<Radio />} label="more" />
-        </RadioGroup>
-      </FormControl>
- */}
-
-      {(function () {
-        return showMonthTypeForm();
-      }
-      )()}
-
-
-      {(function () {
-        if (OneAll == 1) {
-          return (
-            <FormControl className={classes.formControl}>
-              <InputLabel>Select Ride or Attraction</InputLabel>
-              <Select value={SingleRideAttr} defaultValue={1}
-                onChange={handleRideSelection}>
-                <MenuItem value={1}>Ride 1</MenuItem>
-                <MenuItem value={2}>Ride 2</MenuItem>
-              </Select>
-            </FormControl>
-          )
-        }
-      }
-      )()}
-
-    </div>);
-  }
-  function showRideAttacTimeRange() {
-    return (<div>
-      <FormControl className={classes.formControl}>
-        <InputLabel>Type</InputLabel>
-        <Select value={RideType} defaultValue={1}
-          onChange={handleRideTypeChange}>
-          <MenuItem value={1}>Ride</MenuItem>
-          <MenuItem value={2}>Attraction</MenuItem>
-        </Select>
-      </FormControl>
-      <FormControl className={classes.formControl}>
-        <InputLabel>One or All</InputLabel>
-        <Select value={OneAll} defaultValue={1}
-          onChange={handleOneAllChange}>
-          <MenuItem value={1}>One</MenuItem>
-          <MenuItem value={2}>All</MenuItem>
-        </Select>
-      </FormControl>
-
-      {(function () {
-        return showTimeRangeFrom();
-      }
-      )()}
-
-      {(function () {
-        if (OneAll == 1) {
-          return (
-            <FormControl className={classes.formControl}>
-              <InputLabel>Select Ride or Attraction</InputLabel>
-              <Select value={SingleRideAttr} defaultValue={1}
-                onChange={handleRideTypeChange}>
-                <MenuItem value={1}>Ride 1</MenuItem>
-                <MenuItem value={2}>Ride 2</MenuItem>
-              </Select>
-            </FormControl>
-          )
-        }
-      }
-      )()}
-    </div>);
-  }
+  //report
 
   return (
-<<<<<<< HEAD
-    <div>
-      <FormControl className={classes.formControl}>
-        <InputLabel>Report Type</InputLabel>
-        <Select value={reportType}
-          onChange={handleReportTypeChange}>
-          <MenuItem value={1}>Visits</MenuItem>
-          <MenuItem value={2}>Usage</MenuItem>
-          <MenuItem value={3}>Breakdowns</MenuItem>
-          <MenuItem value={4}>Rainouts</MenuItem>
-        </Select>
-      </FormControl>
-
-      <FormControl className={classes.formControl}>
-        <InputLabel>Range</InputLabel>
-        <Select value={TimeType} defaultValue={1}
-          onChange={handleReportTimeChange}>
-          <MenuItem value={1}>Monthly</MenuItem>
-          <MenuItem value={2}>Pick Date</MenuItem>
-        </Select>
-      </FormControl>
-
-      {(function () {
-        if (reportType == 1 && TimeType == 1) {
-          return showMonthTypeForm();
-        }
-        else if (reportType == 1 && TimeType == 2) {
-          return showTimeRangeFrom();
-        }
-        else if (reportType == 2 && TimeType == 1) {
-          return showRideAttacMonthly();
-        }
-        else if (reportType == 2 && TimeType == 2) {
-          return showRideAttacTimeRange();
-        }
-        else if (reportType == 3 && TimeType == 1) {
-          return showRideAttacMonthly();
-        }
-        else if (reportType == 3 && TimeType == 2) {
-          return showRideAttacTimeRange();
-        }
-        else if (reportType == 4 && TimeType == 1) {
-          return showRideAttacMonthly();
-        }
-        else {
-          return showRideAttacTimeRange();
-        }
-      })()}
-=======
     <div className={classes.root}>
       <Grid container spacing={1}>
         <Grid item xs={12}>
           <div>
-            <Button
-              color="primary"
-              variant="contained"
-              size="medium"
-              onClick={() => setReport(true)}
-            >
+            <Button color="primary" variant="contained" size="medium">
               Generate Report
             </Button>
             {/* <Button
@@ -390,11 +86,14 @@ export default function AdminReport() {
           <Paper className={classes.paper}>
             <FormControl className={classes.formControl}>
               <InputLabel>Report Type</InputLabel>
-              <Select value={reportType} onChange={handleReportTypeChange}>
-                <MenuItem value={1}>Visits</MenuItem>
-                <MenuItem value={2}>Usage</MenuItem>
-                <MenuItem value={3}>Breakdowns</MenuItem>
-                <MenuItem value={4}>Rainouts</MenuItem>
+              <Select
+                value={reportType}
+                onChange={(event) => setReportType(event.target.value)}
+              >
+                <MenuItem value={"visits"}>Visits</MenuItem>
+                <MenuItem value={"usage"}>Usage</MenuItem>
+                <MenuItem value={"breakdowns"}>Breakdowns</MenuItem>
+                <MenuItem value={"rainouts"}>Rainouts</MenuItem>
               </Select>
             </FormControl>
             <FormControl className={classes.formControl}>
@@ -425,42 +124,46 @@ export default function AdminReport() {
             <FormControl className={classes.formControl}>
               <InputLabel>Calculate</InputLabel>
               <Select
-                value={TimeType}
+                value={Calculate}
                 defaultValue={1}
-                onChange={handleReportTimeChange}
+                onChange={(event) => setCalculate(event.target.value)}
               >
-                <MenuItem value={1}>Daily Total</MenuItem>
-                <MenuItem value={2}>Monthly Total</MenuItem>
-                <MenuItem value={3}>Daily Average by Month</MenuItem>
-                <MenuItem value={4}>Daily Maximum by Month</MenuItem>
-                <MenuItem value={5}>Daily Minimum by Month</MenuItem>
+                <MenuItem value={"daily total"}>Daily Total</MenuItem>
+                <MenuItem value={"monthly total"}>Monthly Total</MenuItem>
+                <MenuItem value={"daily average by month"}>
+                  Daily Average by Month
+                </MenuItem>
+                <MenuItem value={"daily maximum by month"}>
+                  Daily Maximum by Month
+                </MenuItem>
+                <MenuItem value={"daily minimum by month"}>
+                  Daily Minimum by Month
+                </MenuItem>
               </Select>
             </FormControl>
 
             <FormControl className={classes.formControl}>
               <InputLabel>Show</InputLabel>
               <Select
-                value={TimeType}
-                defaultValue={1}
-                onChange={handleReportTimeChange}
+                value={show}
+                onChange={(event) => setShow(event.target.value)}
               >
-                <MenuItem value={1}>One</MenuItem>
-                <MenuItem value={2}>All</MenuItem>
+                <MenuItem value={"one"}>One</MenuItem>
+                <MenuItem value={"all"}>All</MenuItem>
               </Select>
             </FormControl>
 
             <FormControl className={classes.formControl}>
               <InputLabel>Type</InputLabel>
               <Select
-                value={TimeType}
-                defaultValue={1}
-                onChange={handleReportTimeChange}
+                value={type}
+                onChange={(event) => setType(event.target.value)}
               >
-                <MenuItem value={1}>Ride</MenuItem>
-                <MenuItem value={2}>Attraction</MenuItem>
+                <MenuItem value={"ride"}>Ride</MenuItem>
+                <MenuItem value={"attraction"}>Attraction</MenuItem>
               </Select>
             </FormControl>
-            <FormControl className={classes.formControl}>
+            {/* <FormControl className={classes.formControl}>
               <InputLabel>Name</InputLabel>
               <Select
                 value={TimeType}
@@ -470,7 +173,7 @@ export default function AdminReport() {
                 <MenuItem value={1}>Roler Coaster</MenuItem>
                 <MenuItem value={2}>Water Ride</MenuItem>
               </Select>
-            </FormControl>
+            </FormControl> */}
           </Paper>
         </Grid>
 
@@ -512,8 +215,6 @@ export default function AdminReport() {
           </Paper>
         </Grid>
       </Grid>
->>>>>>> master
     </div>
-
   );
 }
