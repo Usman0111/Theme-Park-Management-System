@@ -31,6 +31,7 @@ import FormControl from "@material-ui/core/FormControl";
 import Select from "@material-ui/core/Select";
 import ArchiveIcon from "@material-ui/icons/Archive";
 import UnarchiveIcon from "@material-ui/icons/Unarchive";
+import AddCircleIcon from "@material-ui/icons/AddCircle";
 
 function Alert(props) {
   return <MuiAlert elevation={6} variant="filled" {...props} />;
@@ -167,7 +168,27 @@ export default function ManagerRides() {
       .catch((err) => console.log(err));
   };
 
-  const setArchive = () => {};
+  const setArchive = (config) => {
+    axios
+      .put("manager/ride-archive", config)
+      .then((res) => {
+        setRides(
+          rides.map((ride) =>
+            ride.ride_id === config.ride_id
+              ? { ...ride, archived: config.archive }
+              : ride
+          )
+        );
+        if (config.archive) {
+          setSnackMsg("Ride successfully archived!");
+          setOpenSnack(true);
+        } else {
+          setSnackMsg("Ride successfully unarchived!");
+          setOpenSnack(true);
+        }
+      })
+      .catch((err) => console.log(err));
+  };
 
   useEffect(() => {
     axios
@@ -178,9 +199,21 @@ export default function ManagerRides() {
       .catch((err) => console.log(err));
   }, []);
 
+  console.log(rides);
+
   return (
     <Container className={classes.cardGrid}>
       <CssBaseline />
+      <Link to={`${url}/add-ride`} style={{ textDecoration: "none" }}>
+        <Button
+          variant="contained"
+          color="primary"
+          style={{ paddingLeft: 13, marginBottom: 10 }}
+        >
+          <AddCircleIcon style={{ marginRight: 5 }} />
+          Add New
+        </Button>
+      </Link>
       <Grid container spacing={4}>
         {rides.map((ride) => (
           <Grid item key={ride.ride_id} md={3}>
@@ -236,9 +269,9 @@ export default function ManagerRides() {
                   <Button
                     title="Unarchive"
                     variant="contained"
-                    // onClick={() =>
-                    //   setArchive({ ride_id: ride.ride_id, archive: false })
-                    // }
+                    onClick={() =>
+                      setArchive({ ride_id: ride.ride_id, archive: false })
+                    }
                   >
                     <UnarchiveIcon />
                   </Button>
@@ -246,9 +279,9 @@ export default function ManagerRides() {
                   <Button
                     title="Archive"
                     variant="contained"
-                    // onClick={() =>
-                    //   setArchive({ ride_id: ride.ride_id, archive: true })
-                    // }
+                    onClick={() =>
+                      setArchive({ ride_id: ride.ride_id, archive: true })
+                    }
                   >
                     <ArchiveIcon />
                   </Button>
