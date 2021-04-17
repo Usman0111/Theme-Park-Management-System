@@ -218,7 +218,14 @@ export default function ManagerRides() {
         {rides.map((ride) => (
           <Grid item key={ride.ride_id} md={3}>
             <Card className={classes.card}>
-              <CardMedia className={classes.cardMedia} image={ride.picture} />
+              <CardMedia
+                className={classes.cardMedia}
+                image={
+                  ride.picture
+                    ? ride.picture
+                    : "http://100.26.17.215:5000/default-coverImage.png"
+                }
+              />
               <CardContent className={classes.cardContent}>
                 <Typography variant="h5">
                   {ride.name}

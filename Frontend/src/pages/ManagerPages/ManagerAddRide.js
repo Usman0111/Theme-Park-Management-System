@@ -18,6 +18,7 @@ import DialogActions from "@material-ui/core/DialogActions";
 import DialogContent from "@material-ui/core/DialogContent";
 import CircularProgress from "@material-ui/core/CircularProgress";
 import DialogTitle from "@material-ui/core/DialogTitle";
+import { useHistory } from "react-router-dom";
 
 const useStyles = makeStyles({
   input: {
@@ -37,31 +38,44 @@ const useStyles = makeStyles({
 
 export default function ManagerAddRide() {
   const classes = useStyles();
-  const [editRide, setEditRide] = useState({});
+  let history = useHistory();
+  const [editRide, setEditRide] = useState({
+    name: "",
+    description: "",
+    location: "",
+    age_restriction: 0,
+    height_restriction: 0,
+    height_restriction_feet: 0,
+    height_restriction_inches: 0,
+    picture: "",
+  });
   const [openModal, setOpenModal] = useState(false);
-  const [editPicture, setEditPicture] = useState({});
+  const [editPicture, setEditPicture] = useState(null);
   const [loading, setLoading] = useState(false);
 
   const handleCloseModal = () => {
     setOpenModal(false);
   };
 
-  const confrimEdit = () => {
+  const confirmCreate = () => {
+    const sumHeight =
+      editRide.height_restriction_feet * 12 +
+      editRide.height_restriction_inches;
     const newRide = {
-      ride_id: editRide.ride_id,
       name: editRide.name,
       description: editRide.description,
       location: editRide.location,
-      age_restriction: editRide.age_restriction,
-      height_restriction:
-        editRide.height_restriction_feet * 12 +
-        editRide.height_restriction_inches,
+      age_restriction:
+        editRide.age_restriction > 0 ? editRide.age_restriction : null,
+      height_restriction: sumHeight > 0 ? sumHeight : null,
       picture: editRide.picture,
     };
-
     axios
-      .put("manager/ride-edit", newRide)
-      .then((res) => {})
+      .post("manager/ride-create", newRide)
+      .then((res) => {
+        console.log(res.data);
+        history.push(`/dashboard/rides/info-ride/${res.data.ride_id}`);
+      })
       .catch((err) => console.log(err));
   };
   const uploadPicture = async () => {
@@ -196,18 +210,16 @@ export default function ManagerAddRide() {
                     size="small"
                     color="primary"
                     variant="contained"
-                    onClick={() => confrimEdit()}
+                    onClick={() => confirmCreate()}
                   >
                     Confirm
                   </Button>
+
                   <Button
                     size="small"
                     color="disable"
                     variant="contained"
-                    onClick={() => {
-                      setLoading(false);
-                      setEditRide({});
-                    }}
+                    onClick={() => history.push(`/dashboard/rides`)}
                   >
                     Cancel
                   </Button>
@@ -216,7 +228,7 @@ export default function ManagerAddRide() {
             </Card>
           </Grid>
           <Grid item xs={6}>
-            {!editPicture.picture ? (
+            {editRide.picture === "" ? (
               <Card square className={classes.cover}>
                 <CardMedia
                   style={{ height: "100%" }}
@@ -259,7 +271,7 @@ export default function ManagerAddRide() {
       <Dialog open={openModal} onClose={handleCloseModal}>
         <DialogContent>
           <Grid justify="center">
-            {true ? (
+            {loading ? (
               <CircularProgress />
             ) : (
               <div>
@@ -267,7 +279,7 @@ export default function ManagerAddRide() {
                   Select Picture
                 </Typography>
                 <div style={{ marginBottom: 20 }}>
-                  {editPicture ? editPicture.picture.name : null}
+                  {editPicture !== null ? editPicture.picture.name : null}
                 </div>
                 <Button
                   variant="outlined"
