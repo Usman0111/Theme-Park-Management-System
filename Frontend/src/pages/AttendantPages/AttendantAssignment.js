@@ -36,6 +36,7 @@ const useStyles = makeStyles((theme) => ({
   },
   content: {
     flex: "1 0 auto",
+  
   },
   cover: {
     width: 600,
@@ -54,7 +55,10 @@ export default function AttendantAssignment() {
   const [open, setOpen] = useState(false);
   const [description, setDescription] = useState("");
   const [snackMsg, setSnackMsg] = useState("");
-  const [retrevied, setRetreived] = useState(true);
+  const [retrevied, setRetreived] = useState(false);
+  const [isRide, setIsRide] = useState(false);
+  const [ageRestriction, setAgeRestriction] = useState("");
+
 
   const handleClickOpen = () => {
     setOpen(true);
@@ -86,8 +90,15 @@ export default function AttendantAssignment() {
       })
       .then((res) => {
         console.log(res.data);
-        setAssignment(res.data.assignment);
-        setType(res.data.type);
+        if(res.data != null){
+          setRetreived(true)
+          setAssignment(res.data.assignment);
+          setType(res.data.type);
+          if(res.data.type === "ride"){
+            setIsRide(true);
+          }
+        }
+        
       })
       .catch((err) => console.log(err));
   }, []);
@@ -143,7 +154,7 @@ export default function AttendantAssignment() {
 
   return (
     <div>
-      {retrevied ? (
+      {retrevied === true ? (
         <div>
           <Card className={classes.root}>
             <div className={classes.details}>
@@ -151,24 +162,28 @@ export default function AttendantAssignment() {
                 <Typography variant="h2">{assignment.name}</Typography>
                 <Typography variant="h6">Description</Typography>
                 <Typography variant="subtitle1" color="textSecondary">
-                  Have a seat, but don’t get too used to having your feet on the
-                  ground. These chairs will soon swing in a peaceful circle
-                  around the stunning 242-foot-tall tower. By the time you get
-                  to the top, you will be careening around the center base at 40
-                  miles per hour!{" "}
+                  {assignment.description}
                 </Typography>
                 <Typography variant="h6">Location</Typography>
                 <Typography variant="subtitle1" color="textSecondary">
-                  Have a seat, but don’t get too used to having your feet on the
+                  {assignment.location} 
                 </Typography>
                 <Typography variant="h6">Age Restriction</Typography>
                 <Typography variant="subtitle1" color="textSecondary">
-                  Have a seat, but don’t get too used to having your feet on the
+                  {assignment.age_restriction ? assignment.age_restriction: "None" }
                 </Typography>
-                <Typography variant="h6">Height Resctriction</Typography>
+                {isRide ? 
+                  <div>
+                    <Typography variant="h6">Height Resctriction</Typography>
                 <Typography variant="subtitle1" color="textSecondary">
-                  Have a seat, but don’t get too used to having your feet on the
+                {assignment.height_restriction
+                        ? `${Math.floor(assignment.height_restriction / 12)}' ${
+                            assignment.height_restriction % 12
+                          }'' `
+                        : "None"}
                 </Typography>
+                  </div>: null}
+                
                 <Typography variant="h6">Status</Typography>
                 <div>
                   {!assignment.broken && !assignment.rainedout ? (
@@ -189,7 +204,8 @@ export default function AttendantAssignment() {
                 </div>
                 <Divider />
                 <div className={classes.buttons}>
-                  {assignment.broken ? (
+                {isRide ? 
+                  assignment.broken ? (
                     <Button variant="contained" color="disabled">
                       Make Fix Request
                     </Button>
@@ -201,8 +217,10 @@ export default function AttendantAssignment() {
                     >
                       Make Fix Request
                     </Button>
-                  )}
-
+                  )
+                : null}
+                
+                
                   {assignment.rainedout ? (
                     <Button
                       variant="contained"
