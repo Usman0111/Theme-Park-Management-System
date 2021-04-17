@@ -35,13 +35,13 @@ const useStyles = makeStyles({
   },
 });
 
-export default function ManagerAddRide() {
+export default function ManagerAddAttraction() {
   const classes = useStyles();
   const { id } = useParams();
 
-  const [ride, setRide] = useState({});
+  const [Attraction, setAttraction] = useState({});
   const [editBool, setEditBool] = useState(false);
-  const [editRide, setEditRide] = useState({});
+  const [editAttraction, setEditAttraction] = useState({});
   const [openModal, setOpenModal] = useState(false);
   const [editPicture, setEditPicture] = useState(null);
   const [loading, setLoading] = useState(false);
@@ -52,31 +52,31 @@ export default function ManagerAddRide() {
 
   const openEdit = () => {
     const split = {
-      ...ride,
-      height_restriction_feet: Math.floor(ride.height_restriction / 12),
-      height_restriction_inches: ride.height_restriction % 12,
+      ...Attraction,
+      height_restriction_feet: Math.floor(Attraction.height_restriction / 12),
+      height_restriction_inches: Attraction.height_restriction % 12,
     };
-    setEditRide(split);
+    setEditAttraction(split);
     setEditBool(true);
   };
 
   const confrimEdit = () => {
-    const newRide = {
-      ride_id: editRide.ride_id,
-      name: editRide.name,
-      description: editRide.description,
-      location: editRide.location,
-      age_restriction: editRide.age_restriction,
+    const newAttraction = {
+      Attraction_id: editAttraction.Attraction_id,
+      name: editAttraction.name,
+      description: editAttraction.description,
+      location: editAttraction.location,
+      age_restriction: editAttraction.age_restriction,
       height_restriction:
-        editRide.height_restriction_feet * 12 +
-        editRide.height_restriction_inches,
-      picture: editRide.picture,
+        editAttraction.height_restriction_feet * 12 +
+        editAttraction.height_restriction_inches,
+      picture: editAttraction.picture,
     };
 
     axios
-      .put("manager/ride-edit", newRide)
+      .put("manager/Attraction-edit", newAttraction)
       .then((res) => {
-        setRide(newRide);
+        setAttraction(newAttraction);
         setEditBool(false);
       })
       .catch((err) => console.log(err));
@@ -90,8 +90,8 @@ export default function ManagerAddRide() {
         .post("manager/upload-image", formData)
         .then((res) => {
           const name = res.data.path.split("/")[1];
-          setEditRide({
-            ...editRide,
+          setEditAttraction({
+            ...editAttraction,
             picture: `http://100.26.17.215:5000/${name}`,
           });
           setLoading(false);
@@ -103,9 +103,11 @@ export default function ManagerAddRide() {
 
   useEffect(() => {
     axios
-      .get("ride/all")
+      .get("Attraction/all")
       .then((res) => {
-        setRide(res.data.find((ride) => ride.ride_id === Number(id)));
+        setAttraction(
+          res.data.find((Attraction) => Attraction.Attraction_id === Number(id))
+        );
       })
       .catch((err) => console.log(err));
   }, []);
@@ -123,22 +125,22 @@ export default function ManagerAddRide() {
                       <strong>Name</strong>
                     </Typography>
                     <Typography variant="subtitle1" gutterBottom>
-                      {ride.name}
+                      {Attraction.name}
                     </Typography>
                     <Typography variant="h6" gutterBottom>
                       <strong>Location</strong>
                     </Typography>
                     <Typography variant="subtitle1" gutterBottom>
-                      {ride.location}
+                      {Attraction.location}
                     </Typography>
 
                     <Typography variant="h6" gutterBottom>
                       <strong>Height Restriction</strong>
                     </Typography>
                     <Typography variant="subtitle1" gutterBottom>
-                      {ride.height_restriction
-                        ? `${Math.floor(ride.height_restriction / 12)}' ${
-                            ride.height_restriction % 12
+                      {Attraction.height_restriction
+                        ? `${Math.floor(Attraction.height_restriction / 12)}' ${
+                            Attraction.height_restriction % 12
                           }'' `
                         : "None"}
                     </Typography>
@@ -147,13 +149,15 @@ export default function ManagerAddRide() {
                       <strong>Age Restriction</strong>
                     </Typography>
                     <Typography variant="subtitle1" gutterBottom>
-                      {ride.age_restriction ? ride.age_restriction : "None"}
+                      {Attraction.age_restriction
+                        ? Attraction.age_restriction
+                        : "None"}
                     </Typography>
                     <Typography variant="h6" gutterBottom>
                       <strong>Description</strong>
                     </Typography>
                     <Typography variant="subtitle1" gutterBottom>
-                      {ride.description}
+                      {Attraction.description}
                     </Typography>
                   </div>
                   <CardActions>
@@ -173,13 +177,16 @@ export default function ManagerAddRide() {
                   <TextField
                     className={classes.textField}
                     required
-                    label="Ride Name"
+                    label="Attraction Name"
                     id="name"
                     variant="outlined"
                     fullWidth
-                    value={editRide.name}
+                    value={editAttraction.name}
                     onChange={(event) =>
-                      setEditRide({ ...editRide, name: event.target.value })
+                      setEditAttraction({
+                        ...editAttraction,
+                        name: event.target.value,
+                      })
                     }
                   />
                   <TextField
@@ -189,9 +196,12 @@ export default function ManagerAddRide() {
                     id="location"
                     variant="outlined"
                     fullWidth
-                    value={editRide.location}
+                    value={editAttraction.location}
                     onChange={(event) =>
-                      setEditRide({ ...editRide, location: event.target.value })
+                      setEditAttraction({
+                        ...editAttraction,
+                        location: event.target.value,
+                      })
                     }
                   />
 
@@ -203,10 +213,10 @@ export default function ManagerAddRide() {
                     type="number"
                     variant="outlined"
                     fullWidth
-                    value={editRide.age_restriction}
+                    value={editAttraction.age_restriction}
                     onChange={(event) =>
-                      setEditRide({
-                        ...editRide,
+                      setEditAttraction({
+                        ...editAttraction,
                         age_restriction:
                           event.target.value < 0
                             ? (event.target.value = 0)
@@ -222,10 +232,10 @@ export default function ManagerAddRide() {
                     type="number"
                     variant="outlined"
                     fullWidth
-                    value={editRide.height_restriction_feet}
+                    value={editAttraction.height_restriction_feet}
                     onChange={(event) =>
-                      setEditRide({
-                        ...editRide,
+                      setEditAttraction({
+                        ...editAttraction,
                         height_restriction_feet:
                           event.target.value < 0
                             ? (event.target.value = 0)
@@ -241,10 +251,10 @@ export default function ManagerAddRide() {
                     type="number"
                     variant="outlined"
                     fullWidth
-                    value={editRide.height_restriction_inches}
+                    value={editAttraction.height_restriction_inches}
                     onChange={(event) =>
-                      setEditRide({
-                        ...editRide,
+                      setEditAttraction({
+                        ...editAttraction,
                         height_restriction_inches:
                           event.target.value < 0
                             ? (event.target.value = 0)
@@ -262,10 +272,10 @@ export default function ManagerAddRide() {
                     fullWidth
                     rows={5}
                     required
-                    value={editRide.description}
+                    value={editAttraction.description}
                     onChange={(event) =>
-                      setEditRide({
-                        ...editRide,
+                      setEditAttraction({
+                        ...editAttraction,
                         description: event.target.value,
                       })
                     }
@@ -285,7 +295,7 @@ export default function ManagerAddRide() {
                       variant="contained"
                       onClick={() => {
                         setLoading(false);
-                        setEditRide({});
+                        setEditAttraction({});
                         setEditBool(false);
                       }}
                     >
@@ -301,7 +311,7 @@ export default function ManagerAddRide() {
               <Card square className={classes.cover}>
                 <CardMedia
                   style={{ height: "100%" }}
-                  image={ride.picture}
+                  image={Attraction.picture}
                   title="your assignment"
                 />
               </Card>
@@ -309,7 +319,7 @@ export default function ManagerAddRide() {
               <Card square className={classes.cover}>
                 <CardMedia
                   style={{ height: "100%" }}
-                  image={editRide.picture}
+                  image={editAttraction.picture}
                   title="your assignment"
                 >
                   <IconButton aria-label="upload picture" component="span">
