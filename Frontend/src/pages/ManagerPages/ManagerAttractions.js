@@ -63,13 +63,13 @@ const useStyles = makeStyles((theme) => ({
   },
 }));
 
-export default function ManagerRides() {
+export default function ManagerAttractions() {
   const classes = useStyles();
   let { url, path } = useRouteMatch();
-  const [rides, setRides] = useState([]);
+  const [Attractions, setAttractions] = useState([]);
   const [unassinged, setUnassinged] = useState([]);
   const [attendant, setAttendant] = useState({});
-  const [ridePicked, setRidePicked] = useState({});
+  const [attractionPicked, setattractionPicked] = useState({});
   const [openSnack, setOpenSnack] = useState(false);
   const [snackMsg, setSnackMsg] = useState("");
 
@@ -89,17 +89,17 @@ export default function ManagerRides() {
 
   const [open, setOpen] = React.useState(false);
 
-  const handleClickOpen = async (ride) => {
-    setRidePicked(ride);
+  const handleClickOpen = async (attraction) => {
+    setattractionPicked(attraction);
     const unassingedAttendants = await axios
       .get("manager/unassinged-attendants")
       .then((res) => res.data)
       .catch((err) => console.log(err));
     setUnassinged(unassingedAttendants);
 
-    if (ride.attendant_id) {
+    if (attraction.attendant_id) {
       const currentAttendant = await axios
-        .post("manager/get-one-attendant", { attendant_id: ride.attendant_id })
+        .post("manager/get-one-attendant", { attendant_id: attraction.attendant_id })
         .then((res) => res.data)
         .catch((err) => console.log(err));
       setAttendant(currentAttendant);
@@ -115,21 +115,21 @@ export default function ManagerRides() {
 
   const assign = () => {
     if (
-      ridePicked.attendant_id !== attendant.account_id &&
+      attractionPicked.attendant_id !== attendant.account_id &&
       attendant.account_id != null
     ) {
       axios
         .post("manager/new-assignment", {
-          assignment_type: "ride",
+          assignment_type: "attraction",
           attendant_id: attendant.account_id,
-          ride_id: ridePicked.ride_id,
+          attraction_id: attractionPicked.attraction_id,
         })
         .then((res) => {
           console.log(res.data);
-          const newRide = res.data;
-          setRides(
-            rides.map((ride) =>
-              ride.ride_id === newRide.ride_id ? newRide : ride
+          const newattraction = res.data;
+          setAttractions(
+            Attractions.map((attraction) =>
+              attraction.attraction_id === newattraction.attraction_id ? newattraction : attraction
             )
           );
           setSnackMsg("Attendant successfully assigned!");
@@ -140,26 +140,26 @@ export default function ManagerRides() {
     handleClose();
   };
 
-  const unassgin = (ride) => {
+  const unassgin = (attraction) => {
     console.log({
-      assignment_type: "ride",
-      attendant_id: ride.attendant_id,
-      ride_id: ride.ride_id,
+      assignment_type: "attraction",
+      attendant_id: attraction.attendant_id,
+      attraction_id: attraction.attraction_id,
     });
     axios
       .delete("manager/remove-assignment", {
         data: {
-          assignment_type: "ride",
-          attendant_id: ride.attendant_id,
-          ride_id: ride.ride_id,
+          assignment_type: "attraction",
+          attendant_id: attraction.attendant_id,
+          attraction_id: attraction.attraction_id,
         },
       })
       .then((res) => {
         console.log(res.data);
-        const newRide = res.data;
-        setRides(
-          rides.map((ride) =>
-            ride.ride_id === newRide.ride_id ? newRide : ride
+        const newattraction = res.data;
+        setAttractions(
+          Attractions.map((attraction) =>
+            attraction.attraction_id === newattraction.attraction_id ? newattraction : attraction
           )
         );
         setSnackMsg("Attendant successfully removed!");
@@ -170,20 +170,20 @@ export default function ManagerRides() {
 
   const setArchive = (config) => {
     axios
-      .put("manager/ride-archive", config)
+      .put("manager/attraction-archive", config)
       .then((res) => {
-        setRides(
-          rides.map((ride) =>
-            ride.ride_id === config.ride_id
-              ? { ...ride, archived: config.archive }
-              : ride
+        setAttractions(
+          Attractions.map((attraction) =>
+            attraction.attraction_id === config.attraction_id
+              ? { ...attraction, archived: config.archive }
+              : attraction
           )
         );
         if (config.archive) {
-          setSnackMsg("Ride successfully archived!");
+          setSnackMsg("attraction successfully archived!");
           setOpenSnack(true);
         } else {
-          setSnackMsg("Ride successfully unarchived!");
+          setSnackMsg("attraction successfully unarchived!");
           setOpenSnack(true);
         }
       })
@@ -192,19 +192,19 @@ export default function ManagerRides() {
 
   useEffect(() => {
     axios
-      .get("ride/all")
+      .get("attraction/all")
       .then((res) => {
-        setRides(res.data);
+        setAttractions(res.data);
       })
       .catch((err) => console.log(err));
   }, []);
 
-  console.log(rides);
+  console.log(Attractions);
 
   return (
     <Container className={classes.cardGrid}>
       <CssBaseline />
-      <Link to={`${url}/add-ride`} style={{ textDecoration: "none" }}>
+      <Link to={`${url}/add-attraction`} style={{ textDecoration: "none" }}>
         <Button
           variant="contained"
           color="primary"
@@ -215,19 +215,19 @@ export default function ManagerRides() {
         </Button>
       </Link>
       <Grid container spacing={4}>
-        {rides.map((ride) => (
-          <Grid item key={ride.ride_id} md={3}>
+        {Attractions.map((attraction) => (
+          <Grid item key={attraction.attraction_id} md={3}>
             <Card className={classes.card}>
-              <CardMedia className={classes.cardMedia} image={ride.picture} />
+              <CardMedia className={classes.cardMedia} image={attraction.picture} />
               <CardContent className={classes.cardContent}>
                 <Typography variant="h5">
-                  {ride.name}
-                  {ride.broken ? (
+                  {attraction.name}
+                  {attraction.broken ? (
                     <Tooltip title="broken">
                       <BrokenImageIcon color="disabled" />
                     </Tooltip>
                   ) : null}
-                  {ride.rainedout ? (
+                  {attraction.rainedout ? (
                     <Tooltip title="rained out">
                       <OpacityIcon color="disabled" />
                     </Tooltip>
@@ -235,13 +235,13 @@ export default function ManagerRides() {
                 </Typography>
               </CardContent>
               <CardActions className={classes.buttons}>
-                {ride.attendant_id ? (
+                {attraction.attendant_id ? (
                   <div>
                     <Button
                       color="primary"
                       variant="contained"
-                      onClick={() => unassgin(ride)}
-                      title={`Assigned to ${ride.first_name} ${ride.last_name}`}
+                      onClick={() => unassgin(attraction)}
+                      title={`Assigned to ${attraction.first_name} ${attraction.last_name}`}
                     >
                       Unassign
                     </Button>
@@ -250,14 +250,14 @@ export default function ManagerRides() {
                   <Button
                     color="primary"
                     variant="contained"
-                    onClick={() => handleClickOpen(ride)}
+                    onClick={() => handleClickOpen(attraction)}
                   >
                     Assign
                   </Button>
                 )}
 
                 <Link
-                  to={`${url}/info-ride/${ride.ride_id}`}
+                  to={`${url}/info-attraction/${attraction.attraction_id}`}
                   style={{ textDecoration: "none" }}
                 >
                   <Button variant="contained" style={{ paddingLeft: 13 }}>
@@ -265,12 +265,12 @@ export default function ManagerRides() {
                   </Button>
                 </Link>
 
-                {ride.archived ? (
+                {attraction.archived ? (
                   <Button
                     title="Unarchive"
                     variant="contained"
                     onClick={() =>
-                      setArchive({ ride_id: ride.ride_id, archive: false })
+                      setArchive({ attraction_id: attraction.attraction_id, archive: false })
                     }
                   >
                     <UnarchiveIcon />
@@ -280,7 +280,7 @@ export default function ManagerRides() {
                     title="Archive"
                     variant="contained"
                     onClick={() =>
-                      setArchive({ ride_id: ride.ride_id, archive: true })
+                      setArchive({ attraction_id: attraction.attraction_id, archive: true })
                     }
                   >
                     <ArchiveIcon />
