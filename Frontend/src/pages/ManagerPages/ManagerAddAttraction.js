@@ -44,9 +44,6 @@ export default function ManagerAddattraction() {
     description: "",
     location: "",
     age_restriction: 0,
-    height_restriction: 0,
-    height_restriction_feet: 0,
-    height_restriction_inches: 0,
     picture: "",
   });
   const [openModal, setOpenModal] = useState(false);
@@ -58,9 +55,6 @@ export default function ManagerAddattraction() {
   };
 
   const confirmCreate = () => {
-    const sumHeight =
-      editattraction.height_restriction_feet * 12 +
-      editattraction.height_restriction_inches;
     const newattraction = {
       name: editattraction.name,
       description: editattraction.description,
@@ -69,7 +63,6 @@ export default function ManagerAddattraction() {
         editattraction.age_restriction > 0
           ? editattraction.age_restriction
           : null,
-      height_restriction: sumHeight > 0 ? sumHeight : null,
       picture: editattraction.picture,
     };
     axios
@@ -153,44 +146,6 @@ export default function ManagerAddattraction() {
                     setEditattraction({
                       ...editattraction,
                       age_restriction:
-                        event.target.value < 0
-                          ? (event.target.value = 0)
-                          : Number(event.target.value),
-                    })
-                  }
-                />
-                <TextField
-                  className={classes.textField}
-                  required
-                  label="Height Restriction Feet"
-                  id="height_restriction_feet"
-                  type="number"
-                  variant="outlined"
-                  fullWidth
-                  value={editattraction.height_restriction_feet}
-                  onChange={(event) =>
-                    setEditattraction({
-                      ...editattraction,
-                      height_restriction_feet:
-                        event.target.value < 0
-                          ? (event.target.value = 0)
-                          : Number(event.target.value),
-                    })
-                  }
-                />
-                <TextField
-                  className={classes.textField}
-                  required
-                  label="Height Restriction Inches"
-                  id="height_restriction_inches"
-                  type="number"
-                  variant="outlined"
-                  fullWidth
-                  value={editattraction.height_restriction_inches}
-                  onChange={(event) =>
-                    setEditattraction({
-                      ...editattraction,
-                      height_restriction_inches:
                         event.target.value < 0
                           ? (event.target.value = 0)
                           : Number(event.target.value),
