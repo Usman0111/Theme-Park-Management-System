@@ -12,9 +12,9 @@ const storage = multer.diskStorage({
   filename: function (req, file, cb) {
     cb(
       null,
-      file.originalname
+      //file.originalname
       //switch to this to rename files before storing
-      //file.fieldname + "-" + Date.now() + path.extname(file.originalname)
+      file.fieldname + "-" + Date.now() + path.extname(file.originalname)
     );
   },
 });
@@ -275,6 +275,10 @@ const validAssignmentTypes = ["ride", "attraction"];
 router.post("/new-assignment", async (req, res) => {
   try {
     const { assignment_type, attendant_id } = req.body;
+    const user = await pool.query(
+      "SELECT * FROM useraccount WHERE account_id=$1",
+      [attendant_id]
+    );
 
     if (!validAssignmentTypes.includes(assignment_type)) {
       return res.status(400).send("Invalid assignment type");
@@ -299,7 +303,7 @@ router.post("/new-assignment", async (req, res) => {
         "UPDATE ride SET attendant_id = $1 WHERE ride_id = $2 RETURNING *",
         [attendant_id, ride_id]
       );
-      return res.json(assignRide.rows[0]);
+      return res.json({ ...assignRide.rows[0], ...user.rows[0] });
     }
 
     if (assignment_type === "attraction") {
@@ -308,7 +312,7 @@ router.post("/new-assignment", async (req, res) => {
         "UPDATE attraction SET attendant_id = $1 WHERE attraction_id = $2 RETURNING *",
         [attendant_id, attraction_id]
       );
-      return res.json(assignAttraction.rows[0]);
+      return res.json({ ...assignAttraction.rows[0], ...user.rows[0] });
     }
 
     res.json("invalid assignment type");

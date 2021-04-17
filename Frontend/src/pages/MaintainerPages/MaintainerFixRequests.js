@@ -11,13 +11,13 @@ import { makeStyles } from "@material-ui/core/styles";
 import Container from "@material-ui/core/Container";
 import axios from "axios";
 import Snackbar from "@material-ui/core/Snackbar";
-import Tooltip from "@material-ui/core/Tooltip";
 import { Dialog } from "@material-ui/core";
 import MuiAlert from "@material-ui/lab/Alert";
 import DialogTitle from "@material-ui/core/DialogTitle";
 import DialogContent from "@material-ui/core/DialogContent";
 import DialogContentText from "@material-ui/core/DialogContentText";
 import DialogActions from "@material-ui/core/DialogActions";
+import { green, grey } from "@material-ui/core/colors";
 
 function Alert(props) {
   return <MuiAlert elevation={6} variant="filled" {...props} />;
@@ -51,51 +51,56 @@ const useStyles = makeStyles((theme) => ({
 
 const getInfo = (breakdown) => {
   const indexT = breakdown.breakdown_date.indexOf("T");
-  const indexDot = breakdown.breakdown_date.indexOf(".");
+  console.log(breakdown);
+
   return {
     r_id: breakdown.ride_id,
     bd_id: breakdown.breakdown_id,
     date: breakdown.breakdown_date.slice(0, indexT),
-    time: breakdown.breakdown_date.slice(indexT + 1, indexDot),
-    attendant: breakdown.attendant_id,
     name: breakdown.name,
     descript: breakdown.breakdown_description,
     location: breakdown.location,
-    status: breakdown.broken,
     picture: breakdown.picture,
+    attendant_name: breakdown.first_name + " " + breakdown.last_name,
   };
 };
 
 const MaintainerFixRequests = () => {
   const classes = useStyles();
-  const [open, setOpen] = React.useState(false);
-  const[openSnackbar, setOpenSnackBar] = React.useState(false);
+  const [openModal, setOpenModal] = React.useState(false);
+  const [openSnackbar, setOpenSnackBar] = React.useState(false);
   const [requests, setRequest] = useState([]);
+  const [inspectIssue, setInspectIssue] = useState({});
+  const [fixMsg, setFixMsg] = useState("");
 
   const handleCloseSnackbar = (event, reason) => {
     if (reason === "clickaway") {
       return;
     }
 
-    setOpen(false);
+    setOpenSnackBar(false);
   };
-
-  const handleClose = (event, reason) => {
+  const handleCloseModal = (event, reason) => {
     if (reason === "clickaway") {
       return;
     }
-
-    setOpen(false);
+    setOpenModal(false);
   };
-  const handleClickOpen = () => {
-    setOpen(true);
+  const handleClickOpenModal = (request) => {
+    setInspectIssue({
+      ride_id: request.r_id,
+      ride_name: request.name,
+      breakdown_description: request.descript,
+      breakdown_date: request.date,
+      attendant_name: request.attendant_name,
+    });
+    setOpenModal(true);
   };
 
   useEffect(() => {
     axios
       .get("maintainer/all-maintainence-requests")
       .then((res) => {
-        console.log(res.data[2].ride_id);
         const req = res.data.map((breakdown) => getInfo(breakdown));
         setRequest(req);
       })
@@ -104,18 +109,20 @@ const MaintainerFixRequests = () => {
       });
   }, []);
 
-  const fixRide = (ride_id) => {
+  const fixRide = () => {
     const data = {
       maintainer_id: Number(localStorage.getItem("user_id")),
-      ride_id,
+      ride_id: inspectIssue.ride_id,
     };
     axios
       .put("maintainer/resolve-request", data)
       .then((res) => {
-        handleClose();
-        this.setRequest({
-          status: "false",
-        });
+        setRequest(
+          requests.filter((request) => request.r_id !== inspectIssue.ride_id)
+        );
+        setFixMsg(`${inspectIssue.ride_name} was fixed!`);
+        setOpenSnackBar(true);
+        handleCloseModal();
         console.log(res.data.broken);
       })
       .catch((err) => {
@@ -141,59 +148,62 @@ const MaintainerFixRequests = () => {
                   <Typography>Location: {request.location}</Typography>
                 </CardContent>
                 <CardActions className={classes.buttons}>
-                <Button
-                onClick={handleClickOpen}
-                variant="outlined" 
-                color="primary" >
-                  Inspect Issue
-                </Button>
-                <Dialog
-                  open={open}
-                  keepMounted
-                >
-                  <DialogTitle>{"Breakdown Information"}</DialogTitle>
-                    <DialogContent >
-                      <DialogContentText >
-                        Breakdown Description: {request.descript}
-                      </DialogContentText>
-                      <DialogContentText >
-                        Reported by Attendant: {request.attendant}
-                      </DialogContentText>
-                      <DialogContentText >
-                        Date of Breakdown: {request.date}
-                      </DialogContentText>
-                      <DialogContentText >
-                        Time of Breakdown: {request.r_id}
-                      </DialogContentText>
-                    </DialogContent>
-                    <DialogActions>
-                      <Button
-                        id = "fixed"
-                        color="primary"
-                        onClick={() => 
-                          fixRide(request.r_id)
-                        }>
-                        Fix Ride
-                      </Button>
-                      <Button 
-                        onClick={handleClose}
-                        color="primary">
-                        Cancel
-                      </Button>
-                    </DialogActions>
-                </Dialog>
+                  <Button
+                    onClick={() => handleClickOpenModal(request)}
+                    variant="contained"
+                    color="primary"
+                  >
+                    Inspect Issue
+                  </Button>
                 </CardActions>
               </Card>
-              
+              {/* {console.log(Object.keys(openModal))} */}
             </Grid>
-            
           ))}
-          <Snackbar open={openSnackbar} autoHideDuration={2000} onClick={handleCloseSnackbar}>
-          <Alert onClick={handleCloseSnackbar} severity="success">
-            test
-          </Alert>
-        </Snackbar>
-          
+          <Dialog open={openModal} onClose={handleCloseModal}>
+            <DialogTitle>{"Breakdown Information"}</DialogTitle>
+            <DialogContent>
+              <DialogContentText>
+                <strong>Breakdown Description: </strong>
+                {inspectIssue.breakdown_description}
+              </DialogContentText>
+              <DialogContentText>
+                <strong>Reported by Attendant: </strong>
+
+                {inspectIssue.attendant_name}
+              </DialogContentText>
+              <DialogContentText>
+                <strong>Date of Breakdown: </strong>
+
+                {inspectIssue.breakdown_date}
+              </DialogContentText>
+            </DialogContent>
+            <DialogActions>
+              <Button
+                variant="contained"
+                color="primary"
+                onClick={() => fixRide()}
+              >
+                Fix Ride
+              </Button>
+              <Button
+                variant="contained"
+                onClick={handleCloseModal}
+                style={{ backgroundColor: grey[400] }}
+              >
+                Cancel
+              </Button>
+            </DialogActions>
+          </Dialog>
+          <Snackbar
+            open={openSnackbar}
+            autoHideDuration={2000}
+            onClose={handleCloseSnackbar}
+          >
+            <Alert onClose={handleCloseSnackbar} severity="success">
+              {fixMsg}
+            </Alert>
+          </Snackbar>
         </Grid>
       </Container>
     </div>
@@ -201,39 +211,3 @@ const MaintainerFixRequests = () => {
 };
 
 export default MaintainerFixRequests;
-
-      /*<Button
-                    color="primary"
-                    variant="outlined"
-                    onClick={() => fixRide(request.r_id)}
-                  >
-                    Fix Ride
-                  </Button>
-                  <Tooltip
-                    title={
-                      <React.Fragment>
-                        <Typography color="inherit" variant="subtitle1">
-                          Description:
-                        </Typography>
-                        <div className={classes.paragraph}>
-                          {request.descript}
-                        </div>
-                        <Typography color="inherit" variant="subtitle1">
-                          Repoted by Attendant:
-                        </Typography>
-                        <div className={classes.paragraph}>
-                          {request.attendant}
-                        </div>
-                        <Typography color="inherit" variant="subtitle1">
-                          Date of Breakdown:
-                        </Typography>
-                        <div className={classes.paragraph}>{request.date}</div>
-                        <Typography color="inherit" variant="subtitle1">
-                          Time of Breakdown:
-                        </Typography>
-                        <div className={classes.paragraph}>{request.time}</div>
-                      </React.Fragment>
-                    }
-                  >
-                    <Button variant="contained">Inspect Issue</Button>
-                  </Tooltip> */

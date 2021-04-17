@@ -20,6 +20,9 @@ import ManagerRides from "./ManagerRides";
 import ManagerAttractions from "./ManagerAttractions";
 import AssessmentIcon from "@material-ui/icons/Assessment";
 import ManagerAddRide from "./ManagerAddRide";
+import ManagerInfoRide from "./ManagerInfoRide";
+import ManagerInfoAttraction from "./ManagerInfoAttraction";
+import ManagerAddAttraction from "./ManagerAddAttraction"
 
 const drawerWidth = 240;
 
@@ -73,7 +76,7 @@ export default function ManagerDashboard() {
       <AppBar position="fixed" className={classes.appBar}>
         <Toolbar>
           <Typography variant="h6" noWrap>
-            User's Name
+            {localStorage.getItem("user_name")}
           </Typography>
         </Toolbar>
       </AppBar>
@@ -112,8 +115,17 @@ export default function ManagerDashboard() {
         <Switch>
           <Route path={`${path}`} component={ManagerReports} exact />
           <Route path={`${path}/rides`} component={ManagerRides} exact />
-          <Route path={`${path}/attractions`} component={ManagerAttractions} />
           <Route path={`${path}/rides/add-ride`} component={ManagerAddRide} />
+          <Route
+            path={`${path}/rides/info-ride/:id`}
+            component={ManagerInfoRide}
+          />
+          <Route path={`${path}/attractions`} component={ManagerAttractions} exact/>
+          <Route path={`${path}/attractions/add-attraction`} component={ManagerAddAttraction} />
+          <Route
+            path={`${path}/attractions/info-attraction/:id`}
+            component={ManagerInfoAttraction} 
+          />
         </Switch>
       </main>
     </div>

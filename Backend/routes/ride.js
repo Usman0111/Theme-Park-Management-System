@@ -7,7 +7,9 @@ const validpass = require("../middleware/validpass");
 //get all rides
 router.get("/all", async (req, res) => {
   try {
-    const rides = await pool.query("SELECT * FROM ride");
+    const rides = await pool.query(
+      "SELECT * from ride LEFT JOIN useraccount ON ride.attendant_id = useraccount.account_id ORDER BY ride.ride_id ASC"
+    );
 
     res.json(rides.rows);
   } catch (err) {
@@ -18,7 +20,9 @@ router.get("/all", async (req, res) => {
 // customer rides
 router.post("/all-customer", validpass, async (req, res) => {
   try {
-    const rides = await pool.query("SELECT * FROM ride WHERE archived=False");
+    const rides = await pool.query(
+      "SELECT * FROM ride WHERE archived=False ORDER BY ride.ride_id ASC"
+    );
 
     res.json({ rides: rides.rows, time_left: req.time_left });
   } catch (err) {

@@ -7,7 +7,9 @@ const validpass = require("../middleware/validpass");
 //get all attractions
 router.get("/all", async (req, res) => {
   try {
-    const attractions = await pool.query("SELECT * from attraction");
+    const attractions = await pool.query(
+      "SELECT * from attraction LEFT JOIN useraccount ON attraction.attendant_id = useraccount.account_id ORDER BY attraction.attraction_id ASC"
+    );
 
     res.json(attractions.rows);
   } catch (err) {
@@ -19,7 +21,7 @@ router.get("/all", async (req, res) => {
 router.post("/all-customer", validpass, async (req, res) => {
   try {
     const attractions = await pool.query(
-      "SELECT * from attraction WHERE archived=False"
+      "SELECT * from attraction WHERE archived=False ORDER BY attraction.attraction_id ASC"
     );
 
     res.json({ attractions: attractions.rows, time_left: req.time_left });

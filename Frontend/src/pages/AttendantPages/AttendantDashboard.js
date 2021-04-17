@@ -13,10 +13,9 @@ import ListItem from "@material-ui/core/ListItem";
 import ListItemIcon from "@material-ui/core/ListItemIcon";
 import ListItemText from "@material-ui/core/ListItemText";
 import ExitToAppIcon from "@material-ui/icons/ExitToApp";
-import StoreIcon from "@material-ui/icons/Store";
-import TrainIcon from "@material-ui/icons/Train";
 import ConfirmationNumberIcon from "@material-ui/icons/ConfirmationNumber";
-import AttendantReports from "./AttendantReport";
+import AttendantAssignment from "./AttendantAssignment";
+import AssignmentIcon from "@material-ui/icons/Assignment";
 
 const drawerWidth = 240;
 
@@ -59,7 +58,7 @@ export default function AttendantDashboard() {
   console.log(path);
 
   const options = [
-    { text: "Dashboard", url: `${url}`, icon: <ConfirmationNumberIcon /> },
+    { text: "My Assignment", url: `${url}`, icon: <AssignmentIcon /> },
   ];
 
   return (
@@ -68,7 +67,7 @@ export default function AttendantDashboard() {
       <AppBar position="fixed" className={classes.appBar}>
         <Toolbar>
           <Typography variant="h6" noWrap>
-            Attendant's Name
+            {localStorage.getItem("user_name")}
           </Typography>
         </Toolbar>
       </AppBar>
@@ -105,7 +104,7 @@ export default function AttendantDashboard() {
       <main className={classes.content}>
         <Toolbar />
         <Switch>
-          <Route path={`${path}`} component={AttendantReports} exact />
+          <Route path={`${path}`} component={AttendantAssignment} exact />
         </Switch>
       </main>
     </div>

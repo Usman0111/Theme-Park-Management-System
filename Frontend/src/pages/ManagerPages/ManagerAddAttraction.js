@@ -36,10 +36,10 @@ const useStyles = makeStyles({
   },
 });
 
-export default function ManagerAddRide() {
+export default function ManagerAddattraction() {
   const classes = useStyles();
   let history = useHistory();
-  const [editRide, setEditRide] = useState({
+  const [editattraction, setEditattraction] = useState({
     name: "",
     description: "",
     location: "",
@@ -59,22 +59,26 @@ export default function ManagerAddRide() {
 
   const confirmCreate = () => {
     const sumHeight =
-      editRide.height_restriction_feet * 12 +
-      editRide.height_restriction_inches;
-    const newRide = {
-      name: editRide.name,
-      description: editRide.description,
-      location: editRide.location,
+      editattraction.height_restriction_feet * 12 +
+      editattraction.height_restriction_inches;
+    const newattraction = {
+      name: editattraction.name,
+      description: editattraction.description,
+      location: editattraction.location,
       age_restriction:
-        editRide.age_restriction > 0 ? editRide.age_restriction : null,
+        editattraction.age_restriction > 0
+          ? editattraction.age_restriction
+          : null,
       height_restriction: sumHeight > 0 ? sumHeight : null,
-      picture: editRide.picture,
+      picture: editattraction.picture,
     };
     axios
-      .post("manager/ride-create", newRide)
+      .post("manager/attraction-create", newattraction)
       .then((res) => {
         console.log(res.data);
-        history.push(`/dashboard/rides/info-ride/${res.data.ride_id}`);
+        history.push(
+          `/dashboard/attractions/info-attraction/${res.data.attraction_id}`
+        );
       })
       .catch((err) => console.log(err));
   };
@@ -87,8 +91,8 @@ export default function ManagerAddRide() {
         .post("manager/upload-image", formData)
         .then((res) => {
           const name = res.data.path.split("/")[1];
-          setEditRide({
-            ...editRide,
+          setEditattraction({
+            ...editattraction,
             picture: `http://100.26.17.215:5000/${name}`,
           });
           setLoading(false);
@@ -108,13 +112,16 @@ export default function ManagerAddRide() {
                 <TextField
                   className={classes.textField}
                   required
-                  label="Ride Name"
+                  label="attraction Name"
                   id="name"
                   variant="outlined"
                   fullWidth
-                  value={editRide.name}
+                  value={editattraction.name}
                   onChange={(event) =>
-                    setEditRide({ ...editRide, name: event.target.value })
+                    setEditattraction({
+                      ...editattraction,
+                      name: event.target.value,
+                    })
                   }
                 />
                 <TextField
@@ -124,9 +131,12 @@ export default function ManagerAddRide() {
                   id="location"
                   variant="outlined"
                   fullWidth
-                  value={editRide.location}
+                  value={editattraction.location}
                   onChange={(event) =>
-                    setEditRide({ ...editRide, location: event.target.value })
+                    setEditattraction({
+                      ...editattraction,
+                      location: event.target.value,
+                    })
                   }
                 />
 
@@ -138,10 +148,10 @@ export default function ManagerAddRide() {
                   type="number"
                   variant="outlined"
                   fullWidth
-                  value={editRide.age_restriction}
+                  value={editattraction.age_restriction}
                   onChange={(event) =>
-                    setEditRide({
-                      ...editRide,
+                    setEditattraction({
+                      ...editattraction,
                       age_restriction:
                         event.target.value < 0
                           ? (event.target.value = 0)
@@ -157,10 +167,10 @@ export default function ManagerAddRide() {
                   type="number"
                   variant="outlined"
                   fullWidth
-                  value={editRide.height_restriction_feet}
+                  value={editattraction.height_restriction_feet}
                   onChange={(event) =>
-                    setEditRide({
-                      ...editRide,
+                    setEditattraction({
+                      ...editattraction,
                       height_restriction_feet:
                         event.target.value < 0
                           ? (event.target.value = 0)
@@ -176,10 +186,10 @@ export default function ManagerAddRide() {
                   type="number"
                   variant="outlined"
                   fullWidth
-                  value={editRide.height_restriction_inches}
+                  value={editattraction.height_restriction_inches}
                   onChange={(event) =>
-                    setEditRide({
-                      ...editRide,
+                    setEditattraction({
+                      ...editattraction,
                       height_restriction_inches:
                         event.target.value < 0
                           ? (event.target.value = 0)
@@ -197,10 +207,10 @@ export default function ManagerAddRide() {
                   fullWidth
                   rows={5}
                   required
-                  value={editRide.description}
+                  value={editattraction.description}
                   onChange={(event) =>
-                    setEditRide({
-                      ...editRide,
+                    setEditattraction({
+                      ...editattraction,
                       description: event.target.value,
                     })
                   }
@@ -219,7 +229,7 @@ export default function ManagerAddRide() {
                     size="small"
                     color="disable"
                     variant="contained"
-                    onClick={() => history.push(`/dashboard/rides`)}
+                    onClick={() => history.push(`/dashboard/attractions`)}
                   >
                     Cancel
                   </Button>
@@ -228,7 +238,7 @@ export default function ManagerAddRide() {
             </Card>
           </Grid>
           <Grid item xs={6}>
-            {editRide.picture === "" ? (
+            {editattraction.picture === "" ? (
               <Card square className={classes.cover}>
                 <CardMedia
                   style={{ height: "100%" }}
@@ -250,7 +260,7 @@ export default function ManagerAddRide() {
               <Card square className={classes.cover}>
                 <CardMedia
                   style={{ height: "100%" }}
-                  image={editRide.picture}
+                  image={editattraction.picture}
                   title="your assignment"
                 >
                   <IconButton aria-label="upload picture" component="span">
