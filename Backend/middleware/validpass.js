@@ -6,7 +6,7 @@ module.exports = async (req, res, next) => {
 
   try {
     const validpasses = await pool.query(
-      "SELECT *, CURRENT_TIMESTAMP-passes.time_purchased as time_left from (SELECT *, CURRENT_TIMESTAMP-entrypass.time_purchased > INTERVAL '1 day' as expired from entrypass WHERE customer_id=$1) AS passes WHERE expired=False",
+      "SELECT *,  CURRENT_TIMESTAMP-passes.time_purchased as time_left from (SELECT *, CURRENT_TIMESTAMP-entrypass.time_purchased > INTERVAL '1 day' as expired from entrypass WHERE customer_id=$1) AS passes WHERE expired=False",
       [customer_id]
     );
     // console.log(validpasses.rows[0].time_left);
