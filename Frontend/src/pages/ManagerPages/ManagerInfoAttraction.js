@@ -53,8 +53,6 @@ export default function ManagerAddattraction() {
   const openEdit = () => {
     const split = {
       ...attraction,
-      height_restriction_feet: Math.floor(attraction.height_restriction / 12),
-      height_restriction_inches: attraction.height_restriction % 12,
     };
     setEditattraction(split);
     setEditBool(true);
@@ -67,9 +65,6 @@ export default function ManagerAddattraction() {
       description: editattraction.description,
       location: editattraction.location,
       age_restriction: editattraction.age_restriction,
-      height_restriction:
-        editattraction.height_restriction_feet * 12 +
-        editattraction.height_restriction_inches,
       picture: editattraction.picture,
     };
 
@@ -141,18 +136,6 @@ export default function ManagerAddattraction() {
                     <Typography variant="subtitle1" gutterBottom>
                       {attraction.location}
                     </Typography>
-
-                    <Typography variant="h6" gutterBottom>
-                      <strong>Height Restriction</strong>
-                    </Typography>
-                    <Typography variant="subtitle1" gutterBottom>
-                      {attraction.height_restriction
-                        ? `${Math.floor(attraction.height_restriction / 12)}' ${
-                            attraction.height_restriction % 12
-                          }'' `
-                        : "None"}
-                    </Typography>
-
                     <Typography variant="h6" gutterBottom>
                       <strong>Age Restriction</strong>
                     </Typography>
@@ -226,44 +209,6 @@ export default function ManagerAddattraction() {
                       setEditattraction({
                         ...editattraction,
                         age_restriction:
-                          event.target.value < 0
-                            ? (event.target.value = 0)
-                            : Number(event.target.value),
-                      })
-                    }
-                  />
-                  <TextField
-                    className={classes.textField}
-                    required
-                    label="Height Restriction Feet"
-                    id="height_restriction_feet"
-                    type="number"
-                    variant="outlined"
-                    fullWidth
-                    value={editattraction.height_restriction_feet}
-                    onChange={(event) =>
-                      setEditattraction({
-                        ...editattraction,
-                        height_restriction_feet:
-                          event.target.value < 0
-                            ? (event.target.value = 0)
-                            : Number(event.target.value),
-                      })
-                    }
-                  />
-                  <TextField
-                    className={classes.textField}
-                    required
-                    label="Height Restriction Inches"
-                    id="height_restriction_inches"
-                    type="number"
-                    variant="outlined"
-                    fullWidth
-                    value={editattraction.height_restriction_inches}
-                    onChange={(event) =>
-                      setEditattraction({
-                        ...editattraction,
-                        height_restriction_inches:
                           event.target.value < 0
                             ? (event.target.value = 0)
                             : Number(event.target.value),
