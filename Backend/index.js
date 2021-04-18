@@ -87,7 +87,7 @@ client.on("notification", async (msg) => {
   if (channel === "ride_fixed_notification") {
     const query = await pool.query(
       `SELECT * FROM useraccount WHERE account_id = $1`,
-      [payload.attendant_id]
+      [payload.maintainer_id]
     );
 
     const attendant = query.rows[0];
