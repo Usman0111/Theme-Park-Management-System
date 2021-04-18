@@ -16,6 +16,13 @@ import TableRow from "@material-ui/core/TableRow";
 import { Button } from "@material-ui/core";
 import ManagerChart from "./ManagerChart";
 
+import ReactExport from "react-export-excel";
+
+const ExcelFile = ReactExport.ExcelFile;
+const ExcelSheet = ReactExport.ExcelFile.ExcelSheet;
+const ExcelColumn = ReactExport.ExcelFile.ExcelColumn;
+
+
 const useStyles = makeStyles((theme) => ({
   root: {
     flexGrow: 1,
@@ -72,6 +79,22 @@ export default function AdminReport() {
             <Button color="primary" variant="contained" size="medium">
               Generate Report
             </Button>
+            <ExcelFile element={<Button
+              color="primary"
+              variant="contained"
+              style={{ marginLeft: "10px" }}
+              size="medium"
+            >
+              Download Excel
+            </Button>}>
+                <ExcelSheet data={rows} name="Employees">
+                    <ExcelColumn label="Name" value="name"/>
+                    <ExcelColumn label="Wallet Money" value="calories"/>
+                    <ExcelColumn label="Gender" value="fat"/>
+                    <ExcelColumn label="Marital Status" value="carbs"/>
+                   <ExcelColumn label="Marital Status" value="carbs"/>
+                </ExcelSheet>
+            </ExcelFile>
             {/* <Button
               color="primary"
               variant="contained"
@@ -82,6 +105,8 @@ export default function AdminReport() {
             </Button> */}
           </div>
         </Grid>
+
+        
         <Grid item xs={12}>
           <Paper className={classes.paper}>
             <FormControl className={classes.formControl}>
