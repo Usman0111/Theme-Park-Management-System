@@ -89,11 +89,10 @@ export default function AdminReport() {
     }
 
     console.log(query);
-    console.log(`manager/${reportType}`);
-    // axios
-    //   .post("manager/visits", query)
-    //   .then((res) => console.log(res.data))
-    //   .catch((err) => console.log(err));
+    axios
+      .post(`manager/${reportType}`, query)
+      .then((res) => console.log(res.data))
+      .catch((err) => console.log(err));
   };
 
   useEffect(() => {
@@ -195,10 +194,10 @@ export default function AdminReport() {
                 <MenuItem value={"daily average by month"}>
                   Daily Average by Month
                 </MenuItem>
-                <MenuItem value={"daily maximum by month"}>
+                <MenuItem value={"daily max by month"}>
                   Daily Maximum by Month
                 </MenuItem>
-                <MenuItem value={"daily minimum by month"}>
+                <MenuItem value={"daily min by month"}>
                   Daily Minimum by Month
                 </MenuItem>
               </Select>

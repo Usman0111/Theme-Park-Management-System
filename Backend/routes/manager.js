@@ -518,7 +518,7 @@ router.post("/usage", async (req, res) => {
       if (show === "all") {
         if (calculate === "daily total") {
           const report = await pool.query(
-            "SELECT name, SUM(usage_count) AS usage, EXTRACT(month from date_used) AS month, EXTRACT(day from date_used) AS day, EXTRACT(year from date_used) AS year FROM attractionusage, attraction WHERE date_used BETWEEN $1 and $2 AND attractionusage.attraction_id = attraction.attraction_id GROUP BY attraction.name, day, month, year ORDER BY year, month, day ASC;",
+            "SELECT name, SUM(visit_count) AS visit, EXTRACT(month from date_visited) AS month, EXTRACT(day from date_visited) AS day, EXTRACT(year from date_visited) AS year FROM attractionvisit, attraction WHERE date_visited BETWEEN $1 and $2 AND attractionvisit.attraction_id = attraction.attraction_id GROUP BY attraction.name, day, month, year ORDER BY year, month, day ASC;",
             [start_date, end_date]
           );
 
@@ -526,7 +526,7 @@ router.post("/usage", async (req, res) => {
         }
         if (calculate === "monthly total") {
           const report = await pool.query(
-            "SELECT name, SUM(usage_count) AS usage , EXTRACT(month from date_used) AS month, EXTRACT(year from date_used) AS year FROM attractionusage, attraction WHERE date_used BETWEEN $1 and $2 AND attractionusage.attraction_id = attraction.attraction_id GROUP BY attraction.name, month, year ORDER by year, month ASC;",
+            "SELECT name, SUM(visit_count) AS visit , EXTRACT(month from date_visited) AS month, EXTRACT(year from date_visited) AS year FROM attractionvisit, attraction WHERE date_visited BETWEEN $1 and $2 AND attractionvisit.attraction_id = attraction.attraction_id GROUP BY attraction.name, month, year ORDER by year, month ASC;",
             [start_date, end_date]
           );
 
@@ -534,7 +534,7 @@ router.post("/usage", async (req, res) => {
         }
         if (calculate === "daily average by month") {
           const report = await pool.query(
-            "SELECT name, AVG(daily.usage) AS usage, month, year FROM (SELECT name, EXTRACT(month from date_used) AS month, EXTRACT(day from date_used) AS day, EXTRACT(year from date_used) AS year, SUM(usage_count) AS usage FROM attractionusage, attraction WHERE date_used BETWEEN $1 and $2 AND attractionusage.attraction_id = attraction.attraction_id GROUP BY attraction.name, day, month, year) AS daily GROUP BY name, month, year ORDER by year, month ASC;",
+            "SELECT name, AVG(daily.visit) AS visit, month, year FROM (SELECT name, EXTRACT(month from date_visited) AS month, EXTRACT(day from date_visited) AS day, EXTRACT(year from date_visited) AS year, SUM(visit_count) AS visit FROM attractionvisit, attraction WHERE date_visited BETWEEN $1 and $2 AND attractionvisit.attraction_id = attraction.attraction_id GROUP BY attraction.name, day, month, year) AS daily GROUP BY name, month, year ORDER by year, month ASC;",
             [start_date, end_date]
           );
 
@@ -542,7 +542,7 @@ router.post("/usage", async (req, res) => {
         }
         if (calculate === "daily max by month") {
           const report = await pool.query(
-            "SELECT name, MAX(daily.usage) AS usage, month, year FROM (SELECT name, EXTRACT(month from date_used) AS month, EXTRACT(day from date_used) AS day, EXTRACT(year from date_used) AS year, SUM(usage_count) AS usage FROM attractionusage, attraction WHERE date_used BETWEEN $1 and $2 AND attractionusage.attraction_id = attraction.attraction_id GROUP BY attraction.name, day, month, year) AS daily GROUP BY name, month, year ORDER by year, month ASC;",
+            "SELECT name, MAX(daily.visit) AS visit, month, year FROM (SELECT name, EXTRACT(month from date_visited) AS month, EXTRACT(day from date_visited) AS day, EXTRACT(year from date_visited) AS year, SUM(visit_count) AS visit FROM attractionvisit, attraction WHERE date_visited BETWEEN $1 and $2 AND attractionvisit.attraction_id = attraction.attraction_id GROUP BY attraction.name, day, month, year) AS daily GROUP BY name, month, year ORDER by year, month ASC;",
             [start_date, end_date]
           );
 
@@ -550,7 +550,7 @@ router.post("/usage", async (req, res) => {
         }
         if (calculate === "daily min by month") {
           const report = await pool.query(
-            "SELECT name, MIN(daily.usage) AS usage, month, year FROM (SELECT name, EXTRACT(month from date_used) AS month, EXTRACT(day from date_used) AS day, EXTRACT(year from date_used) AS year, SUM(usage_count) AS usage FROM attractionusage, attraction WHERE date_used BETWEEN $1 and $2 AND attractionusage.attraction_id = attraction.attraction_id GROUP BY attraction.name, day, month, year) AS daily GROUP BY name, month, year ORDER by year, month ASC;",
+            "SELECT name, MIN(daily.visit) AS visit, month, year FROM (SELECT name, EXTRACT(month from date_visited) AS month, EXTRACT(day from date_visited) AS day, EXTRACT(year from date_visited) AS year, SUM(visit_count) AS visit FROM attractionvisit, attraction WHERE date_visited BETWEEN $1 and $2 AND attractionvisit.attraction_id = attraction.attraction_id GROUP BY attraction.name, day, month, year) AS daily GROUP BY name, month, year ORDER by year, month ASC;",
             [start_date, end_date]
           );
           return res.json(report.rows);
@@ -561,7 +561,7 @@ router.post("/usage", async (req, res) => {
         const { attraction_id } = req.body;
         if (calculate === "daily total") {
           const report = await pool.query(
-            "SELECT  SUM(usage_count) AS usage, EXTRACT(month from date_used) AS month, EXTRACT(day from date_used) AS day, EXTRACT(year from date_used) AS year FROM attractionusage WHERE date_used BETWEEN $1 and $2 AND attractionusage.attraction_id = $3 GROUP BY day, month, year ORDER BY year, month, day ASC;",
+            "SELECT  SUM(visit_count) AS visit, EXTRACT(month from date_visited) AS month, EXTRACT(day from date_visited) AS day, EXTRACT(year from date_visited) AS year FROM attractionvisit WHERE date_visited BETWEEN $1 and $2 AND attractionvisit.attraction_id = $3 GROUP BY day, month, year ORDER BY year, month, day ASC;",
             [start_date, end_date, attraction_id]
           );
 
@@ -569,7 +569,7 @@ router.post("/usage", async (req, res) => {
         }
         if (calculate === "monthly total") {
           const report = await pool.query(
-            "SELECT SUM(usage_count) AS usage , EXTRACT(month from date_used) AS month, EXTRACT(year from date_used) AS year FROM attractionusage WHERE date_used BETWEEN $1 and $2 AND attractionusage.attraction_id = $3 GROUP BY month, year ORDER by year, month ASC;",
+            "SELECT SUM(visit_count) AS visit , EXTRACT(month from date_visited) AS month, EXTRACT(year from date_visited) AS year FROM attractionvisit WHERE date_visited BETWEEN $1 and $2 AND attractionvisit.attraction_id = $3 GROUP BY month, year ORDER by year, month ASC;",
             [start_date, end_date, attraction_id]
           );
 
@@ -577,7 +577,7 @@ router.post("/usage", async (req, res) => {
         }
         if (calculate === "daily average by month") {
           const report = await pool.query(
-            "SELECT AVG(daily.usage) AS usage, month, year FROM (SELECT EXTRACT(month from date_used) AS month, EXTRACT(day from date_used) AS day, EXTRACT(year from date_used) AS year, SUM(usage_count) AS usage FROM attractionusage WHERE date_used BETWEEN $1 and $2 AND attractionusage.attraction_id = $3 GROUP BY day, month, year) AS daily GROUP BY month, year ORDER by year, month ASC;",
+            "SELECT AVG(daily.visit) AS visit, month, year FROM (SELECT EXTRACT(month from date_visited) AS month, EXTRACT(day from date_visited) AS day, EXTRACT(year from date_visited) AS year, SUM(visit_count) AS visit FROM attractionvisit WHERE date_visited BETWEEN $1 and $2 AND attractionvisit.attraction_id = $3 GROUP BY day, month, year) AS daily GROUP BY month, year ORDER by year, month ASC;",
             [start_date, end_date, attraction_id]
           );
 
@@ -585,7 +585,7 @@ router.post("/usage", async (req, res) => {
         }
         if (calculate === "daily max by month") {
           const report = await pool.query(
-            "SELECT MAX(daily.usage) AS usage, month, year FROM (SELECT EXTRACT(month from date_used) AS month, EXTRACT(day from date_used) AS day, EXTRACT(year from date_used) AS year, SUM(usage_count) AS usage FROM attractionusage WHERE date_used BETWEEN $1 and $2 AND attractionusage.attraction_id = $3 GROUP BY day, month, year) AS daily GROUP BY month, year ORDER by year, month ASC;",
+            "SELECT MAX(daily.visit) AS visit, month, year FROM (SELECT EXTRACT(month from date_visited) AS month, EXTRACT(day from date_visited) AS day, EXTRACT(year from date_visited) AS year, SUM(visit_count) AS visit FROM attractionvisit WHERE date_visited BETWEEN $1 and $2 AND attractionvisit.attraction_id = $3 GROUP BY day, month, year) AS daily GROUP BY month, year ORDER by year, month ASC;",
             [start_date, end_date, attraction_id]
           );
 
@@ -593,7 +593,7 @@ router.post("/usage", async (req, res) => {
         }
         if (calculate === "daily min by month") {
           const report = await pool.query(
-            "SELECT MIN(daily.usage) AS usage, month, year FROM (SELECT EXTRACT(month from date_used) AS month, EXTRACT(day from date_used) AS day, EXTRACT(year from date_used) AS year, SUM(usage_count) AS usage FROM attractionusage WHERE date_used BETWEEN $1 and $2 AND attractionusage.attraction_id = $3 GROUP BY day, month, year) AS daily GROUP BY month, year ORDER by year, month ASC;",
+            "SELECT MIN(daily.visit) AS visit, month, year FROM (SELECT EXTRACT(month from date_visited) AS month, EXTRACT(day from date_visited) AS day, EXTRACT(year from date_visited) AS year, SUM(visit_count) AS visit FROM attractionvisit WHERE date_visited BETWEEN $1 and $2 AND attractionvisit.attraction_id = $3 GROUP BY day, month, year) AS daily GROUP BY month, year ORDER by year, month ASC;",
             [start_date, end_date, attraction_id]
           );
           return res.json(report.rows);
@@ -797,7 +797,7 @@ router.post("/rainouts", async (req, res) => {
         }
         if (calculate === "daily min by month") {
           const report = await pool.query(
-            "SELECT MIN(daily.rainouts) AS rainouts, month, year FROM (SELECT COUNT(rainout_id) AS rainouts, EXTRACT(month from date_rainedout) AS month, EXTRACT(day from  date_rainedout) AS day, EXTRACT(year from date_rainedout) AS year FROM riderainout, ride WHERE date_rainedout BETWEEN $1 and $2 AND ridebreakdowns.ride_id = $3 GROUP BY day, month, year ORDER by year, month, day ASC) AS daily  GROUP BY month, year  ORDER by year, month ASC;",
+            "SELECT MIN(daily.rainouts) AS rainouts, month, year FROM (SELECT COUNT(rainout_id) AS rainouts, EXTRACT(month from date_rainedout) AS month, EXTRACT(day from  date_rainedout) AS day, EXTRACT(year from date_rainedout) AS year FROM riderainout, ride WHERE date_rainedout BETWEEN $1 and $2 AND riderainout.ride_id = $3 GROUP BY day, month, year ORDER by year, month, day ASC) AS daily  GROUP BY month, year  ORDER by year, month ASC;",
             [start_date, end_date, ride_id]
           );
           return res.json(report.rows);
@@ -884,7 +884,7 @@ router.post("/rainouts", async (req, res) => {
         }
         if (calculate === "daily min by month") {
           const report = await pool.query(
-            "SELECT MIN(daily.rainouts) AS rainouts, month, year FROM (SELECT COUNT(rainout_id) AS rainouts, EXTRACT(month from date_rainedout) AS month, EXTRACT(day from  date_rainedout) AS day, EXTRACT(year from date_rainedout) AS year FROM attractionrainout, attraction WHERE date_rainedout BETWEEN $1 and $2 AND attractionbreakdowns.attraction_id = $3 GROUP BY day, month, year ORDER by year, month, day ASC) AS daily  GROUP BY month, year  ORDER by year, month ASC;",
+            "SELECT MIN(daily.rainouts) AS rainouts, month, year FROM (SELECT COUNT(rainout_id) AS rainouts, EXTRACT(month from date_rainedout) AS month, EXTRACT(day from  date_rainedout) AS day, EXTRACT(year from date_rainedout) AS year FROM attractionrainout, attraction WHERE date_rainedout BETWEEN $1 and $2 AND attractionrainout.attraction_id = $3 GROUP BY day, month, year ORDER by year, month, day ASC) AS daily  GROUP BY month, year  ORDER by year, month ASC;",
             [start_date, end_date, attraction_id]
           );
           return res.json(report.rows);
