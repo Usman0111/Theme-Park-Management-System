@@ -1,4 +1,4 @@
-import React, { useState, useEffect } from "react";
+import React, { useState, useEffect, useRef } from "react";
 import Button from "@material-ui/core/Button";
 import Card from "@material-ui/core/Card";
 import CardActions from "@material-ui/core/CardActions";
@@ -16,14 +16,13 @@ import MuiAlert from "@material-ui/lab/Alert";
 import PassNeeded from "./PassNeeded";
 import BrokenImageIcon from "@material-ui/icons/BrokenImage";
 import OpacityIcon from "@material-ui/icons/Opacity";
+import Dialog from "@material-ui/core/Dialog";
+import DialogActions from "@material-ui/core/DialogActions";
+import DialogContent from "@material-ui/core/DialogContent";
+import DialogContentText from "@material-ui/core/DialogContentText";
+import DialogTitle from "@material-ui/core/DialogTitle";
+import Slide from "@material-ui/core/Slide";
 import CustomerTimer from "./CustomerTimer";
-
-import Dialog from '@material-ui/core/Dialog';
-import DialogActions from '@material-ui/core/DialogActions';
-import DialogContent from '@material-ui/core/DialogContent';
-import DialogContentText from '@material-ui/core/DialogContentText';
-import DialogTitle from '@material-ui/core/DialogTitle';
-import Slide from '@material-ui/core/Slide';
 
 function Alert(props) {
   return <MuiAlert elevation={6} variant="filled" {...props} />;
@@ -59,11 +58,22 @@ const Transition = React.forwardRef(function Transition(props, ref) {
   return <Slide direction="up" ref={ref} {...props} />;
 });
 
+const calcSecond = (timePassed) => {
+  const hours = timePassed.hours ? timePassed.hours : 0;
+  const minutes = timePassed.minutes ? timePassed.minutes : 0;
+  const seconds = timePassed.seconds ? timePassed.seconds : 0;
+  const milliseconds = timePassed.milliseconds ? timePassed.milliseconds : 0;
+  return (
+    86400000 -
+    Math.round((hours * 3600 + minutes * 60 + seconds) * 1000 + milliseconds)
+  );
+};
+
 export default function CustomerRides() {
   const classes = useStyles();
   const [rides, setRides] = useState([]);
   const [validpass, setValidpass] = useState(true);
-  const [timeleft, setTimeLeft] = useState(true);
+  const timePassed = useRef({});
 
   useEffect(() => {
     axios
@@ -72,8 +82,7 @@ export default function CustomerRides() {
       })
       .then((res) => {
         if (res.data !== "You have an unexpired entry pass") {
-          setTimeLeft(res.data.time_left.minutes);
-          console.log(res.data);
+          timePassed.current = calcSecond(res.data.time_left);
           setRides(res.data.rides);
         } else {
           setValidpass(false);
@@ -121,18 +130,16 @@ export default function CustomerRides() {
       });
   };
 
-  console.log(rides);
-
   return (
     <Container className={classes.cardGrid}>
       <CssBaseline />
+      {rides.length !== 0 ? <CustomerTimer time={timePassed.current} /> : null}
       <Grid container spacing={4}>
         {!validpass ? (
           <PassNeeded type={"rides"} />
         ) : (
           rides.map((ride) => (
             <Grid item key={ride.ride_id} md={3}>
-              <CustomerTimer timeleft={timeleft} />
               <Card className={classes.card}>
                 <CardMedia
                   className={classes.cardMedia}
@@ -168,9 +175,41 @@ export default function CustomerRides() {
                       Ride!
                     </Button>
                   )}
-                  <Button variant="contained" onClick={dialogHandleClickOpen}>Info</Button>
+                  <Tooltip
+                    title={
+                      <React.Fragment>
+                        <Typography color="inherit" variant="subtitle1">
+                          Description
+                        </Typography>
+                        <div className={classes.paragraph}>
+                          {ride.description}
+                        </div>
+                        <Typography color="inherit" variant="subtitle1">
+                          Location
+                        </Typography>
+                        <div className={classes.paragraph}>{ride.location}</div>
+                        <Typography color="inherit" variant="subtitle1">
+                          Age Restriciton
+                        </Typography>
+                        <div className={classes.paragraph}>
+                          {ride.age_restriction ? ride.age_restriction : "None"}
+                        </div>
+                        <Typography color="inherit" variant="subtitle1">
+                          Height Resctriction
+                        </Typography>
+                        <div className={classes.paragraph}>
+                          {ride.height_restriction
+                            ? `${Math.round(ride.height_restriction / 12)}' ${
+                                ride.height_restriction % 12
+                              }''`
+                            : "None"}
+                        </div>
+                      </React.Fragment>
+                    }
+                  >
+                    <Button variant="outlined">Info</Button>
+                  </Tooltip>
                 </CardActions>
-                
               </Card>
             </Grid>
           ))
@@ -181,31 +220,30 @@ export default function CustomerRides() {
           </Alert>
         </Snackbar>
         <Dialog
-                    open={openDialog}
-                    TransitionComponent={Transition}
-                    onClose={dialogHandleClose}
-                    aria-labelledby="alert-dialog-slide-title"
-                    aria-describedby="alert-dialog-slide-description"
-                  >
-                    <DialogTitle id="alert-dialog-slide-title">(ride.name)</DialogTitle>
-                    <DialogContent>
-                      <DialogContentText>(ride.description)</DialogContentText>
-                      <DialogContentText>Location</DialogContentText>
-                      <DialogContentText>(ride.location)</DialogContentText>
-                      <DialogContentText>Age Restriction</DialogContentText>
-                      <DialogContentText>(ride.age_restriction)</DialogContentText>
-                      <DialogContentText>Height Restriction</DialogContentText>
-                      <DialogContentText>ride.height_restriction</DialogContentText>
-                      <DialogContentText></DialogContentText>
-                    </DialogContent>
-                    <DialogActions>
-                      <Button onClick={dialogHandleClose} color="primary">
-                        Close
-                      </Button>
-                    </DialogActions>
-                  </Dialog>
+          open={openDialog}
+          TransitionComponent={Transition}
+          onClose={dialogHandleClose}
+          aria-labelledby="alert-dialog-slide-title"
+          aria-describedby="alert-dialog-slide-description"
+        >
+          <DialogTitle id="alert-dialog-slide-title">(ride.name)</DialogTitle>
+          <DialogContent>
+            <DialogContentText>(ride.description)</DialogContentText>
+            <DialogContentText>Location</DialogContentText>
+            <DialogContentText>(ride.location)</DialogContentText>
+            <DialogContentText>Age Restriction</DialogContentText>
+            <DialogContentText>(ride.age_restriction)</DialogContentText>
+            <DialogContentText>Height Restriction</DialogContentText>
+            <DialogContentText>ride.height_restriction</DialogContentText>
+            <DialogContentText></DialogContentText>
+          </DialogContent>
+          <DialogActions>
+            <Button onClick={dialogHandleClose} color="primary">
+              Close
+            </Button>
+          </DialogActions>
+        </Dialog>
       </Grid>
-      
     </Container>
   );
 }

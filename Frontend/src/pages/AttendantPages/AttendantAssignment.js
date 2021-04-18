@@ -36,7 +36,6 @@ const useStyles = makeStyles((theme) => ({
   },
   content: {
     flex: "1 0 auto",
-  
   },
   cover: {
     width: 600,
@@ -58,7 +57,6 @@ export default function AttendantAssignment() {
   const [retrevied, setRetreived] = useState(false);
   const [isRide, setIsRide] = useState(false);
   const [ageRestriction, setAgeRestriction] = useState("");
-
 
   const handleClickOpen = () => {
     setOpen(true);
@@ -90,14 +88,12 @@ export default function AttendantAssignment() {
       })
       .then((res) => {
         console.log(res.data);
-        if(res.data === null || res.data === "No assignment"){
-
-        }
-        else{
-          setRetreived(true)
+        if (res.data === null || res.data === "No assignment") {
+        } else {
+          setRetreived(true);
           setAssignment(res.data.assignment);
           setType(res.data.type);
-          if(res.data.type === "ride"){
+          if (res.data.type === "ride") {
             setIsRide(true);
           }
         }
@@ -129,73 +125,65 @@ export default function AttendantAssignment() {
   };
 
   const declareRainout = () => {
-    if(isRide)
-    {
+    if (isRide) {
       axios
-      .put("attendant/declare-rainout", {
-        rainout_type: "ride",
-        ride_id: assignment.ride_id,
-        attendant_id: assignment.attendant_id,
-      })
-      .then((res) => {
-        setAssignment({ ...assignment, rainedout: true });
-        handleClickSnack("Rainout successfully declared!");
-      })
-      .catch((err) => {
-        console.log(err);
-      });
-    }
-    else
-    {
+        .put("attendant/declare-rainout", {
+          rainout_type: "ride",
+          ride_id: assignment.ride_id,
+          attendant_id: assignment.attendant_id,
+        })
+        .then((res) => {
+          setAssignment({ ...assignment, rainedout: true });
+          handleClickSnack("Rainout successfully declared!");
+        })
+        .catch((err) => {
+          console.log(err);
+        });
+    } else {
       axios
-      .put("attendant/declare-rainout", {
-        rainout_type: "attraction",
-        attraction_id: assignment.attraction_id,
-        attendant_id: assignment.attendant_id,
-      })
-      .then((res) => {
-        setAssignment({ ...assignment, rainedout: true });
-        handleClickSnack("Rainout successfully declared!");
-      })
-      .catch((err) => {
-        console.log(err);
-      });
+        .put("attendant/declare-rainout", {
+          rainout_type: "attraction",
+          attraction_id: assignment.attraction_id,
+          attendant_id: assignment.attendant_id,
+        })
+        .then((res) => {
+          setAssignment({ ...assignment, rainedout: true });
+          handleClickSnack("Rainout successfully declared!");
+        })
+        .catch((err) => {
+          console.log(err);
+        });
     }
-
   };
 
   const endRainout = () => {
-    if(isRide)
-    {
+    if (isRide) {
       axios
-      .put("attendant/end-rainout", {
-        rainout_type: "ride",
-        ride_id: assignment.ride_id,
-      })
-      .then((res) => {
-        setAssignment({ ...assignment, rainedout: false });
-        handleClickSnack("Rainout successfully ended!");
-      })
-      .catch((err) => {
-        console.log(err);
-      });
-    }
-    else
-    {
+        .put("attendant/end-rainout", {
+          rainout_type: "ride",
+          ride_id: assignment.ride_id,
+        })
+        .then((res) => {
+          setAssignment({ ...assignment, rainedout: false });
+          handleClickSnack("Rainout successfully ended!");
+        })
+        .catch((err) => {
+          console.log(err);
+        });
+    } else {
       axios
-      .put("attendant/end-rainout", {
-        rainout_type: "attraction",
-        attraction_id: assignment.attraction_id,
-      })
-      .then((res) => {
-        setAssignment({ ...assignment, rainedout: false });
-        handleClickSnack("Rainout successfully ended!");
-      })
-      .catch((err) => {
-        console.log(err);
-      });
+        .put("attendant/end-rainout", {
+          rainout_type: "attraction",
+          attraction_id: assignment.attraction_id,
+        })
+        .then((res) => {
+          setAssignment({ ...assignment, rainedout: false });
+          handleClickSnack("Rainout successfully ended!");
+        })
+        .catch((err) => {
+          console.log(err);
+        });
     }
-
   };
 
   return (
@@ -212,24 +200,27 @@ export default function AttendantAssignment() {
                 </Typography>
                 <Typography variant="h6">Location</Typography>
                 <Typography variant="subtitle1" color="textSecondary">
-                  {assignment.location} 
+                  {assignment.location}
                 </Typography>
                 <Typography variant="h6">Age Restriction</Typography>
                 <Typography variant="subtitle1" color="textSecondary">
-                  {assignment.age_restriction ? assignment.age_restriction: "None" }
+                  {assignment.age_restriction
+                    ? assignment.age_restriction
+                    : "None"}
                 </Typography>
-                {isRide ? 
+                {isRide ? (
                   <div>
                     <Typography variant="h6">Height Resctriction</Typography>
-                <Typography variant="subtitle1" color="textSecondary">
-                {assignment.height_restriction
+                    <Typography variant="subtitle1" color="textSecondary">
+                      {assignment.height_restriction
                         ? `${Math.floor(assignment.height_restriction / 12)}' ${
                             assignment.height_restriction % 12
                           }'' `
                         : "None"}
-                </Typography>
-                  </div>: null}
-                
+                    </Typography>
+                  </div>
+                ) : null}
+
                 <Typography variant="h6">Status</Typography>
                 <div>
                   {!assignment.broken && !assignment.rainedout ? (
@@ -250,23 +241,22 @@ export default function AttendantAssignment() {
                 </div>
                 <Divider />
                 <div className={classes.buttons}>
-                {isRide ? 
-                  assignment.broken ? (
-                    <Button variant="contained" color="disabled">
-                      Make Fix Request
-                    </Button>
-                  ) : (
-                    <Button
-                      variant="contained"
-                      style={{ backgroundColor: red["A200"], color: "white" }}
-                      onClick={() => setOpen(true)}
-                    >
-                      Make Fix Request
-                    </Button>
-                  )
-                : null}
-                
-                
+                  {isRide ? (
+                    assignment.broken ? (
+                      <Button variant="contained" color="disabled">
+                        Make Fix Request
+                      </Button>
+                    ) : (
+                      <Button
+                        variant="contained"
+                        style={{ backgroundColor: red["A200"], color: "white" }}
+                        onClick={() => setOpen(true)}
+                      >
+                        Make Fix Request
+                      </Button>
+                    )
+                  ) : null}
+
                   {assignment.rainedout ? (
                     <Button
                       variant="contained"

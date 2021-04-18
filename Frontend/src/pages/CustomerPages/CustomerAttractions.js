@@ -1,4 +1,4 @@
-import React, { useState, useEffect } from "react";
+import React, { useState, useEffect, useRef } from "react";
 import Button from "@material-ui/core/Button";
 import Card from "@material-ui/core/Card";
 import CardActions from "@material-ui/core/CardActions";
@@ -15,6 +15,7 @@ import Snackbar from "@material-ui/core/Snackbar";
 import MuiAlert from "@material-ui/lab/Alert";
 import PassNeeded from "./PassNeeded";
 import OpacityIcon from "@material-ui/icons/Opacity";
+import CustomerTimer from "./CustomerTimer";
 
 function Alert(props) {
   return <MuiAlert elevation={6} variant="filled" {...props} />;
@@ -46,10 +47,22 @@ const useStyles = makeStyles((theme) => ({
   },
 }));
 
+const calcSecond = (timePassed) => {
+  const hours = timePassed.hours ? timePassed.hours : 0;
+  const minutes = timePassed.minutes ? timePassed.minutes : 0;
+  const seconds = timePassed.seconds ? timePassed.seconds : 0;
+  const milliseconds = timePassed.milliseconds ? timePassed.milliseconds : 0;
+  return (
+    86400000 -
+    Math.round((hours * 3600 + minutes * 60 + seconds) * 1000 + milliseconds)
+  );
+};
+
 export default function CustomerAttractions() {
   const classes = useStyles();
   const [attractions, setAttractions] = useState([]);
   const [validpass, setValidpass] = useState(true);
+  const timePassed = useRef({});
 
   useEffect(() => {
     axios
@@ -58,7 +71,8 @@ export default function CustomerAttractions() {
       })
       .then((res) => {
         if (res.data !== "You have an unexpired entry pass") {
-          console.log(res.data);
+          timePassed.current = calcSecond(res.data.time_left);
+
           setAttractions(res.data.attractions);
         } else {
           setValidpass(false);
@@ -96,11 +110,13 @@ export default function CustomerAttractions() {
       });
   };
 
-  console.log(attractions);
-
   return (
     <Container className={classes.cardGrid}>
       <CssBaseline />
+      {attractions.length !== 0 ? (
+        <CustomerTimer time={timePassed.current} />
+      ) : null}
+
       <Grid container spacing={4}>
         {!validpass ? (
           <PassNeeded type={"attractions"} />
@@ -164,7 +180,7 @@ export default function CustomerAttractions() {
                       </React.Fragment>
                     }
                   >
-                    <Button variant="contained">Info</Button>
+                    <Button variant="outlined">Info</Button>
                   </Tooltip>
                 </CardActions>
               </Card>
