@@ -85,16 +85,22 @@ client.on("notification", async (msg) => {
   }
 
   if (channel === "ride_fixed_notification") {
-    const query = await pool.query(
+    const query1 = await pool.query(
       `SELECT * FROM useraccount WHERE account_id = $1`,
-      [payload.maintainer_id]
+      [payload.attendant_id]
     );
 
-    const attendant = query.rows[0];
+    const attendant = query1.rows[0];
+
+    const query2 = await pool.query(
+      `SELECT * FROM useraccount WHERE account_id = $1`,
+      [payload.attendant_id]
+    );
+    const maintainer = query2.rows[0];
 
     receiver = attendant.email;
     subject = "Your Ride is Fixed";
-    message = `${payload.message} by the following maintainer\n\nFirst Name: ${attendant.first_name}\nLast Name: ${attendant.last_name}\nEmail: ${attendant.email}`;
+    message = `${payload.message} by the following maintainer\n\nFirst Name: ${maintainer.first_name}\nLast Name: ${maintainer.last_name}\nEmail: ${maintainer.email}`;
 
     const email = { receiver, subject, message };
     console.log(`sending email to attendant`);
