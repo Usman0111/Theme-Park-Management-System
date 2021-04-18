@@ -94,7 +94,7 @@ client.on("notification", async (msg) => {
 
     const query2 = await pool.query(
       `SELECT * FROM useraccount WHERE account_id = $1`,
-      [payload.attendant_id]
+      [payload.maintainer_id]
     );
     const maintainer = query2.rows[0];
 
