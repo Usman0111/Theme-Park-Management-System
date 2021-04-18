@@ -73,6 +73,22 @@ export default function ManagerAddRide() {
       picture: editRide.picture,
     };
 
+    if(newRide.name=="")
+    {
+      console.log("name is empty");
+      return;
+    }
+    if(newRide.description=="")
+    {
+      console.log("name is empty");
+      return;
+    }
+    if(newRide.location=="")
+    {
+      console.log("name is empty");
+      return;
+    }
+
     axios
       .put("manager/ride-edit", newRide)
       .then((res) => {
