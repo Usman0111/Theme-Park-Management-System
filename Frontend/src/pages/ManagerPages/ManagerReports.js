@@ -13,17 +13,18 @@ import axios from "axios";
 import ManagerTable from "./ManagerTable";
 import Snackbar from "@material-ui/core/Snackbar";
 import MuiAlert from "@material-ui/lab/Alert";
+import ReactExport from "react-export-excel";
+import LinearProgress from "@material-ui/core/LinearProgress";
+import Checkbox from "@material-ui/core/Checkbox";
+import FormControlLabel from "@material-ui/core/FormControlLabel";
 
 function Alert(props) {
   return <MuiAlert elevation={6} variant="filled" {...props} />;
 }
 
-import ReactExport from "react-export-excel";
-
 const ExcelFile = ReactExport.ExcelFile;
 const ExcelSheet = ReactExport.ExcelFile.ExcelSheet;
 const ExcelColumn = ReactExport.ExcelFile.ExcelColumn;
-
 
 const useStyles = makeStyles((theme) => ({
   root: {
@@ -51,11 +52,22 @@ export default function AdminReport() {
   const [type, setType] = useState("ride"); //ride or attraction query
   const [rides, setRides] = useState([]);
   const [attractions, setAttractions] = useState([]);
-  const [ride_id, setRide_id] = useState();
-  const [attraction_id, setAttraction_id] = useState();
+  const [ride_id, setRide_id] = useState(1);
+  const [attraction_id, setAttraction_id] = useState(1);
+  const [ridePairs, setRidePairs] = useState();
+  const [attractionPairs, setAttractionPairs] = useState();
+
+  //checkbox
+  const [checked, setChecked] = useState(false);
+
+  const handleChangeCheck = (event) => {
+    setChecked(event.target.checked);
+  };
 
   //snackbar
-  const [open, setOpen] = React.useState(false);
+  const [open, setOpen] = useState(false);
+  const [snackMsg, setSnackMsg] = useState("");
+
   const handleClose = (event, reason) => {
     if (reason === "clickaway") {
       return;
@@ -67,12 +79,16 @@ export default function AdminReport() {
   //report
   const [report, setReport] = useState();
   const [params, setParams] = useState();
+  const [loading, setLoading] = useState(false);
+  const [excelData, setExcelData] = useState();
 
   const generateReport = () => {
     if (start_date > end_date) {
+      setSnackMsg("End date can not come before start date");
       setOpen(true);
       return;
     }
+    setLoading(true);
 
     let query = {};
 
@@ -95,23 +111,42 @@ export default function AdminReport() {
       }
     }
 
-    console.log(query);
     axios
       .post(`manager/${reportType}`, query)
-      .then((res) => console.log(res.data))
-      .catch((err) => console.log(err));
+      .then((res) => {
+        setReport(res.data);
+        setParams({ reportType: reportType, ...query });
+        setLoading(false);
+      })
+      .catch((err) => {
+        setSnackMsg(
+          "Error occured while generating the report for this criteria"
+        );
+        setOpen(true);
+        console.log(err);
+      });
   };
 
   useEffect(() => {
     axios
       .get("ride/all")
       .then((res) => {
+        const pairs = res.data.reduce((acc, ride) => {
+          acc[ride.ride_id] = ride.name;
+          return acc;
+        }, {});
+        setRidePairs(pairs);
         setRides(res.data);
       })
       .catch((err) => console.log(err));
     axios
       .get("attraction/all")
       .then((res) => {
+        const pairs = res.data.reduce((acc, attraction) => {
+          acc[attraction.attraction_id] = attraction.name;
+          return acc;
+        }, {});
+        setAttractionPairs(pairs);
         setAttractions(res.data);
       })
       .catch((err) => console.log(err));
@@ -120,45 +155,53 @@ export default function AdminReport() {
   return (
     <div className={classes.root}>
       <Grid container spacing={1}>
-        <Grid item xs={12}>
-          <div>
-            <Button
-              color="primary"
-              variant="contained"
-              size="medium"
-              onClick={() => generateReport()}
-            >
-              Generate Report
-            </Button>
-            <ExcelFile element={<Button
-              color="primary"
-              variant="contained"
-              style={{ marginLeft: "10px" }}
-              size="medium"
-            >
-              Download Excel
-            </Button>}>
-                <ExcelSheet data={rows} name="Employees">
-                    <ExcelColumn label="Name" value="name"/>
-                    <ExcelColumn label="Wallet Money" value="calories"/>
-                    <ExcelColumn label="Gender" value="fat"/>
-                    <ExcelColumn label="Marital Status" value="carbs"/>
-                   <ExcelColumn label="Marital Status" value="carbs"/>
-                </ExcelSheet>
-            </ExcelFile>
-            {/* <Button
-            <Button
-              color="primary"
-              variant="contained"
-              style={{ marginLeft: "10px" }}
-              size="medium"
-            >
-              Download Excel
-            </Button>
-          </div>
-        </Grid>
+        <div>
+          <Button
+            color="primary"
+            variant="contained"
+            size="medium"
+            onClick={() => generateReport()}
+          >
+            Generate Report
+          </Button>
+          {report ? (
+            <>
+              {/* <ExcelFile
+                element={
+                  <Button
+                    color="primary"
+                    variant="contained"
+                    style={{ marginLeft: 20 }}
+                    size="medium"
+                  >
+                    Download Excel
+                  </Button>
+                }
+              >
+                <ExcelSheet data={excelData.rows} name="Employees">
+                <ExcelColumn label="Name" value="name" />
 
-        
+              <ExcelColumn label="Wallet Money" value="calories" />
+              <ExcelColumn label="Gender" value="fat" />
+              <ExcelColumn label="Marital Status" value="carbs" />
+              <ExcelColumn label="Marital Status" value="carbs" />
+            </ExcelSheet>
+              </ExcelFile> */}
+              <FormControlLabel
+                control={
+                  <Checkbox
+                    checked={checked}
+                    onChange={handleChangeCheck}
+                    color="primary"
+                    style={{ marginLeft: 20 }}
+                  />
+                }
+                label="Show Graph"
+              />
+            </>
+          ) : null}
+        </div>
+
         <Grid item xs={12}>
           <Paper className={classes.paper}>
             <FormControl className={classes.formControl}>
@@ -260,7 +303,6 @@ export default function AdminReport() {
                     {type === "ride" ? (
                       <Select
                         value={ride_id}
-                        defaultValue={1}
                         onChange={(event) => setRide_id(event.target.value)}
                       >
                         {rides.map((ride) => (
@@ -272,7 +314,6 @@ export default function AdminReport() {
                     ) : (
                       <Select
                         value={attraction_id}
-                        defaultValue={1}
                         onChange={(event) =>
                           setAttraction_id(event.target.value)
                         }
@@ -293,19 +334,35 @@ export default function AdminReport() {
             ) : null}
           </Paper>
         </Grid>
+        {loading ? (
+          <Grid item xs={12}>
+            <LinearProgress />
+          </Grid>
+        ) : null}
 
-        <Grid item xs={12}>
-          <ManagerTable />
-        </Grid>
-        {/* <Grid item xs={12}>
-          <Paper className={classes.paper}>
-            <ManagerChart />
-          </Paper>
-        </Grid> */}
+        {report && !loading ? (
+          <>
+            <Grid item xs={checked ? 7 : 12}>
+              <ManagerTable
+                report={report}
+                params={params}
+                ridePairs={ridePairs}
+                attractionPairs={attractionPairs}
+              />
+            </Grid>
+            {checked ? (
+              <Grid item xs={5}>
+                <Paper className={classes.paper}>
+                  <ManagerChart report={report} params={params} />
+                </Paper>
+              </Grid>
+            ) : null}
+          </>
+        ) : null}
       </Grid>
       <Snackbar open={open} autoHideDuration={2500} onClose={handleClose}>
         <Alert onClose={handleClose} severity="error">
-          End time can not begin before start time!
+          {snackMsg}
         </Alert>
       </Snackbar>
     </div>
