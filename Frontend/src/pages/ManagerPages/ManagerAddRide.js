@@ -70,6 +70,23 @@ export default function ManagerAddRide() {
       height_restriction: sumHeight > 0 ? sumHeight : null,
       picture: editRide.picture,
     };
+
+    if(newRide.name=="")
+    {
+      console.log("name is empty");
+      return;
+    }
+    if(newRide.description=="")
+    {
+      console.log("name is empty");
+      return;
+    }
+    if(newRide.location=="")
+    {
+      console.log("name is empty");
+      return;
+    }
+
     axios
       .post("manager/ride-create", newRide)
       .then((res) => {
