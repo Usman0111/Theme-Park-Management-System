@@ -65,7 +65,7 @@ const getTable = (params, report, ridePairs, attractionPairs) => {
   let columns = [];
 
   // raw data from backend
-  console.log(params, report);
+  // console.log(params, report);
 
   // 1st report
   if (params.reportType === "visits") {
@@ -219,8 +219,9 @@ export default function ManagerTable(props) {
   useEffect(() => {
     const { params, report, ridePairs, attractionPairs } = props;
     const parsedTable = getTable(params, report, ridePairs, attractionPairs);
-    // console.log(parsedTable);
+    console.log(parsedTable);
     setTable(parsedTable);
+    props.setExcelData(parsedTable);
   }, [props]);
 
   return (

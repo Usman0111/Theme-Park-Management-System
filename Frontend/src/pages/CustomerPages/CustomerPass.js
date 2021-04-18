@@ -95,9 +95,7 @@ function CustomerPass(props) {
         user_id: localStorage.getItem("user_id"),
       })
       .then((res) => {
-        console.log(res.data);
         const passes = res.data.map((pass) => createPass(pass));
-        console.log(passes);
         setTickets(passes);
       })
       .catch((err) => {

@@ -45,8 +45,8 @@ export default function AdminReport() {
   const classes = useStyles();
   //menu
   const [reportType, setReportType] = useState("visits");
-  const [start_date, setStartDate] = useState("2020-04-12");
-  const [end_date, setEndDate] = useState("2021-04-17");
+  const [start_date, setStartDate] = useState("");
+  const [end_date, setEndDate] = useState("");
   const [calculate, setCalculate] = useState("daily total");
   const [show, setShow] = useState("all"); // one or all
   const [type, setType] = useState("ride"); //ride or attraction query
@@ -83,6 +83,12 @@ export default function AdminReport() {
   const [excelData, setExcelData] = useState();
 
   const generateReport = () => {
+    if (!start_date || !end_date) {
+      setSnackMsg("Please pick a date range to generate report");
+      setOpen(true);
+      return;
+    }
+
     if (start_date > end_date) {
       setSnackMsg("End date can not come before start date");
       setOpen(true);
@@ -166,28 +172,27 @@ export default function AdminReport() {
           </Button>
           {report ? (
             <>
-              {/* <ExcelFile
-                element={
-                  <Button
-                    color="primary"
-                    variant="contained"
-                    style={{ marginLeft: 20 }}
-                    size="medium"
-                  >
-                    Download Excel
-                  </Button>
-                }
-              >
-                <ExcelSheet data={excelData.rows} name="Employees">
-                <ExcelColumn label="Name" value="name" />
-
-              <ExcelColumn label="Wallet Money" value="calories" />
-              <ExcelColumn label="Gender" value="fat" />
-              <ExcelColumn label="Marital Status" value="carbs" />
-              <ExcelColumn label="Marital Status" value="carbs" />
-            </ExcelSheet>
-              </ExcelFile> */}
-              <FormControlLabel
+              {excelData ? (
+                <ExcelFile
+                  element={
+                    <Button
+                      color="primary"
+                      variant="contained"
+                      style={{ marginLeft: 20 }}
+                      size="medium"
+                    >
+                      Download Excel
+                    </Button>
+                  }
+                >
+                  <ExcelSheet data={excelData.rows} name={reportType}>
+                    {excelData.columns.map((col) => (
+                      <ExcelColumn label={col.label} value={col.id} />
+                    ))}
+                  </ExcelSheet>
+                </ExcelFile>
+              ) : null}
+              {/* <FormControlLabel
                 control={
                   <Checkbox
                     checked={checked}
@@ -197,7 +202,7 @@ export default function AdminReport() {
                   />
                 }
                 label="Show Graph"
-              />
+              /> */}
             </>
           ) : null}
         </div>
@@ -228,7 +233,6 @@ export default function AdminReport() {
                 id="start_date"
                 label="Start date"
                 type="date"
-                defaultValue="2017-05-24"
                 className={classes.textField}
                 InputLabelProps={{
                   shrink: true,
@@ -348,6 +352,7 @@ export default function AdminReport() {
                 params={params}
                 ridePairs={ridePairs}
                 attractionPairs={attractionPairs}
+                setExcelData={setExcelData}
               />
             </Grid>
             {checked ? (
