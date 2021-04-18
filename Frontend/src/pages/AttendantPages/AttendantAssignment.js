@@ -129,7 +129,9 @@ export default function AttendantAssignment() {
   };
 
   const declareRainout = () => {
-    axios
+    if(isRide)
+    {
+      axios
       .put("attendant/declare-rainout", {
         rainout_type: "ride",
         ride_id: assignment.ride_id,
@@ -142,10 +144,30 @@ export default function AttendantAssignment() {
       .catch((err) => {
         console.log(err);
       });
+    }
+    else
+    {
+      axios
+      .put("attendant/declare-rainout", {
+        rainout_type: "attraction",
+        attraction_id: assignment.attraction_id,
+        attendant_id: assignment.attendant_id,
+      })
+      .then((res) => {
+        setAssignment({ ...assignment, rainedout: true });
+        handleClickSnack("Rainout successfully declared!");
+      })
+      .catch((err) => {
+        console.log(err);
+      });
+    }
+
   };
 
   const endRainout = () => {
-    axios
+    if(isRide)
+    {
+      axios
       .put("attendant/end-rainout", {
         rainout_type: "ride",
         ride_id: assignment.ride_id,
@@ -157,6 +179,23 @@ export default function AttendantAssignment() {
       .catch((err) => {
         console.log(err);
       });
+    }
+    else
+    {
+      axios
+      .put("attendant/end-rainout", {
+        rainout_type: "attraction",
+        attraction_id: assignment.attraction_id,
+      })
+      .then((res) => {
+        setAssignment({ ...assignment, rainedout: false });
+        handleClickSnack("Rainout successfully ended!");
+      })
+      .catch((err) => {
+        console.log(err);
+      });
+    }
+
   };
 
   return (
