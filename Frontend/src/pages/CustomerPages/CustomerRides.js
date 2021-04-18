@@ -18,6 +18,13 @@ import BrokenImageIcon from "@material-ui/icons/BrokenImage";
 import OpacityIcon from "@material-ui/icons/Opacity";
 import CustomerTimer from "./CustomerTimer";
 
+import Dialog from '@material-ui/core/Dialog';
+import DialogActions from '@material-ui/core/DialogActions';
+import DialogContent from '@material-ui/core/DialogContent';
+import DialogContentText from '@material-ui/core/DialogContentText';
+import DialogTitle from '@material-ui/core/DialogTitle';
+import Slide from '@material-ui/core/Slide';
+
 function Alert(props) {
   return <MuiAlert elevation={6} variant="filled" {...props} />;
 }
@@ -47,6 +54,10 @@ const useStyles = makeStyles((theme) => ({
     fontSize: 12,
   },
 }));
+
+const Transition = React.forwardRef(function Transition(props, ref) {
+  return <Slide direction="up" ref={ref} {...props} />;
+});
 
 export default function CustomerRides() {
   const classes = useStyles();
@@ -81,8 +92,17 @@ export default function CustomerRides() {
     if (reason === "clickaway") {
       return;
     }
-
     setOpen(false);
+  };
+
+  const [info, setInfo] = React.useState({});
+
+  const [openDialog, setOpenDialog] = React.useState(false);
+  const dialogHandleClickOpen = () => {
+    setOpenDialog(true);
+  };
+  const dialogHandleClose = () => {
+    setOpenDialog(false);
   };
 
   const visit = (ride_id) => {
@@ -148,40 +168,9 @@ export default function CustomerRides() {
                       Ride!
                     </Button>
                   )}
-
-                  <Tooltip
-                    title={
-                      <React.Fragment>
-                        <Typography color="inherit" variant="subtitle1">
-                          Description
-                        </Typography>
-                        <div className={classes.paragraph}>
-                          {ride.description}
-                        </div>
-                        <Typography color="inherit" variant="subtitle1">
-                          Location
-                        </Typography>
-                        <div className={classes.paragraph}>{ride.location}</div>
-                        <Typography color="inherit" variant="subtitle1">
-                          Age Restriciton
-                        </Typography>
-                        <div className={classes.paragraph}>
-                          {ride.age_restriction ? ride.age_restriction : "None"}
-                        </div>
-                        <Typography color="inherit" variant="subtitle1">
-                          Height Resctriction
-                        </Typography>
-                        <div className={classes.paragraph}>
-                          {ride.height_restriction
-                            ? ride.height_restriction
-                            : "None"}
-                        </div>
-                      </React.Fragment>
-                    }
-                  >
-                    <Button variant="contained">Info</Button>
-                  </Tooltip>
+                  <Button variant="contained" onClick={dialogHandleClickOpen}>Info</Button>
                 </CardActions>
+                
               </Card>
             </Grid>
           ))
@@ -191,7 +180,32 @@ export default function CustomerRides() {
             Wheee! enjoying the fun ride
           </Alert>
         </Snackbar>
+        <Dialog
+                    open={openDialog}
+                    TransitionComponent={Transition}
+                    onClose={dialogHandleClose}
+                    aria-labelledby="alert-dialog-slide-title"
+                    aria-describedby="alert-dialog-slide-description"
+                  >
+                    <DialogTitle id="alert-dialog-slide-title">(ride.name)</DialogTitle>
+                    <DialogContent>
+                      <DialogContentText>(ride.description)</DialogContentText>
+                      <DialogContentText>Location</DialogContentText>
+                      <DialogContentText>(ride.location)</DialogContentText>
+                      <DialogContentText>Age Restriction</DialogContentText>
+                      <DialogContentText>(ride.age_restriction)</DialogContentText>
+                      <DialogContentText>Height Restriction</DialogContentText>
+                      <DialogContentText>ride.height_restriction</DialogContentText>
+                      <DialogContentText></DialogContentText>
+                    </DialogContent>
+                    <DialogActions>
+                      <Button onClick={dialogHandleClose} color="primary">
+                        Close
+                      </Button>
+                    </DialogActions>
+                  </Dialog>
       </Grid>
+      
     </Container>
   );
 }

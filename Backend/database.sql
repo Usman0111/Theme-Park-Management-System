@@ -22,9 +22,9 @@ CREATE TABLE CustomerInfo
 CREATE TABLE Ride
 (
     ride_id serial NOT NULL,
-	name varchar(50) NOT NULL,
+	name varchar(500) NOT NULL,
 	description varchar(1000) NOT NULL,
-	location varchar(50) NOT NULL,
+	location varchar(500) NOT NULL,
 	broken boolean NOT NULL,
 	rainedout boolean NOT NULL,
 	age_restriction int,
@@ -38,9 +38,9 @@ CREATE TABLE Ride
 CREATE TABLE Attraction
 (
     attraction_id serial NOT NULL,
-	name varchar(50) NOT NULL,
-    description varchar(100) NOT NULL,
-	location varchar(50) NOT NULL,
+	name varchar(500) NOT NULL,
+    description varchar(1000) NOT NULL,
+	location varchar(500) NOT NULL,
 	rainedout boolean NOT NULL,
 	age_restriction int,
 	picture varchar(300),
