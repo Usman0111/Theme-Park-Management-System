@@ -68,6 +68,22 @@ export default function ManagerAddattraction() {
       picture: editattraction.picture,
     };
 
+    if(newattraction.name=="")
+    {
+      console.log("name is empty");
+      return;
+    }
+    if(newattraction.description=="")
+    {
+      console.log("name is empty");
+      return;
+    }
+    if(newattraction.location=="")
+    {
+      console.log("name is empty");
+      return;
+    }
+
     axios
       .put("manager/attraction-edit", newattraction)
       .then((res) => {
