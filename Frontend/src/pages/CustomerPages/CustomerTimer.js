@@ -16,12 +16,12 @@ const renderer = ({ hours, minutes, seconds, completed }) => {
   }
 };
 
-const CustomerTimer = () => {
+const CustomerTimer = (props) => {
   let history = useHistory();
-
+  const { timeleft } = props;
   return (
     <div>
-      <Countdown date={Date.now() + 10000} renderer={renderer} />
+      <Countdown date={Date.now() + 10000} renderer={0, timeleft, 0, false} />
     </div>
   );
 };

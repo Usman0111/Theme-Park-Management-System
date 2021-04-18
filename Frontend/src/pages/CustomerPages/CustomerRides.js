@@ -16,6 +16,7 @@ import MuiAlert from "@material-ui/lab/Alert";
 import PassNeeded from "./PassNeeded";
 import BrokenImageIcon from "@material-ui/icons/BrokenImage";
 import OpacityIcon from "@material-ui/icons/Opacity";
+import CustomerTimer from "./CustomerTimer";
 
 function Alert(props) {
   return <MuiAlert elevation={6} variant="filled" {...props} />;
@@ -51,6 +52,7 @@ export default function CustomerRides() {
   const classes = useStyles();
   const [rides, setRides] = useState([]);
   const [validpass, setValidpass] = useState(true);
+  const [timeleft, setTimeLeft] = useState(true);
 
   useEffect(() => {
     axios
@@ -59,6 +61,8 @@ export default function CustomerRides() {
       })
       .then((res) => {
         if (res.data !== "You have an unexpired entry pass") {
+          setTimeLeft(res.data.time_left.minutes);
+          console.log(res.data);
           setRides(res.data.rides);
         } else {
           setValidpass(false);
@@ -108,6 +112,7 @@ export default function CustomerRides() {
         ) : (
           rides.map((ride) => (
             <Grid item key={ride.ride_id} md={3}>
+              <CustomerTimer timeleft={timeleft} />
               <Card className={classes.card}>
                 <CardMedia
                   className={classes.cardMedia}
