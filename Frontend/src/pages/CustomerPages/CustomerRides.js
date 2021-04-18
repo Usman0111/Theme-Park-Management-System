@@ -70,6 +70,7 @@ export default function CustomerRides() {
       })
       .then((res) => {
         if (res.data !== "You have an unexpired entry pass") {
+          console.log(res.data.time_left);
           setRides(res.data.rides);
         } else {
           setValidpass(false);

@@ -302,7 +302,7 @@ export default function Managerattractions() {
                       })
                     }
                   >
-                    <ArchiveIcon />
+                    <DeleteIcon />
                   </Button>
                 )}
               </CardActions>

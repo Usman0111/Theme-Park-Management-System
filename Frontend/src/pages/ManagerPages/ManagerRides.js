@@ -290,7 +290,7 @@ export default function ManagerRides() {
                       setArchive({ ride_id: ride.ride_id, archive: true })
                     }
                   >
-                    <ArchiveIcon />
+                    <DeleteIcon />
                   </Button>
                 )}
               </CardActions>
