@@ -20,6 +20,7 @@ import DialogContent from "@material-ui/core/DialogContent";
 import DialogContentText from "@material-ui/core/DialogContentText";
 import Snackbar from "@material-ui/core/Snackbar";
 import MuiAlert from "@material-ui/lab/Alert";
+import NothingMessage from "../../components/NothingMessage/NothingMessage";
 
 function Alert(props) {
   return <MuiAlert elevation={6} variant="filled" {...props} />;
@@ -318,7 +319,11 @@ export default function AttendantAssignment() {
             </DialogActions>
           </Dialog>
         </div>
-      ) : null}
+      ) : (
+        <NothingMessage
+          message={"The manager was notified! Please wait for an assignment."}
+        />
+      )}
       <Snackbar
         open={openSnack}
         autoHideDuration={2000}
