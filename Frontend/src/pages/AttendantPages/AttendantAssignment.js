@@ -1,6 +1,6 @@
 import React, { useState, useEffect } from "react";
 import Button from "@material-ui/core/Button";
-import { Grid, Typography } from "@material-ui/core";
+import { Typography } from "@material-ui/core";
 import TextareaAutosize from "@material-ui/core/TextareaAutosize";
 import Card from "@material-ui/core/Card";
 import Tooltip from "@material-ui/core/Tooltip";
@@ -20,15 +20,25 @@ import DialogContent from "@material-ui/core/DialogContent";
 import DialogContentText from "@material-ui/core/DialogContentText";
 import Snackbar from "@material-ui/core/Snackbar";
 import MuiAlert from "@material-ui/lab/Alert";
-import NothingMessage from "../../components/NothingMessage/NothingMessage";
 
 function Alert(props) {
   return <MuiAlert elevation={6} variant="filled" {...props} />;
 }
 
 const useStyles = makeStyles((theme) => ({
+  root: {
+    display: "flex",
+  },
+  details: {
+    display: "flex",
+    flexDirection: "column",
+    flexGrow: 100,
+  },
+  content: {
+    flex: "1 0 auto",
+  },
   cover: {
-    width: 151,
+    width: 600,
     height: "100%",
   },
   buttons: {
@@ -180,116 +190,103 @@ export default function AttendantAssignment() {
     <div>
       {retrevied === true ? (
         <div>
-          <Grid container>
-            <Grid item xs={6}>
-              <Card className={classes.root}>
-                <div className={classes.details}>
-                  <CardContent className={classes.content}>
-                    <Typography variant="h2">{assignment.name}</Typography>
-                    <Typography variant="h6">Description</Typography>
+          <Card className={classes.root}>
+            <div className={classes.details}>
+              <CardContent className={classes.content}>
+                <Typography variant="h2">{assignment.name}</Typography>
+                <Typography variant="h6">Description</Typography>
+                <Typography variant="subtitle1" color="textSecondary">
+                  {assignment.description}
+                </Typography>
+                <Typography variant="h6">Location</Typography>
+                <Typography variant="subtitle1" color="textSecondary">
+                  {assignment.location}
+                </Typography>
+                <Typography variant="h6">Age Restriction</Typography>
+                <Typography variant="subtitle1" color="textSecondary">
+                  {assignment.age_restriction
+                    ? assignment.age_restriction
+                    : "None"}
+                </Typography>
+                {isRide ? (
+                  <div>
+                    <Typography variant="h6">Height Resctriction</Typography>
                     <Typography variant="subtitle1" color="textSecondary">
-                      {assignment.description}
-                    </Typography>
-                    <Typography variant="h6">Location</Typography>
-                    <Typography variant="subtitle1" color="textSecondary">
-                      {assignment.location}
-                    </Typography>
-                    <Typography variant="h6">Age Restriction</Typography>
-                    <Typography variant="subtitle1" color="textSecondary">
-                      {assignment.age_restriction
-                        ? assignment.age_restriction
+                      {assignment.height_restriction
+                        ? `${Math.floor(assignment.height_restriction / 12)}' ${
+                            assignment.height_restriction % 12
+                          }'' `
                         : "None"}
                     </Typography>
-                    {isRide ? (
-                      <div>
-                        <Typography variant="h6">
-                          Height Resctriction
-                        </Typography>
-                        <Typography variant="subtitle1" color="textSecondary">
-                          {assignment.height_restriction
-                            ? `${Math.floor(
-                                assignment.height_restriction / 12
-                              )}' ${assignment.height_restriction % 12}'' `
-                            : "None"}
-                        </Typography>
-                      </div>
-                    ) : null}
+                  </div>
+                ) : null}
 
-                    <Typography variant="h6">Status</Typography>
-                    <div>
-                      {!assignment.broken && !assignment.rainedout ? (
-                        <Tooltip title="Available">
-                          <EventAvailableIcon fontSize="large" />
-                        </Tooltip>
-                      ) : null}
-                      {assignment.broken ? (
-                        <Tooltip title="Broken">
-                          <BrokenImageIcon fontSize="large" />
-                        </Tooltip>
-                      ) : null}
-                      {assignment.rainedout ? (
-                        <Tooltip title="Rainedout">
-                          <OpacityIcon fontSize="large" />
-                        </Tooltip>
-                      ) : null}
-                    </div>
-                    <Divider />
-                    <div className={classes.buttons}>
-                      {isRide ? (
-                        assignment.broken ? (
-                          <Button variant="contained" color="disabled">
-                            Make Fix Request
-                          </Button>
-                        ) : (
-                          <Button
-                            variant="contained"
-                            style={{
-                              backgroundColor: red["A200"],
-                              color: "white",
-                            }}
-                            onClick={() => setOpen(true)}
-                          >
-                            Make Fix Request
-                          </Button>
-                        )
-                      ) : null}
-
-                      {assignment.rainedout ? (
-                        <Button
-                          variant="contained"
-                          style={{ marginLeft: "15px" }}
-                          color="primary"
-                          onClick={() => endRainout()}
-                        >
-                          End Rainout
-                        </Button>
-                      ) : (
-                        <Button
-                          variant="contained"
-                          color="primary"
-                          style={{ marginLeft: "15px" }}
-                          onClick={() => declareRainout()}
-                        >
-                          Declare Rainout
-                        </Button>
-                      )}
-                    </div>
-                  </CardContent>
+                <Typography variant="h6">Status</Typography>
+                <div>
+                  {!assignment.broken && !assignment.rainedout ? (
+                    <Tooltip title="Available">
+                      <EventAvailableIcon fontSize="large" />
+                    </Tooltip>
+                  ) : null}
+                  {assignment.broken ? (
+                    <Tooltip title="Broken">
+                      <BrokenImageIcon fontSize="large" />
+                    </Tooltip>
+                  ) : null}
+                  {assignment.rainedout ? (
+                    <Tooltip title="Rainedout">
+                      <OpacityIcon fontSize="large" />
+                    </Tooltip>
+                  ) : null}
                 </div>
-              </Card>
-            </Grid>
+                <Divider />
+                <div className={classes.buttons}>
+                  {isRide ? (
+                    assignment.broken ? (
+                      <Button variant="contained" color="disabled">
+                        Make Fix Request
+                      </Button>
+                    ) : (
+                      <Button
+                        variant="contained"
+                        style={{ backgroundColor: red["A200"], color: "white" }}
+                        onClick={() => setOpen(true)}
+                      >
+                        Make Fix Request
+                      </Button>
+                    )
+                  ) : null}
 
-            <Grid item xs={6}>
-              <Card>
-                <CardMedia
-                  image={assignment.picture}
-                  title="your assignment"
-                  style={{ height: 0, paddingTop: "100%" }}
-                />
-              </Card>
-            </Grid>
-          </Grid>
-
+                  {assignment.rainedout ? (
+                    <Button
+                      variant="contained"
+                      style={{ marginLeft: "15px" }}
+                      color="primary"
+                      onClick={() => endRainout()}
+                    >
+                      End Rainout
+                    </Button>
+                  ) : (
+                    <Button
+                      variant="contained"
+                      color="primary"
+                      style={{ marginLeft: "15px" }}
+                      onClick={() => declareRainout()}
+                    >
+                      Declare Rainout
+                    </Button>
+                  )}
+                </div>
+              </CardContent>
+            </div>
+            <Card>
+              <CardMedia
+                className={classes.cover}
+                image={assignment.picture}
+                title="your assignment"
+              />
+            </Card>
+          </Card>
           <Dialog
             open={open}
             onClose={handleClose}
@@ -321,11 +318,7 @@ export default function AttendantAssignment() {
             </DialogActions>
           </Dialog>
         </div>
-      ) : (
-        <NothingMessage
-          message={"Manager was notified! Please wait for an assignment"}
-        />
-      )}
+      ) : null}
       <Snackbar
         open={openSnack}
         autoHideDuration={2000}
