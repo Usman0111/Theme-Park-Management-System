@@ -222,7 +222,7 @@ export default function ManagerTable(props) {
     console.log(parsedTable);
     setTable(parsedTable);
     props.setExcelData(parsedTable);
-  }, [props]);
+  }, []);
 
   return (
     <>
