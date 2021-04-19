@@ -156,7 +156,7 @@ export default function AdminReport() {
         setAttractions(res.data);
       })
       .catch((err) => console.log(err));
-  }, []);
+  }, [report]);
 
   return (
     <div className={classes.root}>
@@ -238,7 +238,10 @@ export default function AdminReport() {
                   shrink: true,
                 }}
                 value={start_date}
-                onChange={(event) => setStartDate(event.target.value)}
+                onChange={(event) => {
+                  console.log(event.target.value);
+                  setStartDate(event.target.value);
+                }}
               />
             </FormControl>
             <FormControl className={classes.formControl}>
