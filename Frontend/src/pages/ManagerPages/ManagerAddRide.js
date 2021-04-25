@@ -19,6 +19,12 @@ import DialogContent from "@material-ui/core/DialogContent";
 import CircularProgress from "@material-ui/core/CircularProgress";
 import DialogTitle from "@material-ui/core/DialogTitle";
 import { useHistory } from "react-router-dom";
+import Snackbar from "@material-ui/core/Snackbar";
+import MuiAlert from "@material-ui/lab/Alert";
+
+function Alert(props) {
+  return <MuiAlert elevation={6} variant="filled" {...props} />;
+}
 
 const useStyles = makeStyles({
   input: {
@@ -57,16 +63,16 @@ export default function ManagerAddRide() {
     setOpenModal(false);
   };
 
-  // const [open, setOpen] = useState(false);
-  // const [err, setErr] = useState("");
+  const [open, setOpen] = useState(false);
+  const [err, setErr] = useState("");
 
-  // const handleClose = (event, reason) => {
-  //   if (reason === "clickaway") {
-  //     return;
-  //   }
+  const handleClose = (event, reason) => {
+    if (reason === "clickaway") {
+       return;
+    }
 
-  //   setOpen(false);
-  // };
+      setOpen(false);
+    };
 
   const confirmCreate = () => {
     const sumHeight =
@@ -82,16 +88,91 @@ export default function ManagerAddRide() {
       picture: editRide.picture,
     };
 
-    if (newRide.name == "") {
+    //Missing Fields
+    if(newRide.name=="")
+    {
       console.log("name is empty");
+      setErr("Name is Empty")
+      setOpen(true)
       return;
     }
-    if (newRide.description == "") {
-      console.log("name is empty");
+    if(newRide.location=="")
+    {
+      console.log("location is empty");
+      setErr("Location is Empty")
+      setOpen(true)
       return;
     }
-    if (newRide.location == "") {
-      console.log("name is empty");
+    if(newRide.height_restriction==null)
+    {
+      console.log("height is empty");
+      setErr("Missing Height")
+      setOpen(true)
+      return;
+    }
+    if(newRide.description=="")
+    {
+      console.log("description is empty");
+      setErr("Description is Empty")
+      setOpen(true)
+      return;
+    }
+    //Fields out of bounds
+    if(newRide.name.length>30)
+    {
+      console.log("name is too big");
+      setErr("Name Length is Too Large")
+      setOpen(true)
+      return;
+    }
+    if(newRide.name.length<4)
+    {
+      console.log("name is too small");
+      setErr("Name Length is Too Small")
+      setOpen(true)
+      return;
+    }
+    if(newRide.location.length>50)
+    {
+      console.log("Location Length is too big");
+      setErr("Location Length is Too Large")
+      setOpen(true)
+      return;
+    }
+    if(newRide.location.length<4)
+    {
+      console.log("name is too small");
+      setErr("Location Length is Too Small")
+      setOpen(true)
+      return;
+    }
+    if(newRide.age_restriction>21)
+    {
+      console.log("age is too big");
+      setErr("Age is Too Large")
+      setOpen(true)
+      return;
+    }
+    if(newRide.height_restriction>96)
+    {
+      console.log("Height is too big");
+      setErr("Height is Too Large")
+      setOpen(true)
+      return;
+    }
+
+    if(newRide.description.length<20)
+    {
+      console.log("description is too small");
+      setErr("Description Length is Too Small")
+      setOpen(true)
+      return;
+    }
+    if(newRide.description.length>400)
+    {
+      console.log("description is too large");
+      setErr("Description Length is Too Large")
+      setOpen(true)
       return;
     }
 
@@ -335,11 +416,11 @@ export default function ManagerAddRide() {
           </Grid>
         </DialogContent>
       </Dialog>
-      {/* <Snackbar open={open} autoHideDuration={4000} onClose={handleClose}>
+      <Snackbar open={open} autoHideDuration={4000} onClose={handleClose}>
             <Alert severity="error" style={{ marginTop: "10px" }}>
               {err}
             </Alert>
-          </Snackbar> */}
+      </Snackbar>
     </div>
   );
 }
