@@ -3,7 +3,6 @@ import Grid from "@material-ui/core/Grid";
 
 import Typography from "@material-ui/core/Typography";
 import { makeStyles } from "@material-ui/core/styles";
-import HourglassEmptyIcon from "@material-ui/icons/HourglassEmpty";
 
 const useStyles = makeStyles({
   root: {
@@ -25,9 +24,7 @@ const NothingMessage = (props) => {
         style={{ marginTop: 100 }}
       >
         <Grid item xs={12}>
-          <div>
-            <HourglassEmptyIcon fontSize="large" />
-          </div>
+          <div>{props.icon ? props.icon : null}</div>
         </Grid>
         <Grid item xs={12}>
           <div className={classes.root}>

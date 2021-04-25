@@ -22,7 +22,9 @@ import AssessmentIcon from "@material-ui/icons/Assessment";
 import ManagerAddRide from "./ManagerAddRide";
 import ManagerInfoRide from "./ManagerInfoRide";
 import ManagerInfoAttraction from "./ManagerInfoAttraction";
-import ManagerAddAttraction from "./ManagerAddAttraction"
+import ManagerAddAttraction from "./ManagerAddAttraction";
+import BrokenImageIcon from "@material-ui/icons/BrokenImage";
+import ManagerBreakdowns from "./ManagerBreakdowns";
 
 const drawerWidth = 240;
 
@@ -68,6 +70,7 @@ export default function ManagerDashboard() {
     { text: "Reports", url: `${url}`, icon: <AssessmentIcon /> },
     { text: "Rides", url: `${url}/rides`, icon: <TrainIcon /> },
     { text: "Attractions", url: `${url}/attractions`, icon: <StoreIcon /> },
+    { text: "Breakdowns", url: `${url}/breakdowns`, icon: <BrokenImageIcon /> },
   ];
 
   return (
@@ -120,11 +123,23 @@ export default function ManagerDashboard() {
             path={`${path}/rides/info-ride/:id`}
             component={ManagerInfoRide}
           />
-          <Route path={`${path}/attractions`} component={ManagerAttractions} exact/>
-          <Route path={`${path}/attractions/add-attraction`} component={ManagerAddAttraction} />
+          <Route
+            path={`${path}/attractions`}
+            component={ManagerAttractions}
+            exact
+          />
+          <Route
+            path={`${path}/attractions/add-attraction`}
+            component={ManagerAddAttraction}
+          />
           <Route
             path={`${path}/attractions/info-attraction/:id`}
-            component={ManagerInfoAttraction} 
+            component={ManagerInfoAttraction}
+          />
+          <Route
+            path={`${path}/breakdowns`}
+            component={ManagerBreakdowns}
+            exact
           />
         </Switch>
       </main>

@@ -21,6 +21,7 @@ import DialogContentText from "@material-ui/core/DialogContentText";
 import Snackbar from "@material-ui/core/Snackbar";
 import MuiAlert from "@material-ui/lab/Alert";
 import NothingMessage from "../../components/NothingMessage/NothingMessage";
+import HourglassEmptyIcon from "@material-ui/icons/HourglassEmpty";
 
 function Alert(props) {
   return <MuiAlert elevation={6} variant="filled" {...props} />;
@@ -335,6 +336,7 @@ export default function AttendantAssignment() {
       ) : (
         <NothingMessage
           message={"The manager was notified! Please wait for an assignment."}
+          icon={<HourglassEmptyIcon />}
         />
       )}
       <Snackbar
