@@ -38,7 +38,14 @@ const useStyles = makeStyles((theme) => ({
   },
 }));
 
+function validateEmail(email) {
+  const re = /^(([^<>()[\]\\.,;:\s@\"]+(\.[^<>()[\]\\.,;:\s@\"]+)*)|(\".+\"))@((\[[0-9]{1,3}\.[0-9]{1,3}\.[0-9]{1,3}\.[0-9]{1,3}\])|(([a-zA-Z\-0-9]+\.)+[a-zA-Z]{2,}))$/;
+  return re.test(email);
+}
+
+
 function Registration() {
+ 
   const classes = useStyles();
   const paperStyle = {
     padding: 20,
@@ -78,6 +85,7 @@ function Registration() {
     last_name: "",
     email: "",
     password: "",
+    confirmed_password: "",
     age: "",
     height_inch: "",
     height_feet: "",
@@ -89,6 +97,7 @@ function Registration() {
     last_name: "",
     email: "",
     password: "",
+    confirmed_password: "",
     user_type: "attendant",
   });
 
@@ -97,6 +106,35 @@ function Registration() {
 
   const customer = (e) => {
     e.preventDefault();
+    //console.log(customerD.first_name)
+    if(customerD.first_name.length < 5){
+      setErr("Your first name needs to be at least 5 characters long");
+      setOpen(true);
+      return
+    }
+    if(customerD.last_name.length < 5){
+      setErr("Your last name needs to be at least 5 characters long");
+      setOpen(true);
+      return
+    }
+
+    if(validateEmail(customerD.email) === false){
+      setErr("Your email is not valid");
+      setOpen(true);
+      return
+    }
+    if(customerD.password.length < 8){
+      setErr("Your password needs to be atleast 8 characters long");
+      setOpen(true);
+      return
+    }
+
+    if(customerD.confirmed_password !== customerD.password){
+      setErr("Your passwords do not match");
+      setOpen(true);
+      return
+    }
+   
     const height =
       Number(customerD.height_feet) * 12 + Number(customerD.height_inch);
     const custData = {
@@ -104,17 +142,11 @@ function Registration() {
       last_name: customerD.last_name,
       email: customerD.email,
       password: customerD.password,
+      customer_password: customerD.customer_password,
       age: Number(customerD.age),
       height,
       user_type: "customer",
     };
-
-    // if(first_name.length < 5){
-    //   setErr("name too short");
-    //   console.log(err.response.data);
-    //   setOpen(true);
-    //   return
-    // }
 
     console.log(custData);
     axios
@@ -134,6 +166,33 @@ function Registration() {
   const employee = (e) => {
     e.preventDefault();
     console.log(e);
+    if(employeeD.first_name.length < 5){
+      setErr("Your first name needs to be at least 5 characters long");
+      setOpen(true);
+      return
+    }
+    if(employeeD.last_name.length < 5){
+      setErr("Your last name needs to be at least 5 characters long");
+      setOpen(true);
+      return
+    }
+
+    if(validateEmail(employeeD.email) === false){
+      setErr("Your email is not valid");
+      setOpen(true);
+      return
+    }
+    if(employeeD.password.length < 8){
+      setErr("Your password needs to be atleast 8 characters long");
+      setOpen(true);
+      return
+    }
+
+    if(employeeD.confirmed_password !== employeeD.password){
+      setErr("Your passwords do not match");
+      setOpen(true);
+      return
+    }
     axios
       .post("http://100.26.17.215:5000/auth/register", {
         ...employeeD,
@@ -291,6 +350,12 @@ function Registration() {
                             margin="normal"
                             variant="filled"
                             type="password"
+                            onChange={(event) => {
+                              setEmployeeD({
+                                ...employeeD,
+                                confirmed_password: event.target.value,
+                              });
+                            }}
                           />
                         </Grid>
                         <br />
@@ -352,11 +417,15 @@ function Registration() {
                             InputLabelProps={{
                               shrink: true,
                             }}
+                            
                             onChange={(event) => {
                               setCustomerD({
                                 ...customerD,
-                                age: event.target.value,
-                              });
+                                age:
+                                  event.target.value < 0 || event.target.value > 119
+                                    ? (event.target.value = 0)
+                                    : Number(event.target.value),
+                              })
                             }}
                           />
                           <TextField
@@ -374,8 +443,11 @@ function Registration() {
                             onChange={(event) => {
                               setCustomerD({
                                 ...customerD,
-                                height_feet: event.target.value,
-                              });
+                                height_feet:
+                                  event.target.value < 0 || event.target.value > 8
+                                    ? (event.target.value = 0)
+                                    : Number(event.target.value),
+                              })
                             }}
                           />
                           <TextField
@@ -393,8 +465,11 @@ function Registration() {
                             onChange={(event) => {
                               setCustomerD({
                                 ...customerD,
-                                height_inch: event.target.value,
-                              });
+                                height_inch:
+                                  event.target.value < 0 || event.target.value > 11
+                                    ? (event.target.value = 0)
+                                    : Number(event.target.value),
+                              })
                             }}
                           />
                           <TextField
@@ -436,6 +511,12 @@ function Registration() {
                               fullWidth
                               margin="normal"
                               variant="filled"
+                              onChange={(event) => {
+                                setCustomerD({
+                                  ...customerD,
+                                  confirmed_password: event.target.value,
+                                });
+                              }}
                             />
                           </div>
                         </Grid>
