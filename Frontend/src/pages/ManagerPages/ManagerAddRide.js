@@ -68,11 +68,11 @@ export default function ManagerAddRide() {
 
   const handleClose = (event, reason) => {
     if (reason === "clickaway") {
-       return;
+      return;
     }
 
-      setOpen(false);
-    };
+    setOpen(false);
+  };
 
   const confirmCreate = () => {
     const sumHeight =
@@ -89,90 +89,61 @@ export default function ManagerAddRide() {
     };
 
     //Missing Fields
-    if(newRide.name=="")
-    {
-      console.log("name is empty");
-      setErr("Name is Empty")
-      setOpen(true)
+    if (newRide.name == "") {
+      setErr("Name is Empty");
+      setOpen(true);
       return;
     }
-    if(newRide.location=="")
-    {
-      console.log("location is empty");
-      setErr("Location is Empty")
-      setOpen(true)
+    if (newRide.location == "") {
+      setErr("Location is Empty");
+      setOpen(true);
       return;
     }
-    if(newRide.height_restriction==null)
-    {
-      console.log("height is empty");
-      setErr("Missing Height")
-      setOpen(true)
-      return;
-    }
-    if(newRide.description=="")
-    {
-      console.log("description is empty");
-      setErr("Description is Empty")
-      setOpen(true)
+    if (newRide.description == "") {
+      setErr("Description is Empty");
+      setOpen(true);
       return;
     }
     //Fields out of bounds
-    if(newRide.name.length>30)
-    {
-      console.log("name is too big");
-      setErr("Name Length is Too Large")
-      setOpen(true)
+    if (newRide.name.length > 30) {
+      setErr("Name Length is Too Large");
+      setOpen(true);
       return;
     }
-    if(newRide.name.length<4)
-    {
-      console.log("name is too small");
-      setErr("Name Length is Too Small")
-      setOpen(true)
+    if (newRide.name.length < 4) {
+      setErr("Name Length is Too Small");
+      setOpen(true);
       return;
     }
-    if(newRide.location.length>50)
-    {
-      console.log("Location Length is too big");
-      setErr("Location Length is Too Large")
-      setOpen(true)
+    if (newRide.location.length > 50) {
+      setErr("Location Length is Too Large");
+      setOpen(true);
       return;
     }
-    if(newRide.location.length<4)
-    {
-      console.log("name is too small");
-      setErr("Location Length is Too Small")
-      setOpen(true)
+    if (newRide.location.length < 4) {
+      setErr("Location Length is Too Small");
+      setOpen(true);
       return;
     }
-    if(newRide.age_restriction>21)
-    {
-      console.log("age is too big");
-      setErr("Age is Too Large")
-      setOpen(true)
+    if (newRide.age_restriction > 21) {
+      setErr("Age is Too Large");
+      setOpen(true);
       return;
     }
-    if(newRide.height_restriction>96)
-    {
-      console.log("Height is too big");
-      setErr("Height is Too Large")
-      setOpen(true)
+    if (newRide.height_restriction > 96) {
+      setErr("Height is Too Large");
+      setOpen(true);
       return;
     }
 
-    if(newRide.description.length<20)
-    {
-      console.log("description is too small");
-      setErr("Description Length is Too Small")
-      setOpen(true)
+    if (newRide.description.length < 20) {
+      setErr("Description Length is Too Small");
+      setOpen(true);
       return;
     }
-    if(newRide.description.length>400)
-    {
-      console.log("description is too large");
-      setErr("Description Length is Too Large")
-      setOpen(true)
+    if (newRide.description.length > 400) {
+      setErr("Description Length is Too Large");
+      setOpen(true);
       return;
     }
 
@@ -182,7 +153,11 @@ export default function ManagerAddRide() {
         console.log(res.data);
         history.push(`/dashboard/rides/info-ride/${res.data.ride_id}`);
       })
-      .catch((err) => console.log(err));
+      .catch((err) => {
+        setErr(err.response.data);
+        setOpen(true);
+        console.log(err.response.data);
+      });
   };
   const uploadPicture = async () => {
     if (editPicture) {
@@ -249,7 +224,7 @@ export default function ManagerAddRide() {
                     setEditRide({
                       ...editRide,
                       age_restriction:
-                        event.target.value < 0
+                        event.target.value < 0 || event.target.value > 25
                           ? (event.target.value = 0)
                           : Number(event.target.value),
                     })
@@ -268,7 +243,7 @@ export default function ManagerAddRide() {
                     setEditRide({
                       ...editRide,
                       height_restriction_feet:
-                        event.target.value < 0
+                        event.target.value < 0 || event.target.value > 6
                           ? (event.target.value = 0)
                           : Number(event.target.value),
                     })
@@ -287,7 +262,7 @@ export default function ManagerAddRide() {
                     setEditRide({
                       ...editRide,
                       height_restriction_inches:
-                        event.target.value < 0
+                        event.target.value < 0 || event.target.value > 11
                           ? (event.target.value = 0)
                           : Number(event.target.value),
                     })
@@ -417,9 +392,9 @@ export default function ManagerAddRide() {
         </DialogContent>
       </Dialog>
       <Snackbar open={open} autoHideDuration={4000} onClose={handleClose}>
-            <Alert severity="error" style={{ marginTop: "10px" }}>
-              {err}
-            </Alert>
+        <Alert severity="error" style={{ marginTop: "10px" }}>
+          {err}
+        </Alert>
       </Snackbar>
     </div>
   );

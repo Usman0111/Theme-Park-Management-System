@@ -93,13 +93,15 @@ const MaintainerFixRequests = () => {
       breakdown_description: request.descript,
       breakdown_date: request.date,
       attendant_name: request.attendant_name,
+      breakdown_id: request.bd_id,
     });
     setOpenModal(true);
   };
 
   useEffect(() => {
+    const maintainer_id = Number(localStorage.getItem("user_id"));
     axios
-      .get("maintainer/all-maintainence-requests")
+      .post("maintainer/get-maintainence-requests", { maintainer_id })
       .then((res) => {
         const req = res.data.map((breakdown) => getInfo(breakdown));
         setRequest(req);
@@ -111,14 +113,16 @@ const MaintainerFixRequests = () => {
 
   const fixRide = () => {
     const data = {
-      maintainer_id: Number(localStorage.getItem("user_id")),
+      breakdown_id: inspectIssue.breakdown_id,
       ride_id: inspectIssue.ride_id,
     };
     axios
       .put("maintainer/resolve-request", data)
       .then((res) => {
         setRequest(
-          requests.filter((request) => request.r_id !== inspectIssue.ride_id)
+          requests.filter(
+            (request) => request.bd_id !== inspectIssue.breakdown_id
+          )
         );
         setFixMsg(`${inspectIssue.ride_name} was fixed!`);
         setOpenSnackBar(true);

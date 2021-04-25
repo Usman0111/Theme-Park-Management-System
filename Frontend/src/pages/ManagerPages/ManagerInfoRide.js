@@ -18,6 +18,12 @@ import DialogActions from "@material-ui/core/DialogActions";
 import DialogContent from "@material-ui/core/DialogContent";
 import CircularProgress from "@material-ui/core/CircularProgress";
 import DialogTitle from "@material-ui/core/DialogTitle";
+import Snackbar from "@material-ui/core/Snackbar";
+import MuiAlert from "@material-ui/lab/Alert";
+
+function Alert(props) {
+  return <MuiAlert elevation={6} variant="filled" {...props} />;
+}
 
 const useStyles = makeStyles({
   input: {
@@ -45,6 +51,16 @@ export default function ManagerAddRide() {
   const [openModal, setOpenModal] = useState(false);
   const [editPicture, setEditPicture] = useState(null);
   const [loading, setLoading] = useState(false);
+  const [open, setOpen] = useState(false);
+  const [err, setErr] = useState("");
+
+  const handleClose = (event, reason) => {
+    if (reason === "clickaway") {
+      return;
+    }
+
+    setOpen(false);
+  };
 
   const handleCloseModal = () => {
     setOpenModal(false);
@@ -73,19 +89,62 @@ export default function ManagerAddRide() {
       picture: editRide.picture,
     };
 
-    if(newRide.name=="")
-    {
-      console.log("name is empty");
+    //Missing Fields
+    if (newRide.name == "") {
+      setErr("Name is Empty");
+      setOpen(true);
       return;
     }
-    if(newRide.description=="")
-    {
-      console.log("name is empty");
+    if (newRide.location == "") {
+      setErr("Location is Empty");
+      setOpen(true);
       return;
     }
-    if(newRide.location=="")
-    {
-      console.log("name is empty");
+    if (newRide.description == "") {
+      setErr("Description is Empty");
+      setOpen(true);
+      return;
+    }
+    //Fields out of bounds
+    if (newRide.name.length > 30) {
+      setErr("Name Length is Too Large");
+      setOpen(true);
+      return;
+    }
+    if (newRide.name.length < 4) {
+      setErr("Name Length is Too Small");
+      setOpen(true);
+      return;
+    }
+    if (newRide.location.length > 50) {
+      setErr("Location Length is Too Large");
+      setOpen(true);
+      return;
+    }
+    if (newRide.location.length < 4) {
+      setErr("Location Length is Too Small");
+      setOpen(true);
+      return;
+    }
+    if (newRide.age_restriction > 21) {
+      setErr("Age is Too Large");
+      setOpen(true);
+      return;
+    }
+    if (newRide.height_restriction > 96) {
+      setErr("Height is Too Large");
+      setOpen(true);
+      return;
+    }
+
+    if (newRide.description.length < 20) {
+      setErr("Description Length is Too Small");
+      setOpen(true);
+      return;
+    }
+    if (newRide.description.length > 400) {
+      setErr("Description Length is Too Large");
+      setOpen(true);
       return;
     }
 
@@ -234,7 +293,7 @@ export default function ManagerAddRide() {
                       setEditRide({
                         ...editRide,
                         age_restriction:
-                          event.target.value < 0
+                          event.target.value < 0 || event.target.value > 25
                             ? (event.target.value = 0)
                             : Number(event.target.value),
                       })
@@ -253,7 +312,7 @@ export default function ManagerAddRide() {
                       setEditRide({
                         ...editRide,
                         height_restriction_feet:
-                          event.target.value < 0
+                          event.target.value < 0 || event.target.value > 6
                             ? (event.target.value = 0)
                             : Number(event.target.value),
                       })
@@ -272,7 +331,7 @@ export default function ManagerAddRide() {
                       setEditRide({
                         ...editRide,
                         height_restriction_inches:
-                          event.target.value < 0
+                          event.target.value < 0 || event.target.value > 11
                             ? (event.target.value = 0)
                             : Number(event.target.value),
                       })
@@ -402,6 +461,11 @@ export default function ManagerAddRide() {
           </Grid>
         </DialogContent>
       </Dialog>
+      <Snackbar open={open} autoHideDuration={4000} onClose={handleClose}>
+        <Alert severity="error" style={{ marginTop: "10px" }}>
+          {err}
+        </Alert>
+      </Snackbar>
     </div>
   );
 }

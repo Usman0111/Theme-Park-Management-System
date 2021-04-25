@@ -152,7 +152,6 @@ const ManagerBreakdowns = () => {
       setFixType("error");
       setFixMsg("Please pick an attendant!");
       setOpenSnackBar(true);
-      console.log("pick a maintainer");
     }
 
     const data = {
@@ -162,15 +161,16 @@ const ManagerBreakdowns = () => {
 
     console.log(data);
     axios
-      .put("maintainer/resolve-request", data)
+      .put("manager/assign-fix", data)
       .then((res) => {
         setRequest(
-          requests.filter((request) => request.r_id !== inspectIssue.ride_id)
+          requests.filter((request) => request.bd_id !== breakdown.bd_id)
         );
-        setFixMsg(`${inspectIssue.ride_name} was fixed!`);
+        setFixType("success");
+        setFixMsg("Fix request assigned to maintainer");
         setOpenSnackBar(true);
-        handleCloseModal();
-        console.log(res.data.broken);
+        setOpenModalAssign(false);
+        console.log(res.data);
       })
       .catch((err) => {
         console.log(err);
@@ -222,7 +222,8 @@ const ManagerBreakdowns = () => {
             ) : (
               <>
                 <h1>
-                  No Rides are currently broken <CheckCircleOutlineIcon />
+                  All breakdown requests (if any) are already assigned to
+                  maintainers <CheckCircleOutlineIcon />
                 </h1>
               </>
             )}
