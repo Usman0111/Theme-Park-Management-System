@@ -108,6 +108,14 @@ function Registration() {
       height,
       user_type: "customer",
     };
+
+    // if(first_name.length < 5){
+    //   setErr("name too short");
+    //   console.log(err.response.data);
+    //   setOpen(true);
+    //   return
+    // }
+
     console.log(custData);
     axios
       .post("http://100.26.17.215:5000/auth/register", custData)

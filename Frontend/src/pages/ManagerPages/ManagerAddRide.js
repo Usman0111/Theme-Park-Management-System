@@ -57,6 +57,17 @@ export default function ManagerAddRide() {
     setOpenModal(false);
   };
 
+  // const [open, setOpen] = useState(false);
+  // const [err, setErr] = useState("");
+
+  // const handleClose = (event, reason) => {
+  //   if (reason === "clickaway") {
+  //     return;
+  //   }
+
+  //   setOpen(false);
+  // };
+
   const confirmCreate = () => {
     const sumHeight =
       editRide.height_restriction_feet * 12 +
@@ -71,18 +82,15 @@ export default function ManagerAddRide() {
       picture: editRide.picture,
     };
 
-    if(newRide.name=="")
-    {
+    if (newRide.name == "") {
       console.log("name is empty");
       return;
     }
-    if(newRide.description=="")
-    {
+    if (newRide.description == "") {
       console.log("name is empty");
       return;
     }
-    if(newRide.location=="")
-    {
+    if (newRide.location == "") {
       console.log("name is empty");
       return;
     }
@@ -327,6 +335,11 @@ export default function ManagerAddRide() {
           </Grid>
         </DialogContent>
       </Dialog>
+      {/* <Snackbar open={open} autoHideDuration={4000} onClose={handleClose}>
+            <Alert severity="error" style={{ marginTop: "10px" }}>
+              {err}
+            </Alert>
+          </Snackbar> */}
     </div>
   );
 }
