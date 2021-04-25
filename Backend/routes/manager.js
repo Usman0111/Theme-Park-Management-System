@@ -53,7 +53,16 @@ router.post("/ride-create", async (req, res) => {
       picture,
     } = req.body;
 
-    //const querry = await pool.query('listen db_notification');
+    const current = await pool.query(
+      `SELECT * FROM ride WHERE name=$1 AND location=$2`,
+      [name, location]
+    );
+
+    if (current.rows.length !== 0) {
+      return res
+        .status(400)
+        .send("Ride with same name and location already exists");
+    }
 
     const newRide = await pool.query(
       `INSERT INTO ride (name, 
@@ -93,6 +102,17 @@ router.put("/ride-edit", async (req, res) => {
       height_restriction,
       picture,
     } = req.body;
+
+    const current = await pool.query(
+      `SELECT * FROM ride WHERE name=$1 AND location=$2`,
+      [name, location]
+    );
+
+    if (current.rows.length !== 0) {
+      return res
+        .status(400)
+        .send("Ride with same name and location already exists");
+    }
     const udpateRide = await pool.query(
       `UPDATE ride SET name = $1,
                             description = $2,
@@ -163,6 +183,18 @@ router.post("/attraction-create", async (req, res) => {
       age_restriction,
       picture,
     } = req.body;
+
+    const current = await pool.query(
+      `SELECT * FROM attraction WHERE name=$1 AND location=$2`,
+      [name, location]
+    );
+
+    if (current.rows.length !== 0) {
+      return res
+        .status(400)
+        .send("Attraction with same name and location already exists");
+    }
+
     const newAttraction = await pool.query(
       `INSERT INTO attraction (name, 
                                 description, 
@@ -190,6 +222,18 @@ router.put("/attraction-edit", async (req, res) => {
       age_restriction,
       picture,
     } = req.body;
+
+    const current = await pool.query(
+      `SELECT * FROM attraction WHERE name=$1 AND location=$2`,
+      [name, location]
+    );
+
+    if (current.rows.length !== 0) {
+      return res
+        .status(400)
+        .send("Attraction with same name and location already exists");
+    }
+
     const udpateAttraction = await pool.query(
       `UPDATE attraction SET name = $1,
                             description = $2,

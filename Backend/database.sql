@@ -75,6 +75,7 @@ CREATE TABLE RideBreakdowns
     breakdown_date date NOT NULL DEFAULT CURRENT_DATE,
     breakdown_description varchar(1000),
 	attendant_id int,
+	fullfilled boolean,
     PRIMARY KEY (breakdown_id),
 	FOREIGN KEY (ride_id) REFERENCES Ride(ride_id),
 	FOREIGN KEY (maintainer_id) REFERENCES UserAccount(account_id)
