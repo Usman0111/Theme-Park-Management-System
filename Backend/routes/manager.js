@@ -132,7 +132,7 @@ router.get("/all-maintainence-requests", async (req, res) => {
   try {
     const breakdowns = await pool.query(
       `SELECT * FROM ridebreakdowns, ride, useraccount
-                      WHERE fullfilled=false AND ridebreakdowns.ride_id = ride.ride_id AND ride.attendant_id=useraccount.account_id`
+                      WHERE maintainer_id=NULL AND fullfilled=false AND ridebreakdowns.ride_id = ride.ride_id AND ride.attendant_id=useraccount.account_id`
     );
 
     // previous query that doesn't give attendant name, if the ids are not properly assigned then above query won't work
