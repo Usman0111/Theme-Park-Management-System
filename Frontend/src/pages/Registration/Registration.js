@@ -43,9 +43,7 @@ function validateEmail(email) {
   return re.test(email);
 }
 
-
 function Registration() {
- 
   const classes = useStyles();
   const paperStyle = {
     padding: 20,
@@ -106,35 +104,34 @@ function Registration() {
 
   const customer = (e) => {
     e.preventDefault();
-    //console.log(customerD.first_name)
-    if(customerD.first_name.length < 5){
+    if (customerD.first_name.length < 5) {
       setErr("Your first name needs to be at least 5 characters long");
       setOpen(true);
-      return
+      return;
     }
-    if(customerD.last_name.length < 5){
+    if (customerD.last_name.length < 5) {
       setErr("Your last name needs to be at least 5 characters long");
       setOpen(true);
-      return
+      return;
     }
 
-    if(validateEmail(customerD.email) === false){
+    if (validateEmail(customerD.email) === false) {
       setErr("Your email is not valid");
       setOpen(true);
-      return
+      return;
     }
-    if(customerD.password.length < 8){
+    if (customerD.password.length < 8) {
       setErr("Your password needs to be atleast 8 characters long");
       setOpen(true);
-      return
+      return;
     }
 
-    if(customerD.confirmed_password !== customerD.password){
+    if (customerD.confirmed_password !== customerD.password) {
       setErr("Your passwords do not match");
       setOpen(true);
-      return
+      return;
     }
-   
+
     const height =
       Number(customerD.height_feet) * 12 + Number(customerD.height_inch);
     const custData = {
@@ -166,32 +163,32 @@ function Registration() {
   const employee = (e) => {
     e.preventDefault();
     console.log(e);
-    if(employeeD.first_name.length < 5){
+    if (employeeD.first_name.length < 5) {
       setErr("Your first name needs to be at least 5 characters long");
       setOpen(true);
-      return
+      return;
     }
-    if(employeeD.last_name.length < 5){
+    if (employeeD.last_name.length < 5) {
       setErr("Your last name needs to be at least 5 characters long");
       setOpen(true);
-      return
+      return;
     }
 
-    if(validateEmail(employeeD.email) === false){
+    if (validateEmail(employeeD.email) === false) {
       setErr("Your email is not valid");
       setOpen(true);
-      return
+      return;
     }
-    if(employeeD.password.length < 8){
+    if (employeeD.password.length < 8) {
       setErr("Your password needs to be atleast 8 characters long");
       setOpen(true);
-      return
+      return;
     }
 
-    if(employeeD.confirmed_password !== employeeD.password){
+    if (employeeD.confirmed_password !== employeeD.password) {
       setErr("Your passwords do not match");
       setOpen(true);
-      return
+      return;
     }
     axios
       .post("http://100.26.17.215:5000/auth/register", {
@@ -417,15 +414,15 @@ function Registration() {
                             InputLabelProps={{
                               shrink: true,
                             }}
-                            
                             onChange={(event) => {
                               setCustomerD({
                                 ...customerD,
                                 age:
-                                  event.target.value < 0 || event.target.value > 119
+                                  event.target.value < 0 ||
+                                  event.target.value > 119
                                     ? (event.target.value = 0)
                                     : Number(event.target.value),
-                              })
+                              });
                             }}
                           />
                           <TextField
@@ -444,10 +441,11 @@ function Registration() {
                               setCustomerD({
                                 ...customerD,
                                 height_feet:
-                                  event.target.value < 0 || event.target.value > 8
+                                  event.target.value < 0 ||
+                                  event.target.value > 8
                                     ? (event.target.value = 0)
                                     : Number(event.target.value),
-                              })
+                              });
                             }}
                           />
                           <TextField
@@ -466,10 +464,11 @@ function Registration() {
                               setCustomerD({
                                 ...customerD,
                                 height_inch:
-                                  event.target.value < 0 || event.target.value > 11
+                                  event.target.value < 0 ||
+                                  event.target.value > 11
                                     ? (event.target.value = 0)
                                     : Number(event.target.value),
-                              })
+                              });
                             }}
                           />
                           <TextField
