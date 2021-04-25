@@ -103,16 +103,6 @@ router.put("/ride-edit", async (req, res) => {
       picture,
     } = req.body;
 
-    const current = await pool.query(
-      `SELECT * FROM ride WHERE name=$1 AND location=$2`,
-      [name, location]
-    );
-
-    if (current.rows.length !== 0) {
-      return res
-        .status(400)
-        .send("Ride with same name and location already exists");
-    }
     const udpateRide = await pool.query(
       `UPDATE ride SET name = $1,
                             description = $2,
@@ -134,6 +124,54 @@ router.put("/ride-edit", async (req, res) => {
     res.json("success");
   } catch (err) {
     res.json("error");
+    console.log(err);
+  }
+});
+
+router.get("/all-maintainence-requests", async (req, res) => {
+  try {
+    const breakdowns = await pool.query(
+      `SELECT * FROM ridebreakdowns, ride, useraccount
+                      WHERE fullfilled=false AND ridebreakdowns.ride_id = ride.ride_id AND ride.attendant_id=useraccount.account_id`
+    );
+
+    // previous query that doesn't give attendant name, if the ids are not properly assigned then above query won't work
+    // const breakdowns = await pool.query(
+    //   `SELECT * FROM ridebreakdowns, ride
+    //                   WHERE maintainer_id IS NULL AND ridebreakdowns.ride_id = ride.ride_id`
+    // );
+
+    res.json(breakdowns.rows);
+  } catch (err) {
+    console.log(err);
+  }
+});
+
+router.get("/all-maintainers", async (req, res) => {
+  try {
+    const maintainers = await pool.query(
+      `SELECT * from useraccount where user_type='maintainer' AND account_id>30`
+    );
+
+    res.json(maintainers.rows);
+  } catch (err) {
+    res.status(500).send("server error");
+    console.log(err);
+  }
+});
+
+router.put("/assign-fix", async (req, res) => {
+  try {
+    const { breakdown_id, maintainer_id } = req.body;
+
+    const updateRequest = await pool.query(
+      `UPDATE ridebreakdowns SET maintainer_id=$1 WHERE breakdown_id=$2 RETURNING *`,
+      [maintainer_id, breakdown_id]
+    );
+
+    res.json(updateRequest.rows[0]);
+  } catch (err) {
+    res.status(500).send("server error");
     console.log(err);
   }
 });
@@ -222,17 +260,6 @@ router.put("/attraction-edit", async (req, res) => {
       age_restriction,
       picture,
     } = req.body;
-
-    const current = await pool.query(
-      `SELECT * FROM attraction WHERE name=$1 AND location=$2`,
-      [name, location]
-    );
-
-    if (current.rows.length !== 0) {
-      return res
-        .status(400)
-        .send("Attraction with same name and location already exists");
-    }
 
     const udpateAttraction = await pool.query(
       `UPDATE attraction SET name = $1,
